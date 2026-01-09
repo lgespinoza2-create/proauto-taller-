@@ -1,0 +1,2903 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Corporación PROAUTO - Tablero de Taller</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    /* REEMPLAZA TU CSS CON ESTE BLOQUE */
+* { box-sizing: border-box; font-family: system-ui, -apple-system, sans-serif; }
+body { margin: 0; padding: 16px; background: #f5f5f7; color: #1a1a1a; }
+
+/* Header AXIS Professional */
+.header-proauto {
+  position: sticky; top: 0; background: #ffffff; z-index: 1000;
+  border-bottom: 1px solid #e6e8ec; display: flex; align-items: center;
+  justify-content: space-between; padding: 10px 20px; margin-bottom: 20px;
+}
+.logo-header { height: 64px; mix-blend-mode: multiply; margin-right: 14px; }
+
+/* Botones Estilo AXIS */
+.btn {
+  border-radius: 999px; padding: 8px 18px; font-size: 12px;
+  border: none; cursor: pointer; font-weight: 600;
+  display: inline-flex; align-items: center; gap: 8px; transition: 0.2s;
+}
+.btn-primary { background: #007dc5; color: white; }
+.btn-secondary { background: #e0e0e0; color: #333; }
+.btn-danger { background: #e53935; color: #fff; }
+
+/* Tarjetas y Columnas Professional */
+.column {
+  background: #ffffff; border-radius: 12px; padding: 12px;
+  min-width: 250px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  border-top: 5px solid #007dc5;
+}
+.card {
+  background: #fff; border-radius: 10px; padding: 12px; margin-bottom: 10px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.08); border-left: 5px solid #007dc5;
+}
+
+/* Auditoría estilo Cebra */
+#tablaAuditoria { width: 100%; border-collapse: collapse; font-size: 12px; background: white; }
+#tablaAuditoria th { background: #f8f9fa; padding: 12px; text-align: left; border-bottom: 2px solid #eee; }
+#tablaAuditoria tr:nth-child(even) { background: #f9fafb; }
+    * {
+      box-sizing: border-box;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    /* Corrige el header para que no se mueva cuando aparece la tarjeta de resumen */
+.header-proauto {
+  position: sticky;
+  top: 0;
+  background: #ffffff;
+  z-index: 1000;
+  border-bottom: 1px solid #e6e8ec;
+}
+/* =====================================
+   ESTILO PROFESIONAL PARA TABLA AUDITORÍA
+===================================== */
+
+#auditoriaBody tr:nth-child(even) {
+    background: #f7f7f7;
+}
+
+#auditoriaBody tr:nth-child(odd) {
+    background: #ffffff;
+}
+
+#auditoriaBody tr:hover {
+    background: #e6f2ff;
+}
+
+#auditoriaBody td, #tablaAuditoria th {
+    padding: 10px 14px;
+    font-size: 13px;
+    border-bottom: 1px solid #ddd;
+}
+
+#tablaAuditoria {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: system-ui, sans-serif;
+    margin-top: 10px;
+    background: white;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+#tablaAuditoria thead {
+    background: #e0e0e0;
+    color: #333;
+    position: sticky;
+    top: 0;
+    z-index: 2;
+}
+
+#tablaAuditoria th {
+    font-weight: 600;
+    text-align: left;
+}
+
+.auditoria-container {
+    max-height: 450px; 
+    overflow-y: auto;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    background: #fff;
+    margin-top: 15px;
+}
+
+#vehicleSummary {
+  position: fixed;
+  top: 110px;
+  right: 16px;
+
+  width: 420px;
+  max-width: calc(100% - 32px);
+
+  background: #f1f4f9;
+  border: 1px solid #d6dbea;
+  border-radius: 12px;
+  padding: 16px 18px;
+
+  box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+  z-index: 2000;
+
+  display: none;
+}
+
+#vehicleSummary.show {
+  display: block;
+}
+
+
+    body {
+      margin: 0;
+      padding: 16px;
+      background: #f5f5f7;
+    }
+
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .logo {
+      height: 42px;
+    }
+    .logo-header {
+     height: 64px;              /* 👈 tamaño ideal */
+     margin-right: 14px;
+       mix-blend-mode: multiply;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 20px;
+    }
+
+    .subtitle {
+      margin: 0;
+      color: #555;
+      font-size: 13px;
+    }
+
+    .top-actions {
+      display: flex;
+      justify-content: flex-end;
+      margin-bottom: 10px;
+      gap: 8px;
+    }
+    .vehicle-summary {
+  margin-top: 12px;
+  margin-bottom: 16px;
+  padding: 10px 16px;
+  background: #f5f7fb;
+  border-radius: 12px;
+  border: 1px solid #dde3f0;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  font-size: 13px;
+  color: #222;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+}
+
+.vehicle-summary.hidden {
+  display: none;
+}
+
+.vs-main {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.vs-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+}
+
+.vs-label {
+  font-weight: 600;
+  color: #555;
+}
+
+.vs-value {
+  font-weight: 500;
+}
+
+.vs-ot {
+  font-style: italic;
+  color: #333;
+}
+
+.vs-separator {
+  color: #aaa;
+}
+
+.vs-close {
+  position: absolute;
+  top: 6px;
+  right: 10px;
+  border: none;
+  background: transparent;
+  font-size: 20px;
+  cursor: pointer;
+  color: #666;
+}
+
+.vs-close:hover {
+  color: #444;
+}
+
+    .btn {
+      border-radius: 999px;
+      padding: 6px 12px;
+      font-size: 12px;
+      border: none;
+      cursor: pointer;
+    }
+
+    .btn-primary {
+      background: #007dc5;
+      color: white;
+    }
+
+    .btn-secondary {
+      background: #e0e0e0;
+      color: #333;
+    }
+
+    .btn-danger {
+      background: #e53935;
+      color: #fff;
+    }
+
+    .btn-link {
+      background: transparent;
+      color: #007dc5;
+      text-decoration: underline;
+      padding: 0;
+      border-radius: 0;
+    }
+
+    .view {
+      display: none;
+    }
+
+    .view.active {
+      display: block;
+    }
+
+    .board {
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+      padding-bottom: 20px;
+      overflow-x: auto;
+      min-height: 320px;
+    }
+
+    .column {
+      background: #ffffff;
+      border-radius: 10px;
+      padding: 8px;
+      min-width: 200px;
+      max-width: 240px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+
+    .column-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 8px;
+    }
+
+    .column-title {
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .column-count {
+      font-size: 11px;
+      color: #777;
+    }
+
+    .dropzone {
+      min-height: 40px;
+      padding: 4px;
+      border-radius: 8px;
+      background: #fafafa;
+    }
+
+    .card {
+      background: #fff;
+      border-radius: 8px;
+      padding: 6px 8px;
+      margin-bottom: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.12);
+      cursor: grab;
+      border-left: 4px solid #007dc5;
+    }
+
+    .card.dragging {
+      opacity: 0.6;
+    }
+
+    .card-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 4px;
+    }
+
+    .plate {
+      font-weight: 700;
+      font-size: 13px;
+    }
+
+    .brand {
+      font-size: 11px;
+      color: #666;
+      text-align: right;
+    }
+
+    .chip {
+      display: inline-block;
+      font-size: 10px;
+      padding: 2px 6px;
+      border-radius: 999px;
+      background: #eee;
+      margin-right: 4px;
+    }
+
+    .chip.insurer {
+      background: #e3f2fd;
+      color: #035388;
+    }
+
+    .chip-client {
+      font-size: 10px;
+      color: #555;
+    }
+
+    .chip-small {
+      font-size: 9px;
+      background: #f3e5f5;
+      color: #5e35b1;
+    }
+    .card-extra {
+      margin-top: 4px;
+      font-size: 10px; 
+      color: #555; 
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+    }
+    .card-ot {
+       margin-top: 6px;
+       font-size: 11px;
+       background: #f5f5f5;
+       padding: 4px 6px;
+        border-radius: 6px;
+       color: #444;
+    }
+
+    .card-extra-item {
+     background: #f5f5f5;
+     border-radius: 999px;
+     padding: 2px 6px;
+    }
+
+    .dropzone.over {
+      outline: 2px dashed #007dc5;
+      background: #e3f2fd;
+    }
+
+    /* Vista formulario */
+    .panel-form {
+      background: #ffffff;
+      border-radius: 10px;
+      padding: 14px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.12);
+    }
+
+    .panel-form h2 {
+      margin: 0 0 8px;
+      font-size: 16px;
+    }
+
+    .panel-form p {
+      margin: 0 0 10px;
+      font-size: 12px;
+      color: #666;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .form-section-title {
+      grid-column: 1 / -1;
+      margin-top: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      color: #333;
+    }
+
+    .form-field {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .form-field label {
+      font-size: 11px;
+      color: #444;
+    }
+
+    .form-field input,
+    .form-field select,
+    .form-field textarea {
+      font-size: 12px;
+      padding: 4px 6px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      outline: none;
+    }
+
+    .form-field input:focus,
+    .form-field select:focus,
+    .form-field textarea:focus {
+      border-color: #007dc5;
+    }
+
+    .checklist-group {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4px 12px;
+      font-size: 11px;
+    }
+
+    .checklist-item {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .checklist-item input {
+      margin: 0;
+    }
+
+    .form-actions {
+      margin-top: 12px;
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .form-actions-right {
+      margin-left: auto;
+      display: flex;
+      gap: 8px;
+    }
+
+    /* Vista detalle */
+    .panel-detalle {
+      background: #ffffff;
+      border-radius: 10px;
+      padding: 14px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.12);
+    }
+
+    .panel-detalle h2 {
+      margin: 0 0 4px;
+      font-size: 16px;
+    }
+
+    .panel-detalle small {
+      color: #666;
+      font-size: 11px;
+    }
+
+    .detalle-header-actions {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 6px;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .detalle-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px 16px;
+      margin-top: 10px;
+      margin-bottom: 10px;
+      font-size: 12px;
+    }
+
+    .detalle-label {
+      font-weight: 600;
+      color: #333;
+    }
+
+    .detalle-value {
+      color: #555;
+    }
+
+    .detalle-subsection-title {
+      margin-top: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      color: #333;
+    }
+
+    .detalle-list {
+      font-size: 11px;
+      color: #555;
+      margin: 4px 0 0;
+      padding-left: 16px;
+    }
+
+    .detalle-archivo a {
+      font-size: 12px;
+    }
+
+    .ordenes-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 6px;
+      margin-top: 10px;
+    }
+
+    .ordenes-list {
+      border: 1px solid #eee;
+      border-radius: 8px;
+      padding: 8px;
+      max-height: 220px;
+      overflow-y: auto;
+      background: #fafafa;
+      margin-bottom: 10px;
+    }
+
+    .orden-item {
+      padding: 6px 8px;
+      border-radius: 6px;
+      background: #fff;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.06);
+      margin-bottom: 6px;
+      font-size: 12px;
+    }
+
+    .orden-item strong {
+      display: block;
+      font-size: 11px;
+      color: #333;
+    }
+
+    /* ===== NUEVO: estilos presupuesto ===== */
+    .presupuesto-resumen {
+      list-style: none;
+      padding-left: 0;
+      margin: 4px 0 6px;
+      font-size: 11px;
+      color: #444;
+    }
+
+    .presupuesto-table {
+      border: 1px solid #eee;
+      border-radius: 8px;
+      overflow: hidden;
+      background: #fafafa;
+      margin-bottom: 8px;
+    }
+
+    .presupuesto-header-row,
+    .presupuesto-row {
+      display: grid;
+      grid-template-columns: 0.8fr 1fr 1.3fr 0.4fr 0.7fr;
+      gap: 4px;
+      padding: 4px 8px;
+      font-size: 11px;
+      align-items: center;
+    }
+
+    .presupuesto-header-row {
+      background: #f0f0f0;
+      font-weight: 600;
+      border-bottom: 1px solid #e0e0e0;
+    }
+
+    .presupuesto-row:nth-child(odd) {
+      background: #ffffff;
+    }
+
+    .presupuesto-row:nth-child(even) {
+      background: #f9f9f9;
+    }
+
+    .presupuesto-importes {
+      text-align: right;
+    }
+    /* ----- Botones de edición y eliminación de órdenes ----- */
+
+.orden-actions {
+  margin-top: 4px;
+  display: flex;
+  gap: 6px;
+}
+
+.orden-btn {
+  border: none;
+  border-radius: 999px;
+  padding: 2px 8px;
+  font-size: 10px;
+  cursor: pointer;
+}
+
+.orden-btn-edit {
+  background: #e3f2fd;
+}
+
+.orden-btn-delete {
+  background: #ffebee;
+}
+
+    .presupuesto-actions {
+  margin-top: 2px;
+  display: flex;
+  gap: 4px;
+  justify-content: flex-end;
+}
+
+.presupuesto-btn {
+  border: none;
+  border-radius: 999px;
+  padding: 1px 6px;
+  font-size: 10px;
+  cursor: pointer;
+}
+
+.presupuesto-btn-edit {
+  background: #e3f2fd;
+}
+
+.presupuesto-btn-delete {
+  background: #ffebee;
+}
+
+
+    .presupuesto-form-inline {
+      display: grid;
+      grid-template-columns: 0.8fr 1fr 1.2fr 0.4fr 0.7fr 1.2fr;
+      gap: 4px;
+      margin-bottom: 4px;
+      font-size: 11px;
+    }
+    .vehicle-summary {
+  background: #eef2f7;
+  border: 1px solid #d0d7e3;
+  padding: 12px 18px;
+  border-radius: 10px;
+  margin-top: 15px;
+  margin-bottom: 20px;
+}
+
+.vehicle-summary.hidden {
+  display: none;
+}
+
+.vs-row {
+  margin-bottom: 6px;
+}
+
+.vs-close {
+  background: transparent;
+  border: none;
+  float: right;
+  font-size: 22px;
+  cursor: pointer;
+}
+
+    .presupuesto-form-inline input,
+    .presupuesto-form-inline select {
+      font-size: 11px;
+      padding: 3px 4px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+
+    .presupuesto-form-actions {
+      display: flex;
+      justify-content: flex-end;
+    }
+
+    @media (max-width: 900px) {
+      .detalle-grid,
+      .form-grid,
+      .checklist-group {
+        grid-template-columns: 1fr;
+      }
+
+      .presupuesto-header-row,
+      .presupuesto-row,
+      .presupuesto-form-inline {
+        grid-template-columns: 1fr;
+      }
+    }
+    .vs-section {
+  margin-bottom: 14px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #e4e7ec;
+}
+
+.vs-section:last-child {
+  border-bottom: none;
+}
+
+.vs-title {
+  font-size: 11px;
+  font-weight: 600;
+  color: #6b7280;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+
+  </style>
+</head>
+<body>
+
+<!-- ==============================
+     LOGIN PROAUTO – INTERFAZ VISUAL (SIN LAVADO)
+     ============================== -->
+<div id="loginScreen"
+     style="
+       position:fixed;top:0;left:0;width:100%;height:100%;
+       background:#eef1f5;display:flex;align-items:center;
+       justify-content:center;z-index:99999;
+       font-family:system-ui;
+     ">
+  
+  <div style="
+      background:white;padding:32px;border-radius:14px;
+      width:360px;box-shadow:0 6px 20px rgba(0,0,0,0.15);
+      text-align:center;
+  ">
+    
+    <!-- LOGO PARA GITHUB -->
+    <div style="height:120px;margin-top:32px;margin-bottom:36px;display:flex;justify-content:center;align-items:center;">
+      <div style="font-size:32px;color:#007dc5;font-weight:bold;">PROAUTO</div>
+    </div>
+
+    <section id="view-login" class="view active" style="padding:40px; text-align:center;">
+    <h2>Ingreso al sistema</h2>
+    <p style="margin-bottom:20px;color:#666;">Ingrese su usuario y contraseña</p>
+
+    <div style="max-width:300px;margin:0 auto;text-align:left;">
+        <label>Usuario</label>
+        <input id="loginUsuario" type="text" class="input" placeholder="usuario" style="width:100%;margin-bottom:10px;">
+
+        <label>Contraseña</label>
+        <input id="loginPassword" type="password" class="input" placeholder="******" style="width:100%;margin-bottom:20px;">
+
+        <button id="btnLogin" class="btn btn-primary" style="width:100%;">Ingresar</button>
+        
+        <p style="margin-top:15px;font-size:12px;color:#666;text-align:center;">
+          <strong>Modo prueba:</strong> Usa cualquier usuario/contraseña
+        </p>
+    </div>
+</section>
+
+  </div>
+</div>
+
+  <header class="header header-proauto">
+    <div class="header-left">
+      <!-- LOGO PARA GITHUB -->
+      <div style="height:64px;margin-right:14px;display:flex;align-items:center;">
+        <div style="font-size:24px;color:#007dc5;font-weight:bold;">PROAUTO</div>
+      </div>
+      <div>
+       <h1>Tablero de vehículos en taller</h1>
+        <p class="subtitle">Gestión visual de órdenes de trabajo - AXIS</p>
+        <p class="subtitle" style="color:#e53935;font-weight:bold;">MODO PRUEBA - Datos en memoria local</p>
+        <!-- RESUMEN DE DATOS DEL VEHÍCULO -->
+    <button id="vs-close" class="vs-close">&times;</button>
+    <div id="vehicle-summary" class="vehicle-summary hidden">
+    <!-- SECCIÓN VEHÍCULO -->
+<div class="vs-section">
+  <div class="vs-title">Vehículo</div>
+
+  <div class="vs-row">
+    <strong><i class="fa-solid fa-id-card"></i> Placa:</strong>
+    <span id="vs-placa"></span>
+  </div>
+
+  <div class="vs-row">
+    <strong><i class="fa-solid fa-fingerprint"></i> VIN:</strong>
+    <span id="vs-vin"></span>
+  </div>
+
+  <div class="vs-row">
+    <strong><i class="fa-solid fa-car-side"></i> Modelo:</strong>
+    <span id="vs-modelo"></span>
+  </div>
+</div>
+
+<!-- SECCIÓN RESPONSABLES -->
+<div class="vs-section">
+  <div class="vs-title">Responsables</div>
+
+  <div class="vs-row">
+    <strong><i class="fa-solid fa-user"></i> Cliente:</strong>
+    <span id="vs-propietario"></span>
+  </div>
+
+  <div class="vs-row">
+    <strong><i class="fa-solid fa-shield-halved"></i> Aseguradora:</strong>
+    <span id="vs-aseguradora"></span>
+  </div>
+
+  <div class="vs-row">
+    <strong><i class="fa-solid fa-user-tie"></i> Asesor:</strong>
+    <span id="vs-asesor"></span>
+  </div>
+
+  <div class="vs-row">
+    <strong><i class="fa-solid fa-user-gear"></i> Técnico:</strong>
+    <span id="vs-tecnico"></span>
+  </div>
+</div>
+
+<!-- SECCIÓN ESTADO -->
+<div class="vs-section">
+  <div class="vs-title">Estado</div>
+
+  <div class="vs-row">
+    <strong><i class="fa-solid fa-calendar-plus"></i> Ingreso:</strong>
+    <span id="vs-fecha-ing"></span>
+  </div>
+
+  <div class="vs-row">
+    <strong><i class="fa-solid fa-calendar-check"></i> Entrega:</strong>
+    <span id="vs-fecha-sal"></span>
+  </div>
+
+  <div class="vs-row">
+    <strong><i class="fa-solid fa-diagram-project"></i> Estado:</strong>
+    <span id="vs-estado"></span>
+  </div>
+
+  <div class="vs-row">
+    <strong><i class="fa-solid fa-clipboard-list"></i> Última OT:</strong>
+    <span id="vs-ot"></span>
+  </div>
+</div>
+
+
+
+
+
+      </div>
+    </div>
+  </header>
+
+  <div class="top-actions">
+    <button id="btnVerTablero" class="btn btn-secondary">
+      <i class="fa-solid fa-table-columns"></i> Ver tablero
+    </button>
+
+    <button id="btnAgregarVehiculo" class="btn btn-primary">
+      <i class="fa-solid fa-car"></i> Agregar / editar vehículo
+    </button>
+
+    <button id="btnLogout" class="btn btn-danger">
+      <i class="fa-solid fa-right-from-bracket"></i> Cerrar sesión
+    </button>
+
+    <button id="btnAuditoria" class="btn btn-secondary">
+      <i class="fa-solid fa-clipboard-check"></i> Auditoría
+    </button>
+
+    <button id="btnUsuarios" class="btn btn-secondary">
+      <i class="fa-solid fa-users"></i> Usuarios
+    </button>
+
+    <button id="btnGuardarLocal" class="btn btn-secondary">
+      <i class="fa-solid fa-floppy-disk"></i> Guardar respaldo
+    </button>
+
+    <button id="btnCargarLocal" class="btn btn-secondary">
+      <i class="fa-solid fa-folder-open"></i> Cargar respaldo
+      <input
+      type="file"
+      id="inputCargarLocal"
+      accept="application/json"
+      style="display:none"
+    />
+    </button>
+    
+    <!-- BOTÓN NUEVO PARA GITHUB -->
+    <button id="btnExportarTodo" class="btn btn-secondary">
+      <i class="fa-solid fa-download"></i> Exportar datos
+    </button>
+  </div>
+
+  <!-- VISTA TABLERO -->
+  <div style="display:flex;justify-content:flex-end;margin-bottom:8px;">
+    <input
+      id="searchInput"
+      type="text"
+      placeholder="Buscar por placa, modelo, propietario..."
+      style="padding:4px 8px;border-radius:8px;border:1px solid #ccc;font-size:12px;max-width:220px;width:100%;"
+    >
+  </div>
+  <section id="view-tablero" class="view active">
+    <div class="board" id="board"></div>
+  </section>
+<div id="userInfoBox" style="
+    position: fixed;
+    top: 12px;
+    right: 12px;
+    background: rgba(255, 255, 255, 0.95);
+    padding: 10px 16px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    font-family: system-ui;
+    z-index: 9999;
+    display: none;
+    backdrop-filter: blur(6px);
+">
+    <div style="font-weight:600;font-size:15px;" id="userInfoName"></div>
+    <div style="font-size:12px;color:#444;" id="userInfoRole"></div>
+</div>
+
+
+  <!-- VISTA FORMULARIO -->
+  <section id="view-form" class="view">
+    <div class="panel-form">
+      <h2 id="form-title">Nuevo vehículo</h2>
+      <p id="form-subtitle">Registre los datos del vehículo. Se agregará en el estado <strong>Falta de inspección</strong>.</p>
+
+      <form id="vehicleForm">
+        <div class="form-grid">
+          <div class="form-field">
+            <label for="vin">VIN</label>
+            <input type="text" id="vin" name="vin" placeholder="Ej: 3N1AB7AP4HY123456" />
+          </div>
+          <div class="form-field">
+  <label for="fecha_ingreso">Fecha ingreso</label>
+  <input type="date" id="fecha_ingreso" name="fecha_ingreso">
+</div>
+
+<div class="form-field">
+  <label for="fecha_salida">Fecha salida</label>
+  <input type="date" id="fecha_salida" name="fecha_salida">
+</div>
+
+          <div class="form-field">
+            <label for="placa">Placa *</label>
+            <input type="text" id="placa" name="placa" required placeholder="Ej: ABC1234" />
+          </div>
+
+          <div class="form-field">
+            <label for="modelo">Modelo / Vehículo *</label>
+            <input type="text" id="modelo" name="modelo" list="modelosChevrolet" required placeholder="Ej: Onix Turbo Sedán" />
+            <datalist id="modelosChevrolet">
+              <!-- Modelos Chevrolet Ecuador aproximados -->
+              <option value="Onix Turbo RS"></option>
+              <option value="Onix Turbo Sedán"></option>
+              <option value="Montana"></option>
+              <option value="Nuevo Groove"></option>
+              <option value="Tracker Turbo"></option>
+              <option value="Captiva XL"></option>
+              <option value="Nueva Tahoe"></option>
+              <option value="Nueva Trailblazer"></option>
+              <option value="Suburban"></option>
+              <option value="N400 Cargo"></option>
+              <option value="N400 Pasajeros"></option>
+              <option value="D-Max"></option>
+              <option value="Colorado"></option>
+              <option value="Silverado"></option>
+              <option value="Captiva EV"></option>
+              <option value="Blazer EV"></option>
+              <option value="Equinox EV"></option>
+              <option value="Spark EUV"></option>
+              <option value="NLR 511 EIV"></option>
+              <option value="NMR EIII"></option>
+              <option value="NPR 815 EIII"></option>
+              <option value="NQR 915 EIII"></option>
+              <option value="NQR 1015 EIII"></option>
+              <option value="FRR 1121 EIII"></option>
+              <option value="FTR 1624 EIII"></option>
+              <option value="FVZ 2630 CORTO"></option>
+              <option value="FVR 1730 EIII CORTO"></option>
+              <option value="FVR 1730 EIII LARGO"></option>
+              <option value="FVZ 2630 EIII"></option>
+            </datalist>
+          </div>
+
+          <div class="form-field">
+            <label for="propietario">Propietario *</label>
+            <input type="text" id="propietario" name="propietario" required placeholder="Nombre del cliente" />
+          </div>
+          <div class="form-field">
+            <label for="cedula">Cédula / ID cliente</label>
+             <input type="text" id="cedula" name="cedula" placeholder="Ej: 1102xxxxxx" />
+          </div>
+
+          <div class="form-field">
+            <label for="aseguradora">Aseguradora</label>
+            <select id="aseguradora" name="aseguradora">
+              <option value="">Sin aseguradora</option>
+              <option>Retail</option>
+              <option>CHUBB Seguros</option>
+              <option>Zurich Seguros</option>
+              <option>Latina Seguros</option>
+              <option>AIG Metropolitana</option>
+              <option>VAZ Seguros</option>
+              <option>Seguros Alianza</option>
+              <option>Seguros EquiSuiza</option>
+              <option>Sweaden Seguros</option>
+              <option>Seguros Atlantida</option>
+              <option>Generali</option>
+              <option>Hispana Seguros</option>
+              <option>Seguros Unidos</option>
+              <option>Flota</option>
+              <option>Seguro Constitución</option>
+              <option>Mapfre</option>
+              <option>Aseguradora del Sur</option>
+              <option>Seguros Condor</option>
+            </select>
+          </div>
+
+          <div class="form-field">
+            <label for="asesor">Asesor de servicio</label>
+            <select id="asesor" name="asesor" class="form-select">
+            <option value="">Seleccione asesor</option>
+            <option value="Jhonathan Cevallos">Jhonathan Cevallos</option>
+            <option value="Pablo León">Pablo León</option>
+            <option value="Magno Hugo">Magno Hugo</option>
+            <option value="Marcos Ibarra">Marcos Ibarra</option>
+          </select>
+          </div>
+
+          <div class="form-field">
+            <label for="tecnico">Tecnico encargado</label>
+            <select id="tecnico" name="tecnico">
+              <option value="">Seleccione tecnico</option>
+              <option>ANGEL ANGUISACA</option>
+              <option>CARLOS CAJAMARCA</option>
+              <option>DIEGO CAMPOVERDE</option>
+              <option>JUAN ERAS</option>
+              <option>JORGE SANCHEZ</option>
+              <option>TECNICO TOT</option>
+              <option>ROMAN SACA</option>
+            </select>
+          </div>
+
+         
+
+          <div class="form-section-title">Archivo de orden de trabajo</div>
+          <div class="form-field" style="grid-column: 1 / -1;">
+            <label for="archivo_orden">Adjuntar archivo (PDF, imagen, etc.)</label>
+            <input type="file" id="archivo_orden" name="archivo_orden" />
+          </div>
+          <!-- Datos del cliente -->
+<div class="form-field" style="grid-column: span 2;">
+  <label for="archivos_cliente">Datos del cliente</label>
+  <input type="file" id="archivos_cliente" name="archivos_cliente" multiple>
+</div>
+
+<!-- Autorizaciones -->
+<div class="form-field" style="grid-column: span 2;">
+  <label for="archivos_autorizaciones">Autorizaciones</label>
+  <input type="file" id="archivos_autorizaciones" name="archivos_autorizaciones" multiple>
+</div>
+
+<!-- Proformas y fotos -->
+<div class="form-field" style="grid-column: span 2;">
+  <label for="archivos_proformas">Proformas y Fotos</label>
+  <input type="file" id="archivos_proformas" name="archivos_proformas" multiple>
+</div>
+
+          <div class="form-field">
+           <label for="hora_salida">Hora de entrega</label>
+           <input type="time" id="hora_salida" name="hora_salida">
+          </div>
+
+
+          <div class="form-section-title">Partes afectadas (daños)</div>
+          <div class="form-field" style="grid-column: 1 / -1;">
+            <div class="checklist-group">
+              <label class="checklist-item"><input type="checkbox" name="danos" value="Frontal" /> Frontal</label>
+              <label class="checklist-item"><input type="checkbox" name="danos" value="Posterior" /> Posterior</label>
+              <label class="checklist-item"><input type="checkbox" name="danos" value="Lateral derecho" /> Lateral derecho</label>
+              <label class="checklist-item"><input type="checkbox" name="danos" value="Lateral izquierdo" /> Lateral izquierdo</label>
+              <label class="checklist-item"><input type="checkbox" name="danos" value="Techo" /> Techo</label>
+              <label class="checklist-item"><input type="checkbox" name="danos" value="Interior" /> Interior</label>
+              <label class="checklist-item"><input type="checkbox" name="danos" value="Parabrisas / vidrios" /> Parabrisas / vidrios</label>
+              <label class="checklist-item"><input type="checkbox" name="danos" value="Chasis / estructura" /> Chasis / estructura</label>
+            </div>
+          </div>
+
+          <div class="form-section-title">Equipamiento presente</div>
+          <div class="form-field" style="grid-column: 1 / -1;">
+            <div class="checklist-group">
+              <label class="checklist-item"><input type="checkbox" name="equipamiento" value="Llave / llavero" /> Llave / llavero</label>
+              <label class="checklist-item"><input type="checkbox" name="equipamiento" value="Espejos" /> Espejos</label>
+              <label class="checklist-item"><input type="checkbox" name="equipamiento" value="Radio / carátula" /> Radio / carátula</label>
+              <label class="checklist-item"><input type="checkbox" name="equipamiento" value="Llanta de emergencia" /> Llanta de emergencia</label>
+              <label class="checklist-item"><input type="checkbox" name="equipamiento" value="Llanta de repuesto" /> Llanta de repuesto</label>
+              <label class="checklist-item"><input type="checkbox" name="equipamiento" value="Herramientas" /> Herramientas</label>
+              <label class="checklist-item"><input type="checkbox" name="equipamiento" value="Triángulos" /> Triángulos</label>
+              <label class="checklist-item"><input type="checkbox" name="equipamiento" value="Gata / extintor" /> Gata / extintor</label>
+              <label class="checklist-item"><input type="checkbox" name="equipamiento" value="Alfombras" /> Alfombras</label>
+              <label class="checklist-item"><input type="checkbox" name="equipamiento" value="Aros de lujo / copas" /> Aros de lujo / copas</label>
+              <label class="checklist-item"><input type="checkbox" name="equipamiento" value="Emblemas / logos" /> Emblemas / logos</label>
+              <label class="checklist-item"><input type="checkbox" name="equipamiento" value="Antena" /> Antena</label>
+              <label class="checklist-item"><input type="checkbox" name="equipamiento" value="Otros" /> Otros</label>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <span id="form-mode-indicator" style="font-size:11px;color:#666;"></span>
+          <div class="form-actions-right">
+            <button type="button" id="btnCancelarForm" class="btn btn-secondary">Cancelar</button>
+            <button type="submit" class="btn btn-primary">Guardar vehículo</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </section><!-- ============================
+     VISTA PANEL AUDITORÍA
+============================ -->
+<section id="view-auditoria" class="view">
+  <div class="panel-detalle">
+    <button id="btnVolverDesdeAuditoria" class="btn btn-link">&larr; Volver al tablero</button>
+
+    <h2>Auditoría de movimientos</h2>
+    <p style="font-size:12px;color:#666;">
+      Se registran todos los movimientos de tarjetas realizados en el tablero.
+    </p>
+    <input
+  id="auditoriaSearch"
+  type="text"
+  placeholder="Filtrar por placa..."
+  style="
+    margin: 10px 0;
+    padding: 6px 10px;
+    width: 220px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    font-size: 12px;
+  "
+>
+
+    <div class="auditoria-container">
+  <table id="tablaAuditoria">
+      <thead>
+          <tr>
+              <th>Fecha</th>
+              <th>Hora</th>
+              <th>Usuario</th>
+              <th>Placa</th>
+              <th>Desde</th>
+              <th>Hacia</th>
+              <th>Acción</th>
+              <th>Descripción</th>
+          </tr>
+      </thead>
+      <tbody id="auditoriaBody"></tbody>
+  </table>
+</div>
+</section>
+
+
+  <!-- VISTA DETALLE VEHÍCULO -->
+  <section id="view-detalle" class="view">
+    <div class="panel-detalle">
+      <div class="detalle-header-actions">
+        <button id="btnVolverDesdeDetalle" class="btn btn-link">&larr; Volver al tablero</button>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <button id="btnEditarVehiculo" class="btn btn-secondary">Editar datos</button>
+          <button id="btnEliminarVehiculo" class="btn btn-danger">Eliminar vehículo</button>
+        </div>
+      </div>
+
+
+      <h2 id="detalle-titulo">Detalle del vehículo</h2>
+      <small id="detalle-subtitulo"></small>
+
+      <div class="detalle-grid">
+        <div><span class="detalle-label">VIN:</span> <span id="detalle-vin" class="detalle-value"></span></div>
+        <div><span class="detalle-label">Placa:</span> <span id="detalle-placa" class="detalle-value"></span></div>
+        <div><span class="detalle-label">Modelo:</span> <span id="detalle-modelo" class="detalle-value"></span></div>
+        <div><span class="detalle-label">Propietario:</span> <span id="detalle-propietario" class="detalle-value"></span></div>
+        <div><span class="detalle-label">Cédula:</span> <span id="detalle-cedula" class="detalle-value"></span></div>
+        <div><span class="detalle-label">Aseguradora:</span> <span id="detalle-aseguradora" class="detalle-value"></span></div>
+        <div><span class="detalle-label">Asesor:</span> <span id="detalle-asesor" class="detalle-value"></span></div>
+        <div><span class="detalle-label">Técnico encargado:</span> <span id="detalle-tecnico" class="detalle-value"></span></div>
+        <div><span class="detalle-label">Fecha ingreso:</span> <span id="detalle-fecha-ingreso" class="detalle-value"></span></div>
+        <div><span class="detalle-label">Fecha tentativa salida:</span> <span id="detalle-fecha-salida" class="detalle-value"></span></div>
+        <div><span class="detalle-label">Hora entrega:</span> <span id="detalle-hora-salida" class="detalle-value"></span></div>
+        <div><span class="detalle-label">Estado actual:</span> <span id="detalle-estado" class="detalle-value"></span></div>
+      </div>
+
+      <div class="detalle-subsection-title">Partes afectadas</div>
+      <ul id="detalle-danos" class="detalle-list"></ul>
+
+      <div class="detalle-subsection-title">Equipamiento presente</div>
+      <ul id="detalle-equipamiento" class="detalle-list"></ul>
+
+      <div class="detalle-subsection-title">Orden de trabajo adjunta</div>
+      <div id="detalle-archivo" class="detalle-archivo" style="font-size:12px;color:#555;margin-top:4px;"></div>
+      
+      <div class="detalle-subsection-title">Datos del cliente</div>
+<div id="detalle-archivos-cliente" class="detalle-archivo"></div>
+
+<div class="detalle-subsection-title">Autorizaciones</div>
+<div id="detalle-archivos-autorizaciones" class="detalle-archivo"></div>
+
+<div class="detalle-subsection-title">Proformas y fotos</div>
+<div id="detalle-archivos-proformas" class="detalle-archivo"></div>
+
+      <!-- NUEVA SECCIÓN: PRESUPUESTO -->
+      <div class="detalle-subsection-title">Presupuesto y repuestos</div>
+
+      <div id="presupuesto-resumen" class="presupuesto-resumen">
+        No hay ítems de presupuesto registrados.
+      </div>
+
+      <div class="presupuesto-table">
+        <div class="presupuesto-header-row">
+          <div>Tipo / Grupo</div>
+          <div>Código</div>
+          <div>Descripción</div>
+          <div>Cant.</div>
+          <div class="presupuesto-importes">Valor</div>
+        </div>
+        <div id="presupuesto-list"></div>
+      </div>
+
+      <form id="presupuestoForm">
+        <div class="presupuesto-form-inline">
+          <select id="presupuesto_tipo">
+            <option value="Seguro">Seguro</option>
+            <option value="Privado">Privado</option>
+          </select>
+          <select id="presupuesto_categoria">
+            <option value="Repuesto">Repuesto</option>
+            <option value="Mano de obra">Mano de obra</option>
+            <option value="Servicio tercero">Servicio tercero</option>
+          </select>
+          <input id="presupuesto_codigo" type="text" placeholder="Código" />
+          <input id="presupuesto_desc" type="text" placeholder="Descripción" />
+          <input id="presupuesto_cant" type="number" min="1" step="1" placeholder="Cant." />
+          <input id="presupuesto_valor" type="number" min="0" step="0.01" placeholder="Valor" />
+        </div>
+        <div class="presupuesto-form-actions">
+          <button type="submit" class="btn btn-secondary" style="font-size:11px;padding:4px 10px;">
+            Agregar ítem
+          </button>
+        </div>
+      </form>
+
+      <div class="ordenes-header">
+        <h3 style="margin:0;font-size:14px;">Órdenes de trabajo (anotaciones)</h3>
+        <small>Doble clic en una tarjeta del tablero para ver y agregar órdenes.</small>
+      </div>
+
+      <div id="ordenesList" class="ordenes-list"></div>
+<form id="ordenForm">
+  <div class="form-grid">
+    <div class="form-field" style="grid-column: span 2;">
+      <label for="orden_descripcion">Descripción de la orden *</label>
+      <textarea id="orden_descripcion" name="orden_descripcion" rows="2" placeholder="Ej: Cambio de parachoques delantero, alineación, revisión de sensores." required></textarea>
+    </div>
+  </div>
+  <div class="form-actions">
+    <div></div>
+    <div class="form-actions-right">
+      <button type="submit" class="btn btn-primary">Agregar orden</button>
+    </div>
+  </div>
+</form>
+
+    </div>
+  <script>
+
+    // =========================================
+// LOGIN PROAUTO – USUARIOS Y ROLES (SIN LAVADO)
+// =========================================
+
+// MODIFICADO PARA GITHUB: Login simplificado
+function loginSistema() {
+    const usuarioIngresado = document.getElementById("loginUsuario").value.trim();
+    const passwordIngresado = document.getElementById("loginPassword").value.trim();
+
+    // En modo prueba, aceptamos cualquier credencial
+    if (!usuarioIngresado) {
+        alert("Ingrese un usuario para continuar.");
+        return;
+    }
+
+    // Crear usuario temporal
+    window.currentUser = {
+        id: Date.now(),
+        nombre: usuarioIngresado,
+        usuario: usuarioIngresado,
+        rol: "admin", // Dar permisos completos para pruebas
+        activo: true
+    };
+
+    // Ocultar login
+    document.getElementById("loginScreen").style.display = "none";
+    showView("tablero");
+    aplicarPermisosEnInterfaz();
+    mostrarInfoUsuario();
+
+    // Limpiar campos
+    document.getElementById("loginUsuario").value = "";
+    document.getElementById("loginPassword").value = "";
+    
+    // Mensaje informativo
+    console.log("Modo prueba activado - Los datos se guardan en memoria del navegador");
+}
+
+// FUNCIÓN PARA EXPORTAR TODOS LOS DATOS
+function exportarDatosCompletos() {
+    const datosCompletos = {
+        fechaExportacion: new Date().toISOString(),
+        vehicles: vehicles,
+        auditoria: auditoria,
+        usuarios: JSON.parse(localStorage.getItem("proauto_usuarios") || "[]")
+    };
+    
+    const blob = new Blob([JSON.stringify(datosCompletos, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `proauto-backup-${new Date().toISOString().split('T')[0]}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+    alert("Datos exportados correctamente. Guarda este archivo para restaurar más tarde.");
+}
+
+// FUNCIÓN PARA CARGAR RESPALDO COMPLETO
+function cargarRespaldoCompleto(file) {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        try {
+            const datos = JSON.parse(e.target.result);
+            
+            if (datos.vehicles) vehicles = datos.vehicles;
+            if (datos.auditoria) auditoria = datos.auditoria;
+            if (datos.usuarios) {
+                localStorage.setItem("proauto_usuarios", JSON.stringify(datos.usuarios));
+            }
+            
+            renderBoard();
+            alert("Datos cargados correctamente desde el respaldo.");
+        } catch (error) {
+            alert("Error al cargar el archivo: " + error.message);
+        }
+    };
+    reader.readAsText(file);
+}
+
+let usuariosSistema = [
+    
+    // =====================
+    // ADMINISTRADORES
+    // =====================
+    {
+        id: 1,
+        nombre: "Jhonathan Cevallos",
+        usuario: "jcevallos",
+        rol: "admin",
+        password: "12345",
+        activo: true
+    },
+    {
+        id: 2,
+        nombre: "Pablo León",
+        usuario: "pleon",
+        rol: "admin",
+        password: "12345",
+        activo: true
+    },
+    {
+        id: 3,
+        nombre: "Magno Hugo",
+        usuario: "mhugo",
+        rol: "admin",
+        password: "12345",
+        activo: true
+    },
+    {
+        id: 4,
+        nombre: "Marcos Ibarra",
+        usuario: "mibarra",
+        rol: "admin",
+        password: "12345",
+        activo: true
+    },
+
+    // =====================
+    // TÉCNICOS
+    // =====================
+    {
+        id: 10,
+        nombre: "Angel Anguisaca",
+        usuario: "aanguisaca",
+        rol: "tecnico",
+        password: "12345",
+        activo: true
+    },
+    {
+        id: 11,
+        nombre: "Carlos Cajamarca",
+        usuario: "ccajamarca",
+        rol: "tecnico",
+        password: "12345",
+        activo: true
+    },
+    {
+        id: 12,
+        nombre: "Diego Campoverde",
+        usuario: "dcampoverde",
+        rol: "tecnico",
+        password: "12345",
+        activo: true
+    },
+    {
+        id: 13,
+        nombre: "Juan Eras",
+        usuario: "jeras",
+        rol: "tecnico",
+        password: "12345",
+        activo: true
+    },
+    {
+        id: 14,
+        nombre: "Jorge Sanchez",
+        usuario: "jsanchez",
+        rol: "tecnico",
+        password: "12345",
+        activo: true
+    },
+    {
+        id: 15,
+        nombre: "Tecnico Tot",
+        usuario: "ttot",
+        rol: "tecnico",
+        password: "12345",
+        activo: true
+    },
+    {
+        id: 16,
+        nombre: "Externo",
+        usuario: "externo1",
+        rol: "tecnico",
+        password: "12345",
+        activo: true
+    },
+    {
+        id: 17,
+        nombre: "Roman Saca",
+        usuario: "rsaca",
+        rol: "tecnico",
+        password: "12345",
+        activo: true
+    }
+];
+
+localStorage.setItem("proauto_usuarios", JSON.stringify(usuariosSistema));
+if (!localStorage.getItem("proauto_usuarios")) {
+    localStorage.setItem("proauto_usuarios", JSON.stringify(usuariosSistema));
+}
+
+// Permisos por rol
+const PERMISOS = {
+  admin: {
+    mover: true,
+    editarVehiculo: true,
+    eliminarVehiculo: true,
+    agregarOT: true,
+    editarPresupuesto: true
+  },
+  asesor: {
+    mover: true,
+    editarVehiculo: true,
+    eliminarVehiculo: false,
+    agregarOT: true,
+    editarPresupuesto: true
+  },
+  tecnico: {
+    mover: true,   // pero con restricciones (las controlaremos abajo)
+    editarVehiculo: false,
+    eliminarVehiculo: false,
+    agregarOT: false,
+    editarPresupuesto: false
+  }
+};
+
+function mostrarResumen() {
+  document.getElementById("vehicle-summary")?.classList.remove("hidden");
+}
+
+function ocultarResumen() {
+  document.getElementById("vehicle-summary")?.classList.add("hidden");
+}
+
+function aplicarPermisosEnInterfaz() {
+
+    const role = currentUser.rol;
+
+    const btnAuditoria = document.getElementById("btnAuditoria");
+    const btnUsuarios  = document.getElementById("btnUsuarios");
+    const btnAgregar   = document.getElementById("btnAgregarVehiculo");
+    const btnEditar    = document.getElementById("btnEditarVehiculo");
+    const btnEliminar  = document.getElementById("btnEliminarVehiculo");
+    const presupuestoForm = document.getElementById("presupuestoForm");
+
+    // 🔁 RESET GENERAL (CLAVE)
+    btnAgregar.style.display = "inline-block";
+    btnEditar.style.display = "inline-block";
+    btnEliminar.style.display = "inline-block";
+    presupuestoForm.style.display = "block";
+
+    btnAuditoria.style.display = "none";
+    btnUsuarios.style.display = "none";
+
+    // 🔐 PERMISOS POR ROL
+    if (role === "admin") {
+        btnAuditoria.style.display = "inline-block";
+        btnUsuarios.style.display = "inline-block";
+    }
+
+    if (role === "tecnico") {
+        btnAgregar.style.display = "none";
+        btnEditar.style.display = "none";
+        btnEliminar.style.display = "none";
+        presupuestoForm.style.display = "none";
+
+        setTimeout(() => {
+            document
+              .querySelectorAll(".presupuesto-btn-edit, .presupuesto-btn-delete")
+              .forEach(b => b.style.display = "none");
+        }, 200);
+    }
+}
+
+    const STATUS_COLUMNS = [
+       { id: "falta_inspeccion", label: "Falta de inspección" },
+       { id: "falta_autorizacion", label: "Falta de autorización" },
+      { id: "autorizado", label: "Autorizado" },   // 🔵 AQUI SE AGREGA
+      { id: "espera_servicio", label: "Espera servicio" },
+      { id: "enderezado", label: "Enderezado" },
+      { id: "preparado", label: "Preparado" },
+      { id: "pintura", label: "Pintura" },
+      { id: "listo", label: "Control de Calidad" }, 
+      { id: "en_lavado", label: "En lavado" },
+      { id: "entregado", label: "Entregado" },
+      { id: "perdida_total", label: "Pérdida total" }
+      ];
+      const STATUS_ICONS = {
+  falta_inspeccion: "fa-magnifying-glass",
+  falta_autorizacion: "fa-circle-xmark",
+  autorizado: "fa-circle-check",
+  espera_servicio: "fa-clock",
+  enderezado: "fa-screwdriver-wrench",
+  preparado: "fa-layer-group",
+  pintura: "fa-spray-can",
+  listo: "fa-check-double",
+  en_lavado: "fa-water",
+  entregado: "fa-truck",
+  perdida_total: "fa-triangle-exclamation"
+};
+
+    let vehicles = [
+      {
+        id: 1,
+        vin: "3N1AB7AP4HY000001",
+        placa: "NC01020",
+        modelo: "Hyundai Elantra GLS 1.6 2013",
+        propietario: "Fabián Souza",
+        aseguradora: "Allianz",
+        asesor: "Rafael Coetano",
+        fecha_ingreso: "2025-01-02",
+        fecha_salida: "2025-01-10",
+        estado: "preparado",
+        danos: ["Frontal", "Parabrisas / vidrios"],
+        equipamiento: ["Llave / llavero", "Llanta de emergencia", "Herramientas", "Triángulos"],
+        archivoOrden: null,
+        presupuesto: [
+          { id: 1, tipo: "Seguro", categoria: "Repuesto", codigo: "PAR-DEL", descripcion: "Parachoques delantero", cantidad: 1, valor: 110.8 },
+          { id: 2, tipo: "Seguro", categoria: "Mano de obra", codigo: "", descripcion: "Desmontaje y montaje frontal", cantidad: 1, valor: 80.0 }
+        ],
+        ordenes: [
+          { id: 101, fecha: "2025-01-03", hora: "10:15", descripcion: "Inspección inicial de daños por colisión frontal." },
+          { id: 102, fecha: "2025-01-04", hora: "15:40", descripcion: "Solicitud de repuestos a aseguradora." }
+        ]
+      },
+      {
+        id: 2,
+        vin: "3N1AB7AP4HY000002",
+        placa: "GI00789",
+        modelo: "Kia Rio 1.4",
+        propietario: "María López",
+        aseguradora: "QBE",
+        asesor: "Guillermo Espinoza",
+        fecha_ingreso: "2025-01-05",
+        fecha_salida: "2025-01-12",
+        estado: "falta_autorizacion",
+        danos: ["Posterior"],
+        equipamiento: ["Llave / llavero", "Radio / carátula"],
+        archivoOrden: null,
+        presupuesto: [],
+        ordenes: [
+          { id: 201, fecha: "2025-01-05", hora: "09:05", descripcion: "Ingreso a taller y registro fotográfico." }
+        ]
+      },
+      {
+        id: 3,
+        vin: "3N1AB7AP4HY000003",
+        placa: "AZZ1234",
+        modelo: "Chevrolet Spark GT",
+        propietario: "Carlos Pérez",
+        aseguradora: "Latina Seguros",
+        asesor: "Lenin Piedra",
+        fecha_ingreso: "2025-01-03",
+        fecha_salida: "2025-01-11",
+        estado: "espera_servicio",
+        danos: [],
+        equipamiento: ["Llanta de repuesto", "Herramientas"],
+        archivoOrden: null,
+        presupuesto: [],
+        ordenes: []
+      },
+      {
+        id: 4,
+        vin: "3N1AB7AP4HY000004",
+        placa: "GIO001",
+        modelo: "Nissan Versa",
+        propietario: "Juan Herrera",
+        aseguradora: "Mapfre",
+        asesor: "Xavier Farfán",
+        fecha_ingreso: "2024-12-28",
+        fecha_salida: "2025-01-05",
+        estado: "entregado",
+        danos: ["Lateral derecho"],
+        equipamiento: ["Llave / llavero", "Llanta de emergencia", "Herramientas", "Triángulos"],
+        archivoOrden: null,
+        presupuesto: [],
+        ordenes: [
+          { id: 401, fecha: "2024-12-29", hora: "11:30", descripcion: "Reparación de panel trasero y pintado completo." },
+          { id: 402, fecha: "2025-01-03", hora: "16:00", descripcion: "Control de calidad y entrega." }
+        ]
+      },
+    ];
+
+    const board = document.getElementById("board");
+    const form = document.getElementById("vehicleForm");
+    const viewTablero = document.getElementById("view-tablero");
+    const viewForm = document.getElementById("view-form");
+    const viewDetalle = document.getElementById("view-detalle");
+    const searchInput = document.getElementById("searchInput");
+
+    const btnAgregarVehiculo = document.getElementById("btnAgregarVehiculo");
+    const btnVerTablero = document.getElementById("btnVerTablero");
+    const btnCancelarForm = document.getElementById("btnCancelarForm");
+
+    const btnVolverDesdeDetalle = document.getElementById("btnVolverDesdeDetalle");
+    const btnEditarVehiculo = document.getElementById("btnEditarVehiculo");
+    const btnEliminarVehiculo = document.getElementById("btnEliminarVehiculo");
+
+    const formTitle = document.getElementById("form-title");
+    const formSubtitle = document.getElementById("form-subtitle");
+    const formModeIndicator = document.getElementById("form-mode-indicator");
+
+    const detalleTitulo = document.getElementById("detalle-titulo");
+    const detalleSubtitulo = document.getElementById("detalle-subtitulo");
+    const detalleVin = document.getElementById("detalle-vin");
+    const detallePlaca = document.getElementById("detalle-placa");
+    const detalleModelo = document.getElementById("detalle-modelo");
+    const detallePropietario = document.getElementById("detalle-propietario");
+    const detalleAseguradora = document.getElementById("detalle-aseguradora");
+    const detalleAsesor = document.getElementById("detalle-asesor");
+    const detalleFechaIngreso = document.getElementById("detalle-fecha-ingreso");
+    const detalleFechaSalida = document.getElementById("detalle-fecha-salida");
+    const detalleEstado = document.getElementById("detalle-estado");
+    const detalleDanos = document.getElementById("detalle-danos");
+    const detalleEquipamiento = document.getElementById("detalle-equipamiento");
+    const detalleArchivo = document.getElementById("detalle-archivo");
+    const ordenesList = document.getElementById("ordenesList");
+    const ordenForm = document.getElementById("ordenForm");
+    const detalleCedula = document.getElementById("detalle-cedula");
+    const detalleTecnico = document.getElementById("detalle-tecnico");
+
+    const presupuestoResumen = document.getElementById("presupuesto-resumen");
+    const presupuestoList = document.getElementById("presupuesto-list");
+    const presupuestoForm = document.getElementById("presupuestoForm");
+
+    let draggedCardId = null;
+    let currentVehicleId = null;
+    let editingVehicleId = null;
+    let searchQuery = "";
+    // ===============================
+// AUDITORÍA DE MOVIMIENTOS
+// ===============================
+    let auditoria = [];
+function showView(name) {
+    document.querySelectorAll(".view").forEach(v => v.classList.remove("active"));
+
+    if (name === "login") document.getElementById("view-login").classList.add("active");
+    if (name === "tablero") document.getElementById("view-tablero").classList.add("active");
+    if (name === "form") document.getElementById("view-form").classList.add("active");
+    if (name === "detalle") document.getElementById("view-detalle").classList.add("active");
+    if (name === "auditoria") document.getElementById("view-auditoria").classList.add("active");
+    if (name === "usuarios") document.getElementById("view-usuarios").classList.add("active");
+}
+
+
+
+
+    function resetFormSelectionGroups() {
+      document.querySelectorAll('input[name="danos"]').forEach(chk => chk.checked = false);
+      document.querySelectorAll('input[name="equipamiento"]').forEach(chk => chk.checked = false);
+    }
+    // Procesar archivos múltiples y generar URLs temporales
+function procesarArchivosDesdeInput(input) {
+    const archivos = [];
+    if (input && input.files && input.files.length > 0) {
+        for (const f of input.files) {
+            archivos.push({
+                nombre: f.name,
+                url: URL.createObjectURL(f)
+            });
+        }
+    }
+    return archivos;
+}
+
+    function openFormNew() {
+      editingVehicleId = null;
+      form.reset();
+      resetFormSelectionGroups();
+      formTitle.textContent = "Nuevo vehículo";
+      formSubtitle.textContent = "Registre los datos del vehículo. Se agregará en el estado \"Falta de inspección\".";
+      formModeIndicator.textContent = "Modo: creación";
+      showView("form");
+    }
+
+    function openFormEdit(vehicleId) {
+      const v = vehicles.find(v => v.id === vehicleId);
+      if (!v) return;
+      editingVehicleId = vehicleId;
+
+      formTitle.textContent = "Editar vehículo";
+      formSubtitle.textContent = "Actualice los datos del vehículo. El estado se mantiene según el tablero.";
+      formModeIndicator.textContent = "Modo: edición de " + v.placa;
+
+      form.reset();
+      resetFormSelectionGroups();
+
+      form.elements["vin"].value = v.vin || "";
+      form.elements["placa"].value = v.placa || "";
+      form.elements["modelo"].value = v.modelo || "";
+      form.elements["propietario"].value = v.propietario || "";
+      form.elements["aseguradora"].value = v.aseguradora || "";
+      form.elements["asesor"].value = v.asesor || "";
+      form.elements["cedula"].value = v.cedula || "";
+      form.elements["tecnico"].value = v.tecnico || "";
+      form.elements["fecha_ingreso"].value = v.fecha_ingreso || "";
+      form.elements["fecha_salida"].value = v.fecha_salida || "";
+      // limpiar inputs de archivos adicionales
+      form.elements["archivos_cliente"].value = "";
+      form.elements["archivos_autorizaciones"].value = "";
+      form.elements["archivos_proformas"].value = "";
+
+
+      if (Array.isArray(v.danos)) {
+        document.querySelectorAll('input[name="danos"]').forEach(chk => {
+          chk.checked = v.danos.includes(chk.value);
+        });
+      }
+      if (Array.isArray(v.equipamiento)) {
+        document.querySelectorAll('input[name="equipamiento"]').forEach(chk => {
+          chk.checked = v.equipamiento.includes(chk.value);
+        });
+      }
+
+      const archivoInput = document.getElementById("archivo_orden");
+      archivoInput.value = "";
+
+      showView("form");
+    }
+
+    btnAgregarVehiculo.addEventListener("click", () => {
+      openFormNew();
+    });
+    document.getElementById("btnAuditoria").addEventListener("click", () => {
+    renderAuditoria();
+    showView("auditoria");
+    });
+    document.getElementById("auditoriaSearch").addEventListener("input", () => {
+    renderAuditoria();
+    });
+
+
+const inputCargarLocal = document.getElementById("inputCargarLocal");
+
+if (inputCargarLocal) {
+  inputCargarLocal.addEventListener("change", (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      try {
+        const data = JSON.parse(reader.result);
+        vehicles = data.vehicles || [];
+        auditoria = data.auditoria || [];
+        renderBoard();
+        alert("Respaldo cargado correctamente");
+      } catch (err) {
+        alert("Archivo inválido");
+      }
+    };
+    reader.readAsText(file);
+  });
+}
+
+
+
+
+    document.getElementById("btnVolverDesdeAuditoria").addEventListener("click", () => {
+  showView("tablero");
+});
+
+    searchInput.addEventListener("input", function () {
+      searchQuery = this.value;
+      renderBoard();
+    });
+    btnEliminarVehiculo.addEventListener("click", () => {
+  if (!PERMISOS[window.currentUser.rol].eliminarVehiculo) {
+    alert("No tiene permisos para eliminar vehículos.");
+    return;
+  }
+
+  // ... resto del código original
+});
+function renderAuditoria() {
+    const body = document.getElementById("auditoriaBody");
+    body.innerHTML = "";
+
+    const search =
+      (document.getElementById("auditoriaSearch")?.value || "")
+        .toLowerCase()
+        .trim();
+
+    const registros = [...auditoria]
+        .reverse()
+        .filter(reg => {
+            if (!search) return true;
+            return reg.placa && reg.placa.toLowerCase().includes(search);
+        });
+
+    registros.forEach(reg => {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+            <td>${reg.fecha}</td>
+            <td>${reg.hora}</td>
+            <td>${reg.usuario}</td>
+            <td>${reg.placa}</td>
+            <td>${reg.desde || "-"}</td>
+            <td>${reg.hacia || "-"}</td>
+            <td>${reg.accion || "-"}</td>
+            <td>${reg.descripcion || "-"}</td>
+        `;
+        body.appendChild(row);
+    });
+}
+
+
+
+
+
+    btnVerTablero.addEventListener("click", () => {
+      showView("tablero");
+    });
+    
+    btnCancelarForm.addEventListener("click", () => {
+      form.reset();
+      resetFormSelectionGroups();
+      editingVehicleId = null;
+      showView("tablero");
+    });
+
+    btnVolverDesdeDetalle.addEventListener("click", () => {
+      showView("tablero");
+    });
+    // =====================
+// BOTÓN CERRAR SESIÓN
+// =====================
+document.getElementById("btnLogout").addEventListener("click", () => {
+  // Limpiar usuario actual
+  currentUser = null;
+  window.currentUser = null;
+
+  // Ocultar info de usuario
+  document.getElementById("userInfoBox").style.display = "none";
+
+  // Ocultar vistas
+  document.querySelectorAll(".view").forEach(v => v.classList.remove("active"));
+
+  // Mostrar login
+  document.getElementById("loginScreen").style.display = "flex";
+  showView("login");
+});
+
+
+// ===============================
+// GUARDAR RESPALDO LOCAL
+// ===============================
+document.getElementById("btnGuardarLocal").addEventListener("click", () => {
+  const data = {
+    fecha: new Date().toISOString(),
+    usuarios: JSON.parse(localStorage.getItem("proauto_usuarios") || "[]"),
+    auditoria,
+    vehicles
+  };
+
+  const json = JSON.stringify(data, null, 2);
+  const blob = new Blob([json], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "pizarra-proauto-backup.json";
+  a.click();
+
+  URL.revokeObjectURL(url);
+});
+
+// ===============================
+// CARGAR RESPALDO LOCAL
+// ===============================
+document.addEventListener("DOMContentLoaded", () => {
+document.getElementById("btnCargarLocal")?.addEventListener("click", cargarLocal);
+});
+
+
+  // Mostrar login nuevamente
+  //document.getElementById("loginScreen").style.display = "flex";
+
+
+    btnEditarVehiculo.addEventListener("click", () => {
+      if (!currentVehicleId) return;
+      openFormEdit(currentVehicleId);
+    });
+
+    btnEliminarVehiculo.addEventListener("click", () => {
+      if (!currentVehicleId) return;
+      const v = vehicles.find(v => v.id === currentVehicleId);
+      const confirmMsg = "¿Eliminar el vehículo " + (v ? v.placa : "") + " del tablero? Esta acción no se puede deshacer.";
+      if (!confirm(confirmMsg)) return;
+      vehicles = vehicles.filter(v => v.id !== currentVehicleId);
+      currentVehicleId = null;
+      renderBoard();
+      showView("tablero");
+    });
+function renderBoard() {
+  board.innerHTML = "";
+
+  // aplicar filtro si existe búsqueda
+  const q = (searchQuery || "").toLowerCase().trim();
+  const data = q
+    ? vehicles.filter(v => {
+        const campos = [
+          v.placa,
+          v.modelo,
+          v.propietario,
+          v.aseguradora,
+          v.asesor,
+          v.tecnico,
+          v.cedula,
+          v.subfase
+        ];
+        return campos.some(campo =>
+          campo && campo.toLowerCase().includes(q)
+        );
+      })
+    : vehicles;
+
+  STATUS_COLUMNS.forEach(col => {
+    const columnEl = document.createElement("div");
+    columnEl.className = "column";
+
+    const headerEl = document.createElement("div");
+    headerEl.className = "column-header";
+
+    const titleEl = document.createElement("div");
+    titleEl.className = "column-title";
+    titleEl.innerHTML = `<i class="fa-solid ${STATUS_ICONS[col.id] || "fa-circle"}"></i> ${col.label}`;
+
+
+    const count = data.filter(v => v.estado === col.id).length;
+    const countEl = document.createElement("div");
+    countEl.className = "column-count";
+    countEl.textContent = count;
+
+    headerEl.appendChild(titleEl);
+    headerEl.appendChild(countEl);
+    columnEl.appendChild(headerEl);
+
+
+    // 🔧 COLUMNA NORMAL (para todas excepto "en servicio")
+    const dropzone = document.createElement("div");
+    dropzone.className = "dropzone";
+    dropzone.dataset.status = col.id;
+
+    dropzone.addEventListener("dragover", handleDragOver);
+    dropzone.addEventListener("dragleave", handleDragLeave);
+    dropzone.addEventListener("drop", handleDrop);
+
+    data
+      .filter(v => v.estado === col.id)
+      .forEach(vehicle => {
+        const card = createCard(vehicle);
+        dropzone.appendChild(card);
+      });
+
+    columnEl.appendChild(dropzone);
+    board.appendChild(columnEl);
+  });
+}
+    function showVehicleSummary(vehicle) {
+  const bar = document.getElementById("vehicle-summary");
+  if (!bar) return;
+
+  document.getElementById("vs-placa").textContent = vehicle.placa || "—";
+  document.getElementById("vs-vin").textContent = vehicle.vin || "—";
+  document.getElementById("vs-modelo").textContent = vehicle.modelo || "—";
+
+  document.getElementById("vs-propietario").textContent = vehicle.propietario || "—";
+  document.getElementById("vs-aseguradora").textContent = vehicle.aseguradora || "—";
+  document.getElementById("vs-asesor").textContent = vehicle.asesor || "—";
+  document.getElementById("vs-tecnico").textContent = vehicle.tecnico || "—";
+
+  document.getElementById("vs-fecha-ing").textContent = vehicle.fecha_ingreso || "—";
+  document.getElementById("vs-fecha-sal").textContent = vehicle.fecha_salida || "—";
+
+  const estadoObj = STATUS_COLUMNS.find(e => e.id === vehicle.estado);
+  document.getElementById("vs-estado").textContent =
+    estadoObj ? estadoObj.label : vehicle.estado;
+
+  // Última OT
+  const ultima = vehicle.ordenes?.length ? vehicle.ordenes[vehicle.ordenes.length - 1] : null;
+  document.getElementById("vs-ot").textContent =
+    ultima ? ultima.descripcion : "Sin OT";
+
+  bar.classList.remove("hidden");
+}
+
+document.getElementById("vs-close").addEventListener("click", () => {
+  document.getElementById("vehicle-summary").classList.add("hidden");
+});
+
+
+
+ function createCard(vehicle) {
+  const card = document.createElement("div");
+  card.className = "card";
+  card.draggable = true;
+  card.dataset.id = vehicle.id;
+  card.addEventListener("click", () => {
+  showVehicleSummary(vehicle);
+  mostrarResumen();
+  });
+  // última OT (anotación) para mostrar en la tarjeta
+  const ultimaOrden =
+    vehicle.ordenes && vehicle.ordenes.length > 0
+      ? vehicle.ordenes[vehicle.ordenes.length - 1]
+      : null;
+
+  // drag & drop
+  card.addEventListener("dragstart", handleDragStart);
+  card.addEventListener("dragend", handleDragEnd);
+
+  // doble clic -> abre detalle grande
+  card.addEventListener("dblclick", () => {
+    openVehicleDetail(vehicle.id);
+  });
+
+  // un clic -> muestra barra resumen arriba
+  card.addEventListener("click", () => {
+    showVehicleSummary(vehicle);
+  });
+
+  const top = document.createElement("div");
+  top.className = "card-top";
+
+  const plate = document.createElement("div");
+  plate.className = "plate";
+  plate.textContent = vehicle.placa;
+
+  const brand = document.createElement("div");
+  brand.className = "brand";
+  brand.textContent = vehicle.modelo;
+
+  top.appendChild(plate);
+  top.appendChild(brand);
+
+  const chipsLine = document.createElement("div");
+
+  if (vehicle.aseguradora) {
+    const insurerChip = document.createElement("span");
+    insurerChip.className = "chip insurer";
+    insurerChip.textContent = vehicle.aseguradora;
+    chipsLine.appendChild(insurerChip);
+  }
+
+  const clientChip = document.createElement("span");
+  clientChip.className = "chip-client";
+  clientChip.textContent = vehicle.propietario || "";
+  chipsLine.appendChild(clientChip);
+
+  if (vehicle.asesor) {
+    const advisorChip = document.createElement("span");
+    advisorChip.className = "chip chip-small";
+    advisorChip.textContent = "Asesor: " + vehicle.asesor;
+    chipsLine.appendChild(advisorChip);
+  }
+
+  card.appendChild(top);
+  card.appendChild(chipsLine);
+
+  // Descripción de la última OT
+  if (ultimaOrden) {
+    const ot = document.createElement("div");
+    ot.className = "card-ot";
+    ot.textContent = "OT: " + ultimaOrden.descripcion;
+    card.appendChild(ot);
+  }
+
+  // línea extra con técnico, cédula y fecha/hora entrega
+  const extra = document.createElement("div");
+extra.className = "card-extra";
+
+const spanTec = document.createElement("span");
+spanTec.className = "card-extra-item";
+spanTec.innerHTML = `<i class="fa-solid fa-user-gear"></i> ${vehicle.tecnico || "—"}`;
+
+const spanCed = document.createElement("span");
+spanCed.className = "card-extra-item";
+spanCed.innerHTML = `<i class="fa-solid fa-id-card-clip"></i> ${vehicle.cedula || "—"}`;
+
+const spanEnt = document.createElement("span");
+spanEnt.className = "card-extra-item";
+spanEnt.innerHTML = `<i class="fa-solid fa-calendar-day"></i> ${vehicle.fecha_salida || "—"}`;
+
+extra.appendChild(spanTec);
+extra.appendChild(spanCed);
+extra.appendChild(spanEnt);
+
+card.appendChild(extra);
+
+
+
+  return card;
+}
+
+
+
+    function handleDragStart(e) {
+      draggedCardId = Number(e.target.dataset.id);
+      e.target.classList.add("dragging");
+      e.dataTransfer.effectAllowed = "move";
+    }
+
+    function handleDragEnd(e) {
+      e.target.classList.remove("dragging");
+    }
+
+    function handleDragOver(e) {
+      e.preventDefault();
+      e.currentTarget.classList.add("over");
+      e.dataTransfer.dropEffect = "move";
+    }
+
+    function handleDragLeave(e) {
+      e.currentTarget.classList.remove("over");
+    }
+
+function handleDrop(e) {
+    e.preventDefault();
+
+    const dropzone = e.currentTarget;
+    const newStatus = dropzone.dataset.status;
+
+    const vehicle = vehicles.find(v => v.id == draggedCardId);
+    if (!vehicle) return;
+
+    const oldStatus = vehicle.estado;
+
+    // ============================
+    // RESTRICCIONES PARA TÉCNICOS
+    // ============================
+    // ============================
+// RESTRICCIONES PARA TÉCNICOS
+// ============================
+if (window.currentUser && window.currentUser.rol === "tecnico") {
+
+    const columnasTecnico = ["enderezado", "preparado", "pintura", "listo"];
+
+    if (!columnasTecnico.includes(oldStatus)) {
+        alert("No tienes permiso para mover vehículos desde esta columna.");
+        return;
+    }
+
+    if (!columnasTecnico.includes(newStatus)) {
+        alert("No tienes permiso para mover vehículos hacia esa columna.");
+        return;
+    }
+
+    const orden = {
+        enderezado: 1,
+        preparado: 2,
+        pintura: 3,
+        listo: 4
+    };
+
+    if (orden[newStatus] < orden[oldStatus]) {
+        alert("No tienes permiso para retroceder un vehículo.");
+        return;
+    }
+}
+
+
+    // ===========================
+    // SI PASA VALIDACIÓN, MOVER
+    // ===========================
+    vehicle.estado = newStatus;
+
+    const ahora = new Date();
+    auditoria.push({
+        fecha: ahora.toISOString().slice(0, 10),
+        hora: ahora.toTimeString().slice(0, 8),
+        usuario: window.currentUser.nombre,
+        placa: vehicle.placa,
+        desde: STATUS_COLUMNS.find(s => s.id === oldStatus)?.label,
+        hacia: STATUS_COLUMNS.find(s => s.id === newStatus)?.label,
+        accion: "Movimiento",
+        descripcion: `Movido por ${currentUser.nombre}`
+    });
+
+    draggedCardId = null;
+    renderBoard();
+}
+
+
+
+
+
+    function renderPresupuesto(vehicle) {
+  presupuestoResumen.textContent = "";
+  presupuestoList.innerHTML = "";
+
+  const items = vehicle.presupuesto || [];
+  if (items.length === 0) {
+    presupuestoResumen.textContent = "No hay ítems de presupuesto registrados.";
+    return;
+  }
+
+  let totalSeguro = 0;
+  let totalPrivado = 0;
+  let totalGeneral = 0;
+
+  items.forEach((it, index) => {
+    const cant = Number(it.cantidad) || 0;
+    const valUnit = Number(it.valor) || 0;
+    const subtotal = cant * valUnit;
+
+    if (it.tipo === "Seguro") totalSeguro += subtotal;
+    if (it.tipo === "Privado") totalPrivado += subtotal;
+    totalGeneral += subtotal;
+
+    const row = document.createElement("div");
+    row.className = "presupuesto-row";
+    row.innerHTML = `
+      <div><strong>${it.tipo}</strong> - ${it.categoria || ""}</div>
+      <div>${it.codigo || ""}</div>
+      <div>${it.descripcion || ""}</div>
+      <div>${cant || ""}</div>
+      <div class="presupuesto-importes">${subtotal.toFixed(2)}</div>
+    `;
+
+    // 📌 celda donde va el valor + botones
+    const valorCell = row.querySelector(".presupuesto-importes");
+
+    // CONTENEDOR DE BOTONES
+    const actions = document.createElement("div");
+    actions.className = "presupuesto-actions";
+
+    // 🔵 BOTÓN EDITAR
+    const btnEdit = document.createElement("button");
+    btnEdit.textContent = "Editar";
+    btnEdit.className = "presupuesto-btn presupuesto-btn-edit";
+    btnEdit.addEventListener("click", () => {
+      const tipo = prompt("Tipo (Seguro / Privado):", it.tipo || "");
+      if (tipo === null) return;
+
+      const categoria = prompt("Categoría (Repuesto / Mano de obra / Servicio tercero):", it.categoria || "");
+      if (categoria === null) return;
+
+      const codigo = prompt("Código:", it.codigo || "");
+      if (codigo === null) return;
+
+      const descripcion = prompt("Descripción:", it.descripcion || "");
+      if (descripcion === null) return;
+
+      const cantidadStr = prompt("Cantidad:", String(it.cantidad || 1));
+      if (cantidadStr === null) return;
+
+      const valorStr = prompt("Valor unitario:", String(it.valor || 0));
+      if (valorStr === null) return;
+
+      const vIndex = vehicles.findIndex(v => v.id === vehicle.id);
+      if (vIndex === -1) return;
+
+      const item = vehicles[vIndex].presupuesto[index];
+      item.tipo = tipo.trim() || item.tipo;
+      item.categoria = categoria.trim() || item.categoria;
+      item.codigo = codigo.trim();
+      item.descripcion = descripcion.trim();
+      item.cantidad = Number(cantidadStr) || 1;
+      item.valor = Number(valorStr) || 0;
+
+      openVehicleDetail(vehicle.id, false); // refresca detalle
+    });
+
+    // 🔴 BOTÓN ELIMINAR
+    const btnDelete = document.createElement("button");
+    btnDelete.textContent = "Eliminar";
+    btnDelete.className = "presupuesto-btn presupuesto-btn-delete";
+    btnDelete.addEventListener("click", () => {
+      if (!confirm("¿Eliminar este ítem del presupuesto?")) return;
+
+      const vIndex = vehicles.findIndex(v => v.id === vehicle.id);
+      if (vIndex === -1) return;
+
+      vehicles[vIndex].presupuesto.splice(index, 1);
+      openVehicleDetail(vehicle.id, false); // refresca detalle y totales
+    });
+
+    actions.appendChild(btnEdit);
+    actions.appendChild(btnDelete);
+    valorCell.appendChild(actions);
+
+    presupuestoList.appendChild(row);
+  });
+
+  const lines = [];
+  lines.push("Total general: " + totalGeneral.toFixed(2));
+  if (totalSeguro > 0) lines.push("Seguro: " + totalSeguro.toFixed(2));
+  if (totalPrivado > 0) lines.push("Privado: " + totalPrivado.toFixed(2));
+
+  presupuestoResumen.textContent = lines.join("   |   ");
+}
+
+
+    function openVehicleDetail(vehicleId, switchView = true) {
+      const vehicle = vehicles.find(v => v.id === vehicleId);
+      if (!vehicle) return;
+
+      currentVehicleId = vehicleId;
+function renderListaArchivos(lista, contenedorId) {
+  const cont = document.getElementById(contenedorId);
+  cont.innerHTML = "";
+
+  if (!lista || lista.length === 0) {
+    cont.textContent = "No se adjuntaron archivos.";
+    return;
+  }
+
+  lista.forEach(a => {
+    const link = document.createElement("a");
+    link.href = a.base64;
+    link.download = a.nombre;
+    link.textContent = a.nombre;
+    link.style.display = "block";
+    cont.appendChild(link);
+  });
+}
+
+      function showVehicleSummary(vehicle) {
+  const bar = document.getElementById("vehicle-summary");
+  if (!bar) return;
+
+  document.getElementById("vs-placa").textContent = vehicle.placa || "—";
+  document.getElementById("vs-vin").textContent = vehicle.vin || "—";
+  document.getElementById("vs-modelo").textContent = vehicle.modelo || "—";
+
+  document.getElementById("vs-propietario").textContent = vehicle.propietario || "—";
+  document.getElementById("vs-aseguradora").textContent = vehicle.aseguradora || "Sin aseguradora";
+  document.getElementById("vs-asesor").textContent = vehicle.asesor || "—";
+  document.getElementById("vs-tecnico").textContent = vehicle.tecnico || "—";
+
+  document.getElementById("vs-fecha-ing").textContent = vehicle.fecha_ingreso || "—";
+  document.getElementById("vs-fecha-sal").textContent = vehicle.fecha_salida || "—";
+
+  const statusObj = STATUS_COLUMNS.find(c => c.id === vehicle.estado);
+  document.getElementById("vs-estado").textContent = statusObj ? statusObj.label : vehicle.estado;
+
+  const ultimaOrden = vehicle.ordenes?.length
+    ? vehicle.ordenes[vehicle.ordenes.length - 1].descripcion
+    : "Sin OT registrada";
+
+  document.getElementById("vs-ot").textContent = ultimaOrden;
+
+  bar.classList.remove("hidden");
+}
+
+// Cerrar barra resumen
+document.getElementById("vs-close").addEventListener("click", () => {
+  document.getElementById("vehicle-summary").classList.add("hidden");
+});
+
+      detalleTitulo.textContent = vehicle.placa + " - " + vehicle.modelo;
+      detalleSubtitulo.textContent = "Propietario: " + (vehicle.propietario || "—");
+
+      detalleVin.textContent = vehicle.vin || "—";
+      detallePlaca.textContent = vehicle.placa || "—";
+      detalleModelo.textContent = vehicle.modelo || "—";
+      detallePropietario.textContent = vehicle.propietario || "—";
+      detalleAseguradora.textContent = vehicle.aseguradora || "Sin aseguradora";
+      detalleAsesor.textContent = vehicle.asesor || "—";
+      detalleCedula.textContent = vehicle.cedula || "—";
+      detalleTecnico.textContent = vehicle.tecnico || "—";
+      detalleFechaIngreso.textContent = vehicle.fecha_ingreso || "—";
+      detalleFechaSalida.textContent = vehicle.fecha_salida || "—";
+      const detalleHoraSalida = document.getElementById("detalle-hora-salida");
+    detalleHoraSalida.textContent = vehicle.hora_salida || "—";
+
+      const statusObj = STATUS_COLUMNS.find(c => c.id === vehicle.estado);
+      detalleEstado.textContent = statusObj ? statusObj.label : vehicle.estado;
+
+      detalleDanos.innerHTML = "";
+      if (vehicle.danos && vehicle.danos.length > 0) {
+        vehicle.danos.forEach(d => {
+          const li = document.createElement("li");
+          li.textContent = d;
+          detalleDanos.appendChild(li);
+        });
+      } else {
+        const li = document.createElement("li");
+        li.textContent = "Sin daños señalados.";
+        detalleDanos.appendChild(li);
+      }
+
+      detalleEquipamiento.innerHTML = "";
+      if (vehicle.equipamiento && vehicle.equipamiento.length > 0) {
+        vehicle.equipamiento.forEach(d => {
+          const li = document.createElement("li");
+          li.textContent = d;
+          detalleEquipamiento.appendChild(li);
+        });
+      } else {
+        const li = document.createElement("li");
+        li.textContent = "No se registró equipamiento.";
+        detalleEquipamiento.appendChild(li);
+      }
+
+      detalleArchivo.innerHTML = "";
+if (vehicle.archivoOrden && vehicle.archivoOrden.base64) {
+  const link = document.createElement("a");
+  link.href = vehicle.archivoOrden.base64;
+  link.download = vehicle.archivoOrden.nombre || "archivo";
+  link.textContent = "Ver archivo adjunto: " + (vehicle.archivoOrden.nombre || "archivo");
+  detalleArchivo.appendChild(link);
+} else {
+  detalleArchivo.textContent = "No se adjuntó archivo.";
+}
+renderListaArchivos(vehicle.archivosCliente, "detalle-archivos-cliente");
+renderListaArchivos(vehicle.archivosAutorizaciones, "detalle-archivos-autorizaciones");
+renderListaArchivos(vehicle.archivosProformas, "detalle-archivos-proformas");
+
+
+
+      renderPresupuesto(vehicle);
+      renderOrdenes(vehicle);
+
+      if (switchView) {
+        showView("detalle");
+      }
+    }
+    function renderOrdenes(vehicle) {
+  ordenesList.innerHTML = "";
+  const ordenes = vehicle.ordenes || [];
+
+  if (ordenes.length === 0) {
+    const empty = document.createElement("div");
+    empty.textContent = "No hay órdenes registradas aún.";
+    empty.style.fontSize = "12px";
+    empty.style.color = "#777";
+    ordenesList.appendChild(empty);
+    return;
+  }
+
+  ordenes.forEach(o => {
+    const item = document.createElement("div");
+    item.className = "orden-item";
+
+    // ⭐ Combinar fecha + hora automáticamente
+    let fechaTexto = "Sin fecha";
+    if (o.fecha && o.hora) {
+      fechaTexto = `${o.fecha} ${o.hora}`;
+    } else if (o.fecha) {
+      fechaTexto = o.fecha;
+    }
+
+    // Mostrar fecha
+    const fechaEl = document.createElement("strong");
+    fechaEl.textContent = fechaTexto;
+    item.appendChild(fechaEl);
+
+    // Descripción
+    const descEl = document.createElement("div");
+    descEl.textContent = o.descripcion || "";
+    item.appendChild(descEl);
+
+    // Contenedor de botones
+    const actions = document.createElement("div");
+    actions.className = "orden-actions";
+
+    // BOTÓN EDITAR
+    const btnEdit = document.createElement("button");
+    btnEdit.textContent = "Editar";
+    btnEdit.className = "orden-btn orden-btn-edit";
+    btnEdit.addEventListener("click", () => {
+      const nuevaDescripcion = prompt("Editar descripción:", o.descripcion || "");
+      if (nuevaDescripcion === null) return;
+      // Registrar auditoría por edición
+auditoria.push({
+    fecha,
+    hora,
+    usuario: window.currentUser ? window.currentUser.nombre : "Sistema",
+    placa: nuevaOT.placa,
+    desde: "-",
+    hacia: "-",
+    accion: "Nueva OT",
+    descripcion: "INGRESA EL VEHICULO"
+});
+
+
+      const nuevaFecha = prompt("Editar fecha (YYYY-MM-DD HH:MM):", fechaTexto);
+
+      const vIndex = vehicles.findIndex(v => v.id === vehicle.id);
+      if (vIndex === -1) return;
+
+      const oIndex = vehicles[vIndex].ordenes.findIndex(ord => ord.id === o.id);
+      if (oIndex === -1) return;
+
+      vehicles[vIndex].ordenes[oIndex].descripcion = nuevaDescripcion.trim();
+      vehicles[vIndex].ordenes[oIndex].fecha = nuevaFecha || fechaTexto;
+      openVehicleDetail(vehicle.id, false);
+      renderBoard();
+      renderListaArchivos(vehicle.archivosCliente || [], "detalle-archivos-cliente");
+renderListaArchivos(vehicle.archivosAutorizaciones || [], "detalle-archivos-autorizaciones");
+renderListaArchivos(vehicle.archivosProformas || [], "detalle-archivos-proformas");
+
+    });
+
+    // BOTÓN ELIMINAR
+    const btnDelete = document.createElement("button");
+    btnDelete.textContent = "Eliminar";
+    btnDelete.className = "orden-btn orden-btn-delete";
+    btnDelete.addEventListener("click", () => {
+      if (!confirm("¿Eliminar anotación?")) return;
+
+      const vIndex = vehicles.findIndex(v => v.id === vehicle.id);
+      if (vIndex === -1) return;
+
+      const oIndex = vehicles[vIndex].ordenes.findIndex(ord => ord.id === o.id);
+      if (oIndex === -1) return;
+      // Registrar auditoría por eliminación
+auditoria.push({
+    fecha: new Date().toISOString().slice(0, 10),
+    hora: new Date().toTimeString().slice(0, 8),
+    usuario: window.currentUser ? window.currentUser.nombre : "Sistema",
+    placa: vehicle.placa,
+    accion: "Eliminar OT",
+    descripcion: o.descripcion
+});
+
+      vehicles[vIndex].ordenes.splice(oIndex, 1);
+
+      openVehicleDetail(vehicle.id, false);
+      renderBoard();
+    });
+
+    actions.appendChild(btnEdit);
+    actions.appendChild(btnDelete);
+    item.appendChild(actions);
+
+    ordenesList.appendChild(item);
+  });
+}
+
+    async function procesarArchivosMultiple(inputId) {
+  const input = document.getElementById(inputId);
+  if (!input || !input.files || input.files.length === 0) return [];
+
+  const archivos = [];
+
+  for (const file of input.files) {
+    const base64 = await convertirArchivoABase64(file);
+    archivos.push({
+      nombre: file.name,
+      tipo: file.type,
+      base64
+    });
+  }
+  return archivos;
+}
+
+function convertirArchivoABase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+
+
+
+    form.addEventListener("submit", async function (e) {
+  e.preventDefault();
+  const formData = new FormData(form);
+
+  const placa = (formData.get("placa") || "").trim();
+  const modelo = (formData.get("modelo") || "").trim();
+  const propietario = (formData.get("propietario") || "").trim();
+  const cedula = (formData.get("cedula") || "").trim();
+
+  if (!placa || !modelo || !propietario) {
+    alert("Placa, modelo y propietario son obligatorios.");
+    return;
+  }
+
+  const vin = (formData.get("vin") || "").trim();
+  const aseguradora = formData.get("aseguradora") || "";
+  const asesor = (formData.get("asesor") || "").trim();
+  const tecnico = formData.get("tecnico") || "";
+  const fecha_ingreso = formData.get("fecha_ingreso") || "";
+  const fecha_salida = formData.get("fecha_salida") || "";
+  const hora_salida = formData.get("hora_salida") || "";
+  const danos = formData.getAll("danos");
+  const equipamiento = formData.getAll("equipamiento");
+
+  // ✅ ARCHIVOS MULTIPLES (base64)
+  const archivosCliente = await procesarArchivosMultiple("archivos_cliente");
+  const archivosAutorizaciones = await procesarArchivosMultiple("archivos_autorizaciones");
+  const archivosProformas = await procesarArchivosMultiple("archivos_proformas");
+
+  // ✅ ARCHIVO PRINCIPAL (base64) - no usar createObjectURL
+  const archivoInput = document.getElementById("archivo_orden");
+  const file = archivoInput?.files?.[0] || null;
+
+  let archivoOrden = null;
+  if (file) {
+    const base64 = await convertirArchivoABase64(file);
+    archivoOrden = { nombre: file.name, tipo: file.type, base64 };
+  }
+
+  if (editingVehicleId) {
+    const idx = vehicles.findIndex(v => v.id === editingVehicleId);
+    if (idx === -1) return;
+
+    const original = vehicles[idx];
+
+    vehicles[idx] = {
+      ...original,
+      vin,
+      placa,
+      modelo,
+      propietario,
+      cedula,
+      aseguradora,
+      asesor,
+      tecnico,
+      fecha_ingreso,
+      fecha_salida,
+      hora_salida,
+      danos,
+      equipamiento,
+      archivoOrden: archivoOrden || original.archivoOrden,
+      archivosCliente: archivosCliente.length ? archivosCliente : (original.archivosCliente || []),
+      archivosAutorizaciones: archivosAutorizaciones.length ? archivosAutorizaciones : (original.archivosAutorizaciones || []),
+      archivosProformas: archivosProformas.length ? archivosProformas : (original.archivosProformas || [])
+    };
+
+    editingVehicleId = null;
+  } else {
+    const newVehicle = {
+      id: Date.now(),
+      vin,
+      placa,
+      modelo,
+      propietario,
+      cedula,
+      aseguradora,
+      asesor,
+      tecnico,
+      fecha_ingreso,
+      fecha_salida,
+      hora_salida,
+      estado: "falta_inspeccion",
+      danos,
+      equipamiento,
+      archivoOrden,
+      archivosCliente,
+      archivosAutorizaciones,
+      archivosProformas,
+      presupuesto: [],
+      ordenes: []
+    };
+
+    vehicles.push(newVehicle);
+  }
+
+  renderBoard();
+  form.reset();
+  resetFormSelectionGroups();
+  showView("tablero");
+});
+
+
+    ordenForm.addEventListener("submit", async function (e) {
+  e.preventDefault();
+  if (!currentVehicleId) return;
+
+  const descripcion = (document.getElementById("orden_descripcion").value || "").trim();
+
+  if (!descripcion) {
+    alert("La descripción de la orden es obligatoria.");
+    return;
+  }
+
+  // 📅 Generar fecha y hora actuales
+  const ahora = new Date();
+  const anio = ahora.getFullYear();
+  const mes = String(ahora.getMonth() + 1).padStart(2, "0");
+  const dia = String(ahora.getDate()).padStart(2, "0");
+  const horas = String(ahora.getHours()).padStart(2, "0");
+  const minutos = String(ahora.getMinutes()).padStart(2, "0");
+
+  // Guardamos todo junto: "YYYY-MM-DD HH:MM"
+  const fechaCompleta = `${anio}-${mes}-${dia} ${horas}:${minutos}`;
+
+  const vehicleIndex = vehicles.findIndex(v => v.id === currentVehicleId);
+  if (vehicleIndex === -1) return;
+
+  const nuevaOrden = {
+    id: Date.now(),
+    fecha: fechaCompleta,
+    descripcion
+  };
+
+  if (!Array.isArray(vehicles[vehicleIndex].ordenes)) {
+    vehicles[vehicleIndex].ordenes = [];
+  }
+  vehicles[vehicleIndex].ordenes.push(nuevaOrden);
+// Registrar auditoría por creación de OT
+auditoria.push({
+    fecha: fechaCompleta.split(" ")[0],
+    hora: fechaCompleta.split(" ")[1],
+    usuario: currentUser ? currentUser.nombre : "Sistema",
+    placa: vehicles[vehicleIndex].placa,
+    accion: "Nueva OT",
+    descripcion: descripcion
+});
+
+  ordenForm.reset();
+  openVehicleDetail(currentVehicleId, false);
+});
+
+
+    presupuestoForm.addEventListener("submit", function (e) {
+      e.preventDefault();
+      if (!currentVehicleId) return;
+
+      const tipo = document.getElementById("presupuesto_tipo").value || "Seguro";
+      const categoria = document.getElementById("presupuesto_categoria").value || "Repuesto";
+      const codigo = document.getElementById("presupuesto_codigo").value.trim();
+      const desc = document.getElementById("presupuesto_desc").value.trim();
+      const cantVal = document.getElementById("presupuesto_cant").value;
+      const valorVal = document.getElementById("presupuesto_valor").value;
+
+      const cantidad = cantVal ? Number(cantVal) : 1;
+      const valor = valorVal ? Number(valorVal) : 0;
+
+      if (!desc && !codigo) {
+        alert("Ingrese al menos un código o una descripción.");
+        return;
+      }
+
+      const idx = vehicles.findIndex(v => v.id === currentVehicleId);
+      if (idx === -1) return;
+
+      if (!Array.isArray(vehicles[idx].presupuesto)) {
+        vehicles[idx].presupuesto = [];
+      }
+
+      vehicles[idx].presupuesto.push({
+        id: Date.now(),
+        tipo,
+        categoria,
+        codigo,
+        descripcion: desc,
+        cantidad,
+        valor
+      });
+
+      document.getElementById("presupuesto_codigo").value = "";
+      document.getElementById("presupuesto_desc").value = "";
+      document.getElementById("presupuesto_cant").value = "";
+      document.getElementById("presupuesto_valor").value = "";
+
+      openVehicleDetail(currentVehicleId, false);
+    });
+
+    // ==============================
+    // CONFIGURACIÓN FINAL PARA GITHUB
+    // ==============================
+    document.addEventListener('DOMContentLoaded', function() {
+      // Botón de exportación
+      document.getElementById('btnExportarTodo').addEventListener('click', exportarDatosCompletos);
+      
+      // Configurar carga de respaldo
+      document.getElementById('inputCargarLocal')?.addEventListener('change', function(e) {
+          if (e.target.files[0]) {
+              cargarRespaldoCompleto(e.target.files[0]);
+          }
+      });
+      
+      // Mensaje inicial
+      console.warn("MODO PRUEBA GITHUB PAGES ACTIVADO");
+      console.warn("Exporta regularmente tus datos para no perderlos");
+      
+      // Configurar login
+      document.getElementById("btnLogin").addEventListener("click", loginSistema);
+    });
+
+    renderBoard();
+  </script>
+</body>
+</html>
