@@ -1249,36 +1249,35 @@ function handleDrop(e) {
         if (orden[newStatus] < orden[oldStatus]) { alert("No tienes permiso para retroceder un vehículo."); return; }
     }
 
+    // 1. CAMBIAR ESTADO
     vehicle.estado = newStatus;
-    // INICIO NOTIFICACION MOVIMIENTO
+    
+    // 2. NOTIFICACIONES (Solo una vez)
     if (window.currentUser && window.currentUser.rol === "tecnico") {
         crearNotificacion("asesor", null, `El técnico ${window.currentUser.nombre} movió el vehículo ${vehicle.placa} a ${newStatus.toUpperCase()}`);
     }
-    // FIN NOTIFICACION MOVIMIENTO
-    // RESETEAR SUBFASE LAVADORA SI ENTRA A LAVADO
+
+    // 3. LÓGICA LAVADORA
     if(newStatus === "en_lavado" && oldStatus !== "en_lavado") {
         vehicle.lavado_status = "espera";
-    // 👇 PEGAR ESTO AQUÍ 👇
-    // Si quien mueve es un TÉCNICO, avisar a los ASESORES
-    if (currentUser.rol === "tecnico") {
-        crearNotificacion("asesor", null, `El técnico ${currentUser.nombre} movió el auto ${vehicle.placa} a ${newStatus.toUpperCase()}`);
-    }
-    // 👆 FIN DE LO PEGADO 👆
     }
 
+    // 4. AUDITORÍA
     const ahora = new Date();
     auditoria.push({
         fecha: ahora.toISOString().slice(0, 10), hora: ahora.toTimeString().slice(0, 8),
         usuario: window.currentUser.nombre, placa: vehicle.placa, desde: STATUS_COLUMNS.find(s=>s.id===oldStatus)?.label, hacia: STATUS_COLUMNS.find(s=>s.id===newStatus)?.label, accion: "Movimiento", descripcion: `Movido por ${currentUser.nombre}`
     });
-    draggedCardId = null;
-    // ... código anterior ...
     
-    // 🔔 NUEVO: SI CAE EN "AUTORIZADO", ABRIR VENTANA DE COSTOS
+    draggedCardId = null;
+
+    // 5. VENTANA EMERGENTE DE COSTOS
     if (newStatus === "autorizado") {
         abrirModalPresupuesto(vehicle.id);
     }
 
+    // 6. GUARDAR EN LA NUBE Y RENDERIZAR
+    guardarCambios(); 
     renderBoard();
 }
 
@@ -1482,7 +1481,10 @@ form.addEventListener("submit", async function (e) {
         );
     }
   }
-
+  // Al final, antes de renderBoard():
+    guardarCambios(); // <--- IMPORTANTE
+    renderBoard();
+    form.reset();
   renderBoard();
   form.reset();
   resetFormSelectionGroups();
@@ -1758,7 +1760,8 @@ function editarVehiculoDesdeDetalle(id) {
 function eliminarVehiculoDesdeDetalle(id) {
     if(confirm("¿Eliminar este vehículo permanentemente?")) {
         vehicles = vehicles.filter(x => x.id != id);
-        if(typeof guardarCambios === "function") guardarCambios();
+        if(typeof guardarCambios === "function")
+        guardarCambios();
         renderBoard();
         showView("tablero");
     }
@@ -1999,7 +2002,7 @@ function guardarModalPresupuesto() {
     vehicles[idx].presupuestoDesglose = nuevosDatos;
     
     if(typeof guardarCambios === "function") guardarCambios();
-    
+    guardarCambios(); // <--- IMPORTANTE
     cerrarModalPresupuesto();
 }
 
@@ -2145,6 +2148,78 @@ function renderPresupuestoGeneral() {
     
     document.getElementById("granTotalDisplay").textContent = "$ " + granTotal.toFixed(2);
     document.getElementById("granTotalIvaDisplay").textContent = "$ " + granTotalConIva.toFixed(2);
+}
+// =========================================
+// ☁️ CONEXIÓN CON GOOGLE DRIVE (SHEETS)
+// =========================================
+const API_URL = "https://script.google.com/macros/s/AKfycbwhx7b0lNnEeKBj3bjtGlIVvj911LF_-u6P-snKTfl34nutMr09-Z09dUtbw8dkwzBw/exec"; // <--- ¡IMPORTANTE! PEGA TU URL AQUÍ
+
+async function cargarDatosDeNube() {
+    // Mostrar indicador de carga (opcional)
+    const btnRefresh = document.getElementById("btnVerTablero");
+    const textoOriginal = btnRefresh.innerHTML;
+    btnRefresh.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Cargando...';
+
+    try {
+        const response = await fetch(API_URL);
+        const data = await response.json();
+        
+        if (data.vehicles && Array.isArray(data.vehicles)) {
+            vehicles = data.vehicles;
+            console.log("Vehículos cargados de la nube:", vehicles.length);
+        }
+        if (data.auditoria && Array.isArray(data.auditoria)) {
+            auditoria = data.auditoria;
+        }
+        
+        // Guardamos copia local por si se va el internet
+        localStorage.setItem("axtrom_vehicles", JSON.stringify(vehicles));
+        renderBoard(); // Actualizar tablero visualmente
+        
+    } catch (error) {
+        console.error("Error cargando de nube:", error);
+        alert("No se pudo sincronizar con la nube. Usando datos locales.");
+    } finally {
+        btnRefresh.innerHTML = textoOriginal;
+    }
+}
+
+function guardarEnNube() {
+    // Esta función se ejecuta en segundo plano
+    fetch(API_URL, {
+        method: "POST",
+        body: JSON.stringify({
+            vehicles: vehicles,
+            auditoria: auditoria
+        })
+    })
+    .then(res => res.json())
+    .then(d => console.log("Guardado en nube exitoso"))
+    .catch(e => console.error("Error guardando en nube", e));
+}
+
+// =========================================
+// 🔄 AUTO-SINCRONIZACIÓN
+// =========================================
+// 1. Cargar datos al iniciar sesión (Modificar loginSistema)
+const originalLogin = loginSistema;
+loginSistema = function() {
+    originalLogin(); // Ejecuta el login normal
+    if (currentUser) {
+        cargarDatosDeNube(); // Descarga los datos más recientes
+        // Activar auto-recarga cada 30 segundos para ver cambios de otros
+        setInterval(cargarDatosDeNube, 30000); 
+    }
+};
+
+// 2. Guardar datos cada vez que se hace un cambio importante
+// Modificamos la función de guardado local para que también mande a la nube
+function guardarCambios() {
+    // Guardado Local (Respaldo inmediato)
+    localStorage.setItem("axtrom_vehicles", JSON.stringify(vehicles));
+    
+    // Guardado Nube (Drive)
+    guardarEnNube();
 }
 </script>
 <div id="modalPresupuesto" class="modal-overlay">
