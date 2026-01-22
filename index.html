@@ -2,1131 +2,519 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <title>AXTROM - Tablero de Taller</title>
+  <title>Corporación PROAUTO - Tablero de Taller + Lavado</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <style>
-    /* REEMPLAZA TU CSS CON ESTE BLOQUE */
-* { box-sizing: border-box; font-family: system-ui, -apple-system, sans-serif; }
-body { margin: 0; padding: 16px; background: #f5f5f7; color: #1a1a1a; }
-
-/* Header AXIS Professional */
-.header-proauto {
-  position: sticky; top: 0; background: #ffffff; z-index: 1000;
-  border-bottom: 1px solid #e6e8ec; display: flex; align-items: center;
-  justify-content: space-between; padding: 10px 20px; margin-bottom: 20px;
-}
-.logo-header { height: 64px; mix-blend-mode: multiply; margin-right: 14px; }
-
-/* Botones Estilo AXIS */
-.btn {
-  border-radius: 999px; padding: 8px 18px; font-size: 12px;
-  border: none; cursor: pointer; font-weight: 600;
-  display: inline-flex; align-items: center; gap: 8px; transition: 0.2s;
-}
-.btn-primary { background: #007dc5; color: white; }
-.btn-secondary { background: #e0e0e0; color: #333; }
-.btn-danger { background: #e53935; color: #fff; }
-
-/* Tarjetas y Columnas Professional */
-.column {
-  background: #ffffff; border-radius: 12px; padding: 12px;
-  min-width: 250px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-  border-top: 5px solid #007dc5;
-}
-.card {
-  background: #fff; border-radius: 10px; padding: 12px; margin-bottom: 10px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.08); border-left: 5px solid #007dc5;
-}
-
-/* Auditoría estilo Cebra */
-#tablaAuditoria { width: 100%; border-collapse: collapse; font-size: 12px; background: white; }
-#tablaAuditoria th { background: #f8f9fa; padding: 12px; text-align: left; border-bottom: 2px solid #eee; }
-#tablaAuditoria tr:nth-child(even) { background: #f9fafb; }
+    /* =========================================================
+       ESTILOS ORIGINALES AXTROM v0.3 (INTACTOS)
+       ========================================================= */
     * {
       box-sizing: border-box;
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     }
-    /* Corrige el header para que no se mueva cuando aparece la tarjeta de resumen */
-.header-proauto {
-  position: sticky;
-  top: 0;
-  background: #ffffff;
-  z-index: 1000;
-  border-bottom: 1px solid #e6e8ec;
-}
-/* =====================================
-   ESTILO PROFESIONAL PARA TABLA AUDITORÍA
-===================================== */
+    .header-proauto {
+      position: sticky; top: 0; background: #ffffff; z-index: 1000; border-bottom: 1px solid #e6e8ec;
+    }
+    #auditoriaBody tr:nth-child(even) { background: #f7f7f7; }
+    #auditoriaBody tr:nth-child(odd) { background: #ffffff; }
+    #auditoriaBody tr:hover { background: #e6f2ff; }
+    #auditoriaBody td, #tablaAuditoria th { padding: 10px 14px; font-size: 13px; border-bottom: 1px solid #ddd; }
+    #tablaAuditoria { width: 100%; border-collapse: collapse; font-family: system-ui, sans-serif; margin-top: 10px; background: white; border-radius: 8px; overflow: hidden; }
+    #tablaAuditoria thead { background: #e0e0e0; color: #333; position: sticky; top: 0; z-index: 2; }
+    #tablaAuditoria th { font-weight: 600; text-align: left; }
+    .auditoria-container { max-height: 450px; overflow-y: auto; border-radius: 8px; border: 1px solid #ddd; background: #fff; margin-top: 15px; }
+    #vehicleSummary { position: fixed; top: 110px; right: 16px; width: 420px; max-width: calc(100% - 32px); background: #f1f4f9; border: 1px solid #d6dbea; border-radius: 12px; padding: 16px 18px; box-shadow: 0 8px 24px rgba(0,0,0,0.15); z-index: 2000; display: none; }
+    #vehicleSummary.show { display: block; }
+    body { margin: 0; padding: 16px; background: #f5f5f7; }
+    .header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+    .header-left { display: flex; align-items: center; gap: 12px; }
+    .logo { height: 42px; }
+    .logo-header { height: 64px; margin-right: 14px; mix-blend-mode: multiply; }
+    h1 { margin: 0; font-size: 20px; }
+    .subtitle { margin: 0; color: #555; font-size: 13px; }
+    .top-actions { display: flex; justify-content: flex-end; margin-bottom: 10px; gap: 8px; }
+    .vehicle-summary { margin-top: 12px; margin-bottom: 16px; padding: 10px 16px; background: #f5f7fb; border-radius: 12px; border: 1px solid #dde3f0; display: flex; justify-content: space-between; align-items: flex-start; font-size: 13px; color: #222; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+    .vehicle-summary.hidden { display: none; }
+    .vs-main { display: flex; flex-direction: column; gap: 4px; }
+    .vs-row { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+    .vs-label { font-weight: 600; color: #555; }
+    .vs-value { font-weight: 500; }
+    .vs-ot { font-style: italic; color: #333; }
+    .vs-separator { color: #aaa; }
+    .vs-close { position: absolute; top: 6px; right: 10px; border: none; background: transparent; font-size: 20px; cursor: pointer; color: #666; }
+    .vs-close:hover { color: #444; }
+    .btn { border-radius: 999px; padding: 6px 12px; font-size: 12px; border: none; cursor: pointer; }
+    .btn-primary { background: #007dc5; color: white; }
+    .btn-secondary { background: #e0e0e0; color: #333; }
+    .btn-danger { background: #e53935; color: #fff; }
+    .btn-link { background: transparent; color: #007dc5; text-decoration: underline; padding: 0; border-radius: 0; }
+    .view { display: none; }
+    .view.active { display: block; }
+    .board { display: flex; gap: 12px; align-items: flex-start; padding-bottom: 20px; overflow-x: auto; min-height: 320px; }
+    .column { background: #ffffff; border-radius: 10px; padding: 8px; min-width: 200px; max-width: 240px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+    .column-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px; }
+    .column-title { font-size: 13px; font-weight: 600; }
+    .column-count { font-size: 11px; color: #777; }
+    .dropzone { min-height: 40px; padding: 4px; border-radius: 8px; background: #fafafa; }
+    .card { background: #fff; border-radius: 8px; padding: 6px 8px; margin-bottom: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.12); cursor: grab; border-left: 4px solid #007dc5; }
+    .card.dragging { opacity: 0.6; }
+    .card-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
+    .plate { font-weight: 700; font-size: 13px; }
+    .brand { font-size: 11px; color: #666; text-align: right; }
+    .chip { display: inline-block; font-size: 10px; padding: 2px 6px; border-radius: 999px; background: #eee; margin-right: 4px; }
+    .chip.insurer { background: #e3f2fd; color: #035388; }
+    .chip-client { font-size: 10px; color: #555; }
+    .chip-small { font-size: 9px; background: #f3e5f5; color: #5e35b1; }
+    .card-extra { margin-top: 4px; font-size: 10px; color: #555; display: flex; flex-wrap: wrap; gap: 4px; }
+    .card-ot { margin-top: 6px; font-size: 11px; background: #f5f5f5; padding: 4px 6px; border-radius: 6px; color: #444; }
+    .card-extra-item { background: #f5f5f5; border-radius: 999px; padding: 2px 6px; }
+    .dropzone.over { outline: 2px dashed #007dc5; background: #e3f2fd; }
+    .panel-form { background: #ffffff; border-radius: 10px; padding: 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.12); }
+    .panel-form h2 { margin: 0 0 8px; font-size: 16px; }
+    .panel-form p { margin: 0 0 10px; font-size: 12px; color: #666; }
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .form-section-title { grid-column: 1 / -1; margin-top: 8px; font-size: 12px; font-weight: 600; color: #333; }
+    .form-field { display: flex; flex-direction: column; gap: 2px; }
+    .form-field label { font-size: 11px; color: #444; }
+    .form-field input, .form-field select, .form-field textarea { font-size: 12px; padding: 4px 6px; border-radius: 6px; border: 1px solid #ccc; outline: none; }
+    .form-field input:focus, .form-field select:focus, .form-field textarea:focus { border-color: #007dc5; }
+    .checklist-group { display: grid; grid-template-columns: 1fr 1fr; gap: 4px 12px; font-size: 11px; }
+    .checklist-item { display: flex; align-items: center; gap: 4px; }
+    .checklist-item input { margin: 0; }
+    .form-actions { margin-top: 12px; display: flex; justify-content: space-between; gap: 8px; align-items: center; flex-wrap: wrap; }
+    .form-actions-right { margin-left: auto; display: flex; gap: 8px; }
+    .panel-detalle { background: #ffffff; border-radius: 10px; padding: 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.12); }
+    .panel-detalle h2 { margin: 0 0 4px; font-size: 16px; }
+    .panel-detalle small { color: #666; font-size: 11px; }
+    .detalle-header-actions { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; gap: 8px; flex-wrap: wrap; }
+    .detalle-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 16px; margin-top: 10px; margin-bottom: 10px; font-size: 12px; }
+    .detalle-label { font-weight: 600; color: #333; }
+    .detalle-value { color: #555; }
+    .detalle-subsection-title { margin-top: 8px; font-size: 12px; font-weight: 600; color: #333; }
+    .detalle-list { font-size: 11px; color: #555; margin: 4px 0 0; padding-left: 16px; }
+    .detalle-archivo a { font-size: 12px; }
+    .ordenes-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; margin-top: 10px; }
+    .ordenes-list { border: 1px solid #eee; border-radius: 8px; padding: 8px; max-height: 220px; overflow-y: auto; background: #fafafa; margin-bottom: 10px; }
+    .orden-item { padding: 6px 8px; border-radius: 6px; background: #fff; box-shadow: 0 1px 2px rgba(0,0,0,0.06); margin-bottom: 6px; font-size: 12px; }
+    .orden-item strong { display: block; font-size: 11px; color: #333; }
+    .presupuesto-resumen { list-style: none; padding-left: 0; margin: 4px 0 6px; font-size: 11px; color: #444; }
+    .presupuesto-table { border: 1px solid #eee; border-radius: 8px; overflow: hidden; background: #fafafa; margin-bottom: 8px; }
+    .presupuesto-header-row, .presupuesto-row { display: grid; grid-template-columns: 0.8fr 1fr 1.3fr 0.4fr 0.7fr; gap: 4px; padding: 4px 8px; font-size: 11px; align-items: center; }
+    .presupuesto-header-row { background: #f0f0f0; font-weight: 600; border-bottom: 1px solid #e0e0e0; }
+    .presupuesto-row:nth-child(odd) { background: #ffffff; }
+    .presupuesto-row:nth-child(even) { background: #f9f9f9; }
+    .presupuesto-importes { text-align: right; }
+    .orden-actions { margin-top: 4px; display: flex; gap: 6px; }
+    .orden-btn { border: none; border-radius: 999px; padding: 2px 8px; font-size: 10px; cursor: pointer; }
+    .orden-btn-edit { background: #e3f2fd; }
+    .orden-btn-delete { background: #ffebee; }
+    .presupuesto-actions { margin-top: 2px; display: flex; gap: 4px; justify-content: flex-end; }
+    .presupuesto-btn { border: none; border-radius: 999px; padding: 1px 6px; font-size: 10px; cursor: pointer; }
+    .presupuesto-btn-edit { background: #e3f2fd; }
+    .presupuesto-btn-delete { background: #ffebee; }
+    .presupuesto-form-inline { display: grid; grid-template-columns: 0.8fr 1fr 1.2fr 0.4fr 0.7fr 1.2fr; gap: 4px; margin-bottom: 4px; font-size: 11px; }
+    .vehicle-summary { background: #eef2f7; border: 1px solid #d0d7e3; padding: 12px 18px; border-radius: 10px; margin-top: 15px; margin-bottom: 20px; }
+    .vehicle-summary.hidden { display: none; }
+    .vs-row { margin-bottom: 6px; }
+    .vs-close { background: transparent; border: none; float: right; font-size: 22px; cursor: pointer; }
+    .presupuesto-form-inline input, .presupuesto-form-inline select { font-size: 11px; padding: 3px 4px; border-radius: 6px; border: 1px solid #ccc; }
+    .presupuesto-form-actions { display: flex; justify-content: flex-end; }
+    @media (max-width: 900px) {
+      .detalle-grid, .form-grid, .checklist-group { grid-template-columns: 1fr; }
+      .presupuesto-header-row, .presupuesto-row, .presupuesto-form-inline { grid-template-columns: 1fr; }
+    }
+    .vs-section { margin-bottom: 14px; padding-bottom: 10px; border-bottom: 1px solid #e4e7ec; }
+    .vs-section:last-child { border-bottom: none; }
+    .vs-title { font-size: 11px; font-weight: 600; color: #6b7280; text-transform: uppercase; margin-bottom: 6px; }
+    /* =========================================
+       ESTILOS NOTIFICACIONES (PROFESIONAL)
+       ========================================= */
+    .btn-notif { 
+        position: relative; 
+        background: #fff; 
+        border: 1px solid #e2e8f0; 
+        color: #64748b; 
+        font-size: 16px; 
+        padding: 8px 12px; 
+        border-radius: 50%; 
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    .btn-notif:hover { background: #f1f5f9; color: #007dc5; }
+    
+    .notif-badge { 
+        position: absolute; top: -2px; right: -2px; 
+        background: #ef4444; color: white; 
+        border-radius: 50%; font-size: 10px; 
+        width: 18px; height: 18px; 
+        display: flex; align-items: center; justify-content: center; 
+        font-weight: 700; border: 2px solid #fff;
+    }
 
-#auditoriaBody tr:nth-child(even) {
-    background: #f7f7f7;
+    /* MENÚ FLOTANTE MEJORADO */
+    .notif-panel {
+        position: absolute; 
+        top: 50px; /* Separación del botón */
+        left: 0;
+        width: 320px; /* Ancho fijo elegante */
+        max-height: 400px; 
+        overflow-y: auto; 
+        background: white; 
+        border: none; 
+        border-radius: 12px; 
+        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1); /* Sombra suave */
+        z-index: 9999; /* Para que flote SOBRE todo */
+        display: none; /* Oculto por defecto */
+        flex-direction: column;
+    }
+    
+    /* Flechita decorativa arriba del menú */
+    .notif-panel::before {
+        content: ""; position: absolute; top: -6px; left: 14px;
+        width: 12px; height: 12px; background: white;
+        transform: rotate(45deg); border-top: 1px solid #f1f5f9; border-left: 1px solid #f1f5f9;
+    }
+
+    .notif-panel.show { display: flex; animation: slideDown 0.2s ease-out; }
+
+    .notif-header { 
+        padding: 12px 16px; 
+        border-bottom: 1px solid #f1f5f9; 
+        display: flex; justify-content: space-between; align-items: center;
+        background: #fff; border-radius: 12px 12px 0 0;
+    }
+    
+    .notif-item { 
+        padding: 12px 16px; 
+        border-bottom: 1px solid #f8fafc; 
+        display: flex; flex-direction: column; gap: 4px; 
+        cursor: default;
+        transition: background 0.2s;
+    }
+    .notif-item:last-child { border-bottom: none; }
+    .notif-item:hover { background: #f8fafc; }
+    
+    /* Estado NO LEÍDO (Azul muy suave y borde izquierdo) */
+    .notif-item.unread { 
+        background: #f0f9ff; 
+        border-left: 3px solid #007dc5; 
+    }
+    
+    .notif-msg { font-size: 12px; color: #334155; line-height: 1.4; }
+    .notif-time { font-size: 10px; color: #94a3b8; align-self: flex-end; font-weight: 500;}
+
+    @keyframes slideDown {
+        from { opacity: 0; transform: translateY(-10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    /* =========================================================
+       NUEVOS ESTILOS: INTEGRACIÓN LAVADORA
+       ========================================================= */
+    /* Subzonas verticales en el tablero principal */
+    .lavado-subzone-container { display: flex; flex-direction: column; gap: 6px; min-height: 100%; }
+    .lavado-subzone { background: #f1f5f9; border: 1px dashed #cbd5e1; border-radius: 8px; padding: 6px; min-height: 50px; }
+    .lavado-subzone-title { font-size: 9px; font-weight: 800; color: #64748b; text-transform: uppercase; margin-bottom: 4px; }
+    
+    /* Vista Exclusiva Lavador */
+    #view-lavador { max-width: 1200px; margin: 0 auto; }
+    .lavador-header { background: #007dc5; color: white; padding: 20px; border-radius: 12px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; }
+    .lavador-board { display: flex; gap: 15px; overflow-x: auto; padding-bottom: 20px; }
+    .lavador-column { flex: 1; background: white; border-radius: 10px; padding: 10px; min-width: 250px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); border-top: 4px solid #007dc5; }
+    .lavador-card { background: #f8fafc; border: 1px solid #e2e8f0; padding: 12px; border-radius: 8px; margin-bottom: 10px; border-left: 4px solid #4caf50; }
+    .lavador-card-plate { font-size: 18px; font-weight: 800; color: #333; }
+    .lavador-controls { margin-top: 10px; display: flex; gap: 5px; }
+    /* =========================================
+   ESTILOS VENTANA EMERGENTE (PRESUPUESTO)
+   ========================================= */
+.modal-overlay {
+  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  background: rgba(0, 0, 0, 0.5); z-index: 10000;
+  display: none; justify-content: center; align-items: center;
+  backdrop-filter: blur(4px);
 }
 
-#auditoriaBody tr:nth-child(odd) {
-    background: #ffffff;
+.modal-content {
+  background: white; width: 500px; max-width: 95%;
+  border-radius: 8px; overflow: hidden;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+  font-family: system-ui, sans-serif;
+  animation: slideUp 0.3s ease-out;
 }
 
-#auditoriaBody tr:hover {
-    background: #e6f2ff;
+@keyframes slideUp { from {transform: translateY(20px); opacity: 0;} to {transform: translateY(0); opacity: 1;} }
+
+.pres-header {
+  background: #007dc5; /* 🔵 CAMBIO: Azul corporativo */
+  color: white; padding: 10px 15px;
+  display: flex; justify-content: space-between; align-items: center;
+  font-weight: bold; font-size: 14px;
 }
 
-#auditoriaBody td, #tablaAuditoria th {
-    padding: 10px 14px;
-    font-size: 13px;
-    border-bottom: 1px solid #ddd;
-}
+.pres-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+.pres-table th { text-align: left; padding: 8px; color: #666; font-weight: normal; border-bottom: 1px solid #eee; }
+.pres-table td { padding: 6px 8px; border-bottom: 1px solid #f0f0f0; }
+.pres-row-bg { background: #f9f9f9; font-weight: 600; color: #444; }
 
-#tablaAuditoria {
-    width: 100%;
-    border-collapse: collapse;
-    font-family: system-ui, sans-serif;
-    margin-top: 10px;
-    background: white;
+.pres-input {
+  width: 100%; padding: 4px; border: 1px solid #ddd;
+  border-radius: 4px; text-align: right; font-family: monospace;
+}
+.pres-input:focus { border-color: #c62828; outline: none; }
+
+.pres-footer {
+  padding: 15px; background: #f5f5f5; display: flex; justify-content: flex-end; gap: 10px;
+}
+/* CLASES PARA OCULTAR/MOSTRAR SECCIONES */
+.pres-section-container {
+    border: 1px solid #eee;
     border-radius: 8px;
+    margin-bottom: 10px;
     overflow: hidden;
 }
 
-#tablaAuditoria thead {
-    background: #e0e0e0;
-    color: #333;
-    position: sticky;
-    top: 0;
-    z-index: 2;
+.pres-toggle-header {
+    background: #f8f9fa;
+    padding: 10px 15px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    border-bottom: 1px solid transparent;
+    transition: all 0.2s;
 }
 
-#tablaAuditoria th {
-    font-weight: 600;
-    text-align: left;
+.pres-toggle-header:hover {
+    background: #eef2f7;
 }
 
-.auditoria-container {
-    max-height: 450px; 
-    overflow-y: auto;
-    border-radius: 8px;
-    border: 1px solid #ddd;
-    background: #fff;
-    margin-top: 15px;
+.pres-toggle-header.active {
+    background: #e3f2fd;
+    border-bottom: 1px solid #dee2e6;
+    color: #007dc5;
+    font-weight: bold;
 }
 
-#vehicleSummary {
-  position: fixed;
-  top: 110px;
-  right: 16px;
-
-  width: 420px;
-  max-width: calc(100% - 32px);
-
-  background: #f1f4f9;
-  border: 1px solid #d6dbea;
-  border-radius: 12px;
-  padding: 16px 18px;
-
-  box-shadow: 0 8px 24px rgba(0,0,0,0.15);
-  z-index: 2000;
-
-  display: none;
+.pres-content-body {
+    display: none; /* Oculto por defecto */
+    padding: 10px;
+    animation: fadeIn 0.3s;
 }
 
-#vehicleSummary.show {
-  display: block;
+.pres-content-body.show {
+    display: block; /* Mostrar cuando tenga la clase */
 }
 
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-    body {
-      margin: 0;
-      padding: 16px;
-      background: #f5f5f7;
-    }
-
-    .header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 12px;
-    }
-
-    .header-left {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .logo {
-      height: 42px;
-    }
-    .logo-header {
-     height: 64px;              /* 👈 tamaño ideal */
-     margin-right: 14px;
-       mix-blend-mode: multiply;
-    }
-
-    h1 {
-      margin: 0;
-      font-size: 20px;
-    }
-
-    .subtitle {
-      margin: 0;
-      color: #555;
-      font-size: 13px;
-    }
-
-    .top-actions {
-      display: flex;
-      justify-content: flex-end;
-      margin-bottom: 10px;
-      gap: 8px;
-    }
-    .vehicle-summary {
-  margin-top: 12px;
-  margin-bottom: 16px;
-  padding: 10px 16px;
-  background: #f5f7fb;
-  border-radius: 12px;
-  border: 1px solid #dde3f0;
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  font-size: 13px;
-  color: #222;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+/* Checkbox personalizado más grande */
+.big-check {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
 }
-
-.vehicle-summary.hidden {
-  display: none;
+/* =========================================
+   ESTILOS NUEVA VISTA DETALLE (REDDISEÑO)
+   ========================================= */
+.detail-header-card {
+    background: linear-gradient(135deg, #007dc5 0%, #005a8d 100%);
+    color: white; padding: 20px; border-radius: 12px;
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 20px; box-shadow: 0 4px 12px rgba(0,125,197,0.2);
 }
-
-.vs-main {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
+.detail-main-grid {
+    display: grid; grid-template-columns: 2fr 1fr; gap: 20px;
 }
-
-.vs-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  align-items: center;
+.detail-card {
+    background: white; border-radius: 12px; padding: 20px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05); border: 1px solid #eef2f6;
+    margin-bottom: 20px;
 }
-
-.vs-label {
-  font-weight: 600;
-  color: #555;
+.detail-card h3 {
+    margin-top: 0; margin-bottom: 15px; font-size: 14px; 
+    color: #007dc5; text-transform: uppercase; border-bottom: 2px solid #f0f4f8; 
+    padding-bottom: 8px;
 }
-
-.vs-value {
-  font-weight: 500;
+.info-row {
+    display: flex; justify-content: space-between; border-bottom: 1px solid #f8fafc;
+    padding: 8px 0; font-size: 13px;
 }
+.info-row:last-child { border-bottom: none; }
+.info-label { color: #64748b; font-weight: 500; }
+.info-val { color: #1e293b; font-weight: 600; text-align: right; }
 
-.vs-ot {
-  font-style: italic;
-  color: #333;
+/* Tabla Financiera en Detalle */
+.fin-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+.fin-table th { background: #f8fafc; color: #475569; padding: 8px; text-align: right; border-bottom: 2px solid #e2e8f0; }
+.fin-table th:first-child { text-align: left; }
+.fin-table td { padding: 8px; text-align: right; border-bottom: 1px solid #f1f5f9; color: #334155; }
+.fin-table td:first-child { text-align: left; font-weight: 600; }
+.fin-total-row { background: #f0f9ff; font-weight: 800; color: #007dc5; }
+
+/* Galería de Fotos */
+.gallery-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 10px;
 }
-
-.vs-separator {
-  color: #aaa;
+.gallery-item {
+    position: relative; height: 100px; border-radius: 8px; overflow: hidden;
+    border: 1px solid #ddd; cursor: pointer; transition: transform 0.2s;
 }
-
-.vs-close {
-  position: absolute;
-  top: 6px;
-  right: 10px;
-  border: none;
-  background: transparent;
-  font-size: 20px;
-  cursor: pointer;
-  color: #666;
+.gallery-item:hover { transform: scale(1.05); box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+.gallery-img { width: 100%; height: 100%; object-fit: cover; }
+.gallery-overlay {
+    position: absolute; bottom: 0; left: 0; right: 0; 
+    background: rgba(0,0,0,0.6); color: white; 
+    font-size: 10px; padding: 4px; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
-
-.vs-close:hover {
-  color: #444;
+/* Estilo para lista de documentos (PDFs) */
+.doc-list { display: flex; flex-direction: column; gap: 8px; }
+.doc-item { 
+    display: flex; align-items: center; gap: 10px; 
+    background: #f8fafc; padding: 10px; border-radius: 8px; 
+    border: 1px solid #e2e8f0; transition: background 0.2s;
 }
-
-    .btn {
-      border-radius: 999px;
-      padding: 6px 12px;
-      font-size: 12px;
-      border: none;
-      cursor: pointer;
-    }
-
-    .btn-primary {
-      background: #007dc5;
-      color: white;
-    }
-
-    .btn-secondary {
-      background: #e0e0e0;
-      color: #333;
-    }
-
-    .btn-danger {
-      background: #e53935;
-      color: #fff;
-    }
-
-    .btn-link {
-      background: transparent;
-      color: #007dc5;
-      text-decoration: underline;
-      padding: 0;
-      border-radius: 0;
-    }
-
-    .view {
-      display: none;
-    }
-
-    .view.active {
-      display: block;
-    }
-
-    .board {
-      display: flex;
-      gap: 12px;
-      align-items: flex-start;
-      padding-bottom: 20px;
-      overflow-x: auto;
-      min-height: 320px;
-    }
-
-    .column {
-      background: #ffffff;
-      border-radius: 10px;
-      padding: 8px;
-      min-width: 200px;
-      max-width: 240px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-    }
-
-    .column-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: baseline;
-      margin-bottom: 8px;
-    }
-
-    .column-title {
-      font-size: 13px;
-      font-weight: 600;
-    }
-
-    .column-count {
-      font-size: 11px;
-      color: #777;
-    }
-
-    .dropzone {
-      min-height: 40px;
-      padding: 4px;
-      border-radius: 8px;
-      background: #fafafa;
-    }
-
-    .card {
-      background: #fff;
-      border-radius: 8px;
-      padding: 6px 8px;
-      margin-bottom: 6px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.12);
-      cursor: grab;
-      border-left: 4px solid #007dc5;
-    }
-
-    .card.dragging {
-      opacity: 0.6;
-    }
-
-    .card-top {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 4px;
-    }
-
-    .plate {
-      font-weight: 700;
-      font-size: 13px;
-    }
-
-    .brand {
-      font-size: 11px;
-      color: #666;
-      text-align: right;
-    }
-
-    .chip {
-      display: inline-block;
-      font-size: 10px;
-      padding: 2px 6px;
-      border-radius: 999px;
-      background: #eee;
-      margin-right: 4px;
-    }
-
-    .chip.insurer {
-      background: #e3f2fd;
-      color: #035388;
-    }
-
-    .chip-client {
-      font-size: 10px;
-      color: #555;
-    }
-
-    .chip-small {
-      font-size: 9px;
-      background: #f3e5f5;
-      color: #5e35b1;
-    }
-    .card-extra {
-      margin-top: 4px;
-      font-size: 10px; 
-      color: #555; 
-      display: flex;
-      flex-wrap: wrap;
-      gap: 4px;
-    }
-    .card-ot {
-       margin-top: 6px;
-       font-size: 11px;
-       background: #f5f5f5;
-       padding: 4px 6px;
-        border-radius: 6px;
-       color: #444;
-    }
-
-    .card-extra-item {
-     background: #f5f5f5;
-     border-radius: 999px;
-     padding: 2px 6px;
-    }
-
-    .dropzone.over {
-      outline: 2px dashed #007dc5;
-      background: #e3f2fd;
-    }
-
-    /* Vista formulario */
-    .panel-form {
-      background: #ffffff;
-      border-radius: 10px;
-      padding: 14px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.12);
-    }
-
-    .panel-form h2 {
-      margin: 0 0 8px;
-      font-size: 16px;
-    }
-
-    .panel-form p {
-      margin: 0 0 10px;
-      font-size: 12px;
-      color: #666;
-    }
-
-    .form-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 8px;
-    }
-
-    .form-section-title {
-      grid-column: 1 / -1;
-      margin-top: 8px;
-      font-size: 12px;
-      font-weight: 600;
-      color: #333;
-    }
-
-    .form-field {
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
-    }
-
-    .form-field label {
-      font-size: 11px;
-      color: #444;
-    }
-
-    .form-field input,
-    .form-field select,
-    .form-field textarea {
-      font-size: 12px;
-      padding: 4px 6px;
-      border-radius: 6px;
-      border: 1px solid #ccc;
-      outline: none;
-    }
-
-    .form-field input:focus,
-    .form-field select:focus,
-    .form-field textarea:focus {
-      border-color: #007dc5;
-    }
-
-    .checklist-group {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 4px 12px;
-      font-size: 11px;
-    }
-
-    .checklist-item {
-      display: flex;
-      align-items: center;
-      gap: 4px;
-    }
-
-    .checklist-item input {
-      margin: 0;
-    }
-
-    .form-actions {
-      margin-top: 12px;
-      display: flex;
-      justify-content: space-between;
-      gap: 8px;
-      align-items: center;
-      flex-wrap: wrap;
-    }
-
-    .form-actions-right {
-      margin-left: auto;
-      display: flex;
-      gap: 8px;
-    }
-
-    /* Vista detalle */
-    .panel-detalle {
-      background: #ffffff;
-      border-radius: 10px;
-      padding: 14px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.12);
-    }
-
-    .panel-detalle h2 {
-      margin: 0 0 4px;
-      font-size: 16px;
-    }
-
-    .panel-detalle small {
-      color: #666;
-      font-size: 11px;
-    }
-
-    .detalle-header-actions {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 6px;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
-
-    .detalle-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 6px 16px;
-      margin-top: 10px;
-      margin-bottom: 10px;
-      font-size: 12px;
-    }
-
-    .detalle-label {
-      font-weight: 600;
-      color: #333;
-    }
-
-    .detalle-value {
-      color: #555;
-    }
-
-    .detalle-subsection-title {
-      margin-top: 8px;
-      font-size: 12px;
-      font-weight: 600;
-      color: #333;
-    }
-
-    .detalle-list {
-      font-size: 11px;
-      color: #555;
-      margin: 4px 0 0;
-      padding-left: 16px;
-    }
-
-    .detalle-archivo a {
-      font-size: 12px;
-    }
-
-    .ordenes-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 6px;
-      margin-top: 10px;
-    }
-
-    .ordenes-list {
-      border: 1px solid #eee;
-      border-radius: 8px;
-      padding: 8px;
-      max-height: 220px;
-      overflow-y: auto;
-      background: #fafafa;
-      margin-bottom: 10px;
-    }
-
-    .orden-item {
-      padding: 6px 8px;
-      border-radius: 6px;
-      background: #fff;
-      box-shadow: 0 1px 2px rgba(0,0,0,0.06);
-      margin-bottom: 6px;
-      font-size: 12px;
-    }
-
-    .orden-item strong {
-      display: block;
-      font-size: 11px;
-      color: #333;
-    }
-
-    /* ===== NUEVO: estilos presupuesto ===== */
-    .presupuesto-resumen {
-      list-style: none;
-      padding-left: 0;
-      margin: 4px 0 6px;
-      font-size: 11px;
-      color: #444;
-    }
-
-    .presupuesto-table {
-      border: 1px solid #eee;
-      border-radius: 8px;
-      overflow: hidden;
-      background: #fafafa;
-      margin-bottom: 8px;
-    }
-
-    .presupuesto-header-row,
-    .presupuesto-row {
-      display: grid;
-      grid-template-columns: 0.8fr 1fr 1.3fr 0.4fr 0.7fr;
-      gap: 4px;
-      padding: 4px 8px;
-      font-size: 11px;
-      align-items: center;
-    }
-
-    .presupuesto-header-row {
-      background: #f0f0f0;
-      font-weight: 600;
-      border-bottom: 1px solid #e0e0e0;
-    }
-
-    .presupuesto-row:nth-child(odd) {
-      background: #ffffff;
-    }
-
-    .presupuesto-row:nth-child(even) {
-      background: #f9f9f9;
-    }
-
-    .presupuesto-importes {
-      text-align: right;
-    }
-    /* ----- Botones de edición y eliminación de órdenes ----- */
-
-.orden-actions {
-  margin-top: 4px;
-  display: flex;
-  gap: 6px;
-}
-
-.orden-btn {
-  border: none;
-  border-radius: 999px;
-  padding: 2px 8px;
-  font-size: 10px;
-  cursor: pointer;
-}
-
-.orden-btn-edit {
-  background: #e3f2fd;
-}
-
-.orden-btn-delete {
-  background: #ffebee;
-}
-
-    .presupuesto-actions {
-  margin-top: 2px;
-  display: flex;
-  gap: 4px;
-  justify-content: flex-end;
-}
-
-.presupuesto-btn {
-  border: none;
-  border-radius: 999px;
-  padding: 1px 6px;
-  font-size: 10px;
-  cursor: pointer;
-}
-
-.presupuesto-btn-edit {
-  background: #e3f2fd;
-}
-
-.presupuesto-btn-delete {
-  background: #ffebee;
-}
-
-
-    .presupuesto-form-inline {
-      display: grid;
-      grid-template-columns: 0.8fr 1fr 1.2fr 0.4fr 0.7fr 1.2fr;
-      gap: 4px;
-      margin-bottom: 4px;
-      font-size: 11px;
-    }
-    .vehicle-summary {
-  background: #eef2f7;
-  border: 1px solid #d0d7e3;
-  padding: 12px 18px;
-  border-radius: 10px;
-  margin-top: 15px;
-  margin-bottom: 20px;
-}
-
-.vehicle-summary.hidden {
-  display: none;
-}
-
-.vs-row {
-  margin-bottom: 6px;
-}
-
-.vs-close {
-  background: transparent;
-  border: none;
-  float: right;
-  font-size: 22px;
-  cursor: pointer;
-}
-
-    .presupuesto-form-inline input,
-    .presupuesto-form-inline select {
-      font-size: 11px;
-      padding: 3px 4px;
-      border-radius: 6px;
-      border: 1px solid #ccc;
-    }
-
-    .presupuesto-form-actions {
-      display: flex;
-      justify-content: flex-end;
-    }
-
-    @media (max-width: 900px) {
-      .detalle-grid,
-      .form-grid,
-      .checklist-group {
-        grid-template-columns: 1fr;
-      }
-
-      .presupuesto-header-row,
-      .presupuesto-row,
-      .presupuesto-form-inline {
-        grid-template-columns: 1fr;
-      }
-    }
-    .vs-section {
-  margin-bottom: 14px;
-  padding-bottom: 10px;
-  border-bottom: 1px solid #e4e7ec;
-}
-
-.vs-section:last-child {
-  border-bottom: none;
-}
-
-.vs-title {
-  font-size: 11px;
-  font-weight: 600;
-  color: #6b7280;
-  text-transform: uppercase;
-  margin-bottom: 6px;
-}
-
+.doc-item:hover { background: #f1f5f9; }
+.doc-icon { font-size: 20px; color: #ef4444; /* Rojo tipo PDF */ }
+.doc-link { text-decoration: none; color: #334155; font-weight: 500; font-size: 12px; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.doc-download { color: #007dc5; font-size: 14px; cursor: pointer; }
   </style>
 </head>
 <body>
 
-<!-- ==============================
-     LOGIN PROAUTO – INTERFAZ VISUAL (SIN LAVADO)
-     ============================== -->
-<div id="loginScreen"
-     style="
-       position:fixed;top:0;left:0;width:100%;height:100%;
-       background:#eef1f5;display:flex;align-items:center;
-       justify-content:center;z-index:99999;
-       font-family:system-ui;
-     ">
-  
-  <div style="
-      background:white;padding:32px;border-radius:14px;
-      width:360px;box-shadow:0 6px 20px rgba(0,0,0,0.15);
-      text-align:center;
-  ">
-    
-    <!-- LOGO PARA GITHUB -->
-    <div style="height:120px;margin-top:32px;margin-bottom:36px;display:flex;justify-content:center;align-items:center;">
-      <div style="font-size:32px;color:#007dc5;font-weight:bold;">AXTROM</div>
-    </div>
-
+<div id="loginScreen" style="position:fixed;top:0;left:0;width:100%;height:100%;background:#eef1f5;display:flex;align-items:center;justify-content:center;z-index:99999;font-family:system-ui;">
+  <div style="background:white;padding:32px;border-radius:14px;width:360px;box-shadow:0 6px 20px rgba(0,0,0,0.15);text-align:center;">
+    <img src="logo_axis.png" alt="AXIS" style="height:120px;margin-top:32px;margin-bottom:36px;">
     <section id="view-login" class="view active" style="padding:40px; text-align:center;">
     <h2>Ingreso al sistema</h2>
     <p style="margin-bottom:20px;color:#666;">Ingrese su usuario y contraseña</p>
-
     <div style="max-width:300px;margin:0 auto;text-align:left;">
         <label>Usuario</label>
         <input id="loginUsuario" type="text" class="input" placeholder="usuario" style="width:100%;margin-bottom:10px;">
-
         <label>Contraseña</label>
         <input id="loginPassword" type="password" class="input" placeholder="******" style="width:100%;margin-bottom:20px;">
-
         <button id="btnLogin" class="btn btn-primary" style="width:100%;">Ingresar</button>
-        
-        <p style="margin-top:15px;font-size:12px;color:#666;text-align:center;">
-          <strong>Modo prueba:</strong> Usa cualquier usuario/contraseña
-        </p>
     </div>
-</section>
-
+    </section>
   </div>
 </div>
 
+<div id="main-container">
   <header class="header header-proauto">
     <div class="header-left">
-      <!-- LOGO PARA GITHUB -->
-      <div style="height:64px;margin-right:14px;display:flex;align-items:center;">
-        <div style="font-size:24px;color:#007dc5;font-weight:bold;">AXTROM</div>
-      </div>
+      <img src="logo_axis.png" alt="AXIS" class="logo logo-header" />
       <div>
        <h1>Tablero de vehículos en taller</h1>
-        <p class="subtitle">Gestión visual de órdenes de trabajo - AXTROM</p>
-        <p class="subtitle" style="color:#e53935;font-weight:bold;">MODO PRUEBA - Datos en memoria local</p>
-        <!-- RESUMEN DE DATOS DEL VEHÍCULO -->
-    <button id="vs-close" class="vs-close">&times;</button>
-    <div id="vehicle-summary" class="vehicle-summary hidden">
-    <!-- SECCIÓN VEHÍCULO -->
-<div class="vs-section">
-  <div class="vs-title">Vehículo</div>
-
-  <div class="vs-row">
-    <strong><i class="fa-solid fa-id-card"></i> Placa:</strong>
-    <span id="vs-placa"></span>
-  </div>
-
-  <div class="vs-row">
-    <strong><i class="fa-solid fa-fingerprint"></i> VIN:</strong>
-    <span id="vs-vin"></span>
-  </div>
-
-  <div class="vs-row">
-    <strong><i class="fa-solid fa-car-side"></i> Modelo:</strong>
-    <span id="vs-modelo"></span>
-  </div>
-</div>
-
-<!-- SECCIÓN RESPONSABLES -->
-<div class="vs-section">
-  <div class="vs-title">Responsables</div>
-
-  <div class="vs-row">
-    <strong><i class="fa-solid fa-user"></i> Cliente:</strong>
-    <span id="vs-propietario"></span>
-  </div>
-
-  <div class="vs-row">
-    <strong><i class="fa-solid fa-shield-halved"></i> Aseguradora:</strong>
-    <span id="vs-aseguradora"></span>
-  </div>
-
-  <div class="vs-row">
-    <strong><i class="fa-solid fa-user-tie"></i> Asesor:</strong>
-    <span id="vs-asesor"></span>
-  </div>
-
-  <div class="vs-row">
-    <strong><i class="fa-solid fa-user-gear"></i> Técnico:</strong>
-    <span id="vs-tecnico"></span>
-  </div>
-</div>
-
-<!-- SECCIÓN ESTADO -->
-<div class="vs-section">
-  <div class="vs-title">Estado</div>
-
-  <div class="vs-row">
-    <strong><i class="fa-solid fa-calendar-plus"></i> Ingreso:</strong>
-    <span id="vs-fecha-ing"></span>
-  </div>
-
-  <div class="vs-row">
-    <strong><i class="fa-solid fa-calendar-check"></i> Entrega:</strong>
-    <span id="vs-fecha-sal"></span>
-  </div>
-
-  <div class="vs-row">
-    <strong><i class="fa-solid fa-diagram-project"></i> Estado:</strong>
-    <span id="vs-estado"></span>
-  </div>
-
-  <div class="vs-row">
-    <strong><i class="fa-solid fa-clipboard-list"></i> Última OT:</strong>
-    <span id="vs-ot"></span>
-  </div>
-</div>
-
-
-
-
-
+        <p class="subtitle">Gestión visual de órdenes de trabajo - AXIS</p>
+        <button id="vs-close" class="vs-close">&times;</button>
+        <div id="vehicle-summary" class="vehicle-summary hidden">
+          <div class="vs-section">
+            <div class="vs-title">Vehículo</div>
+            <div class="vs-row"><strong><i class="fa-solid fa-id-card"></i> Placa:</strong> <span id="vs-placa"></span></div>
+            <div class="vs-row"><strong><i class="fa-solid fa-fingerprint"></i> VIN:</strong> <span id="vs-vin"></span></div>
+            <div class="vs-row"><strong><i class="fa-solid fa-car-side"></i> Modelo:</strong> <span id="vs-modelo"></span></div>
+          </div>
+          <div class="vs-section">
+            <div class="vs-title">Responsables</div>
+            <div class="vs-row"><strong><i class="fa-solid fa-user"></i> Cliente:</strong> <span id="vs-propietario"></span></div>
+            <div class="vs-row"><strong><i class="fa-solid fa-shield-halved"></i> Aseguradora:</strong> <span id="vs-aseguradora"></span></div>
+            <div class="vs-row"><strong><i class="fa-solid fa-user-tie"></i> Asesor:</strong> <span id="vs-asesor"></span></div>
+            <div class="vs-row"><strong><i class="fa-solid fa-user-gear"></i> Técnico:</strong> <span id="vs-tecnico"></span></div>
+          </div>
+          <div class="vs-section">
+            <div class="vs-title">Estado</div>
+            <div class="vs-row"><strong><i class="fa-solid fa-calendar-plus"></i> Ingreso:</strong> <span id="vs-fecha-ing"></span></div>
+            <div class="vs-row"><strong><i class="fa-solid fa-calendar-check"></i> Entrega:</strong> <span id="vs-fecha-sal"></span></div>
+            <div class="vs-row"><strong><i class="fa-solid fa-diagram-project"></i> Estado:</strong> <span id="vs-estado"></span></div>
+            <div class="vs-row"><strong><i class="fa-solid fa-clipboard-list"></i> Última OT:</strong> <span id="vs-ot"></span></div>
+          </div>
+        </div>
       </div>
     </div>
   </header>
 
-  <div class="top-actions">
-    <button id="btnVerTablero" class="btn btn-secondary">
-      <i class="fa-solid fa-table-columns"></i> Ver tablero
-    </button>
-
-    <button id="btnAgregarVehiculo" class="btn btn-primary">
-      <i class="fa-solid fa-car"></i> Agregar / editar vehículo
-    </button>
-
-    <button id="btnLogout" class="btn btn-danger">
-      <i class="fa-solid fa-right-from-bracket"></i> Cerrar sesión
-    </button>
-
-    <button id="btnAuditoria" class="btn btn-secondary">
-      <i class="fa-solid fa-clipboard-check"></i> Auditoría
-    </button>
-
-    <button id="btnUsuarios" class="btn btn-secondary">
-      <i class="fa-solid fa-users"></i> Usuarios
-    </button>
-
+  <div id="nav-buttons" style="padding: 10px;">
+    <div style="display:inline-block; position:relative; margin-right:5px;">
+        <button id="btnNotificaciones" class="btn btn-notif">
+            <i class="fa-solid fa-bell"></i>
+            <span id="notifBadge" class="notif-badge" style="display:none;">0</span>
+        </button>
+        <div id="notifPanel" class="notif-panel">
+            <div style="padding:10px; border-bottom:1px solid #eee; display:flex; justify-content:space-between; align-items:center;">
+                <strong>Notificaciones</strong>
+                <button id="btnMarkRead" style="border:none; background:none; color:#007dc5; cursor:pointer; font-size:11px;">Marcar leídas</button>
+            </div>
+            <div id="notifList"></div>
+        </div>
+    </div>
+    <button id="btnVerTablero" class="btn btn-secondary"><i class="fa-solid fa-table-columns"></i> Ver tablero</button>
+    <button id="btnAgregarVehiculo" class="btn btn-primary"><i class="fa-solid fa-car"></i> Agregar / editar vehículo</button>
+    <button id="btnLogout" class="btn btn-danger"><i class="fa-solid fa-right-from-bracket"></i> Cerrar sesión</button>
+    <button id="btnAuditoria" class="btn btn-secondary"><i class="fa-solid fa-clipboard-check"></i> Auditoría</button>
+    <button id="btnPresupuesto" class="btn btn-secondary"><i class="fa-solid fa-file-invoice-dollar"></i> Presupuesto</button>
     <button id="btnGuardarLocal" class="btn btn-secondary">
+      <input type="file" id="inputCargarLocal" accept="application/json" style="display:none" />
       <i class="fa-solid fa-floppy-disk"></i> Guardar respaldo
     </button>
-
     <button id="btnCargarLocal" class="btn btn-secondary">
       <i class="fa-solid fa-folder-open"></i> Cargar respaldo
-      <input
-      type="file"
-      id="inputCargarLocal"
-      accept="application/json"
-      style="display:none"
-    />
-    </button>
-    
-    <!-- BOTÓN NUEVO PARA GITHUB -->
-    <button id="btnExportarTodo" class="btn btn-secondary">
-      <i class="fa-solid fa-download"></i> Exportar datos
+      <input type="file" id="inputCargarLocalInput" accept="application/json" style="display:none" />
     </button>
   </div>
 
-  <!-- VISTA TABLERO -->
-  <div style="display:flex;justify-content:flex-end;margin-bottom:8px;">
-    <input
-      id="searchInput"
-      type="text"
-      placeholder="Buscar por placa, modelo, propietario..."
-      style="padding:4px 8px;border-radius:8px;border:1px solid #ccc;font-size:12px;max-width:220px;width:100%;"
-    >
+  <div style="display:flex;justify-content:flex-end;margin-bottom:8px;padding:0 10px;">
+    <input id="searchInput" type="text" placeholder="Buscar por placa, modelo, propietario..." style="padding:4px 8px;border-radius:8px;border:1px solid #ccc;font-size:12px;max-width:220px;width:100%;">
   </div>
-  <section id="view-tablero" class="view active">
+  <section id="view-tablero" class="view active" style="padding:10px;">
     <div class="board" id="board"></div>
   </section>
-<div id="userInfoBox" style="
-    position: fixed;
-    top: 12px;
-    right: 12px;
-    background: rgba(255, 255, 255, 0.95);
-    padding: 10px 16px;
-    border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-    font-family: system-ui;
-    z-index: 9999;
-    display: none;
-    backdrop-filter: blur(6px);
-">
+
+  <div id="userInfoBox" style="position: fixed; top: 12px; right: 12px; background: rgba(255, 255, 255, 0.95); padding: 10px 16px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.15); font-family: system-ui; z-index: 9999; display: none; backdrop-filter: blur(6px);">
     <div style="font-weight:600;font-size:15px;" id="userInfoName"></div>
     <div style="font-size:12px;color:#444;" id="userInfoRole"></div>
-</div>
+  </div>
 
-
-  <!-- VISTA FORMULARIO -->
-  <section id="view-form" class="view">
+  <section id="view-form" class="view" style="padding:10px;">
     <div class="panel-form">
       <h2 id="form-title">Nuevo vehículo</h2>
       <p id="form-subtitle">Registre los datos del vehículo. Se agregará en el estado <strong>Falta de inspección</strong>.</p>
-
       <form id="vehicleForm">
         <div class="form-grid">
-          <div class="form-field">
-            <label for="vin">VIN</label>
-            <input type="text" id="vin" name="vin" placeholder="Ej: 3N1AB7AP4HY123456" />
-          </div>
-          <div class="form-field">
-  <label for="fecha_ingreso">Fecha ingreso</label>
-  <input type="date" id="fecha_ingreso" name="fecha_ingreso">
-</div>
-
-<div class="form-field">
-  <label for="fecha_salida">Fecha salida</label>
-  <input type="date" id="fecha_salida" name="fecha_salida">
-</div>
-
-          <div class="form-field">
-            <label for="placa">Placa *</label>
-            <input type="text" id="placa" name="placa" required placeholder="Ej: ABC1234" />
-          </div>
-
+          <div class="form-field"><label for="vin">VIN</label><input type="text" id="vin" name="vin" placeholder="Ej: 3N1AB7AP4HY123456" /></div>
+          <div class="form-field"><label for="fecha_ingreso">Fecha ingreso</label><input type="date" id="fecha_ingreso" name="fecha_ingreso"></div>
+          <div class="form-field"><label for="fecha_salida">Fecha salida</label><input type="date" id="fecha_salida" name="fecha_salida"></div>
+          <div class="form-field"><label for="placa">Placa *</label><input type="text" id="placa" name="placa" required placeholder="Ej: ABC1234" /></div>
           <div class="form-field">
             <label for="modelo">Modelo / Vehículo *</label>
             <input type="text" id="modelo" name="modelo" list="modelosChevrolet" required placeholder="Ej: Onix Turbo Sedán" />
             <datalist id="modelosChevrolet">
-              <!-- Modelos Chevrolet Ecuador aproximados -->
-              <option value="Onix Turbo RS"></option>
-              <option value="Onix Turbo Sedán"></option>
-              <option value="Montana"></option>
-              <option value="Nuevo Groove"></option>
-              <option value="Tracker Turbo"></option>
-              <option value="Captiva XL"></option>
-              <option value="Nueva Tahoe"></option>
-              <option value="Nueva Trailblazer"></option>
-              <option value="Suburban"></option>
-              <option value="N400 Cargo"></option>
-              <option value="N400 Pasajeros"></option>
-              <option value="D-Max"></option>
-              <option value="Colorado"></option>
-              <option value="Silverado"></option>
-              <option value="Captiva EV"></option>
-              <option value="Blazer EV"></option>
-              <option value="Equinox EV"></option>
-              <option value="Spark EUV"></option>
-              <option value="NLR 511 EIV"></option>
-              <option value="NMR EIII"></option>
-              <option value="NPR 815 EIII"></option>
-              <option value="NQR 915 EIII"></option>
-              <option value="NQR 1015 EIII"></option>
-              <option value="FRR 1121 EIII"></option>
-              <option value="FTR 1624 EIII"></option>
-              <option value="FVZ 2630 CORTO"></option>
-              <option value="FVR 1730 EIII CORTO"></option>
-              <option value="FVR 1730 EIII LARGO"></option>
-              <option value="FVZ 2630 EIII"></option>
+              <option value="Onix Turbo RS"></option><option value="Onix Turbo Sedán"></option><option value="Montana"></option><option value="Nuevo Groove"></option><option value="Tracker Turbo"></option><option value="Captiva XL"></option><option value="Nueva Tahoe"></option><option value="Nueva Trailblazer"></option><option value="Suburban"></option><option value="N400 Cargo"></option><option value="N400 Pasajeros"></option><option value="D-Max"></option><option value="Colorado"></option><option value="Silverado"></option>
             </datalist>
           </div>
-
-          <div class="form-field">
-            <label for="propietario">Propietario *</label>
-            <input type="text" id="propietario" name="propietario" required placeholder="Nombre del cliente" />
-          </div>
-          <div class="form-field">
-            <label for="cedula">Cédula / ID cliente</label>
-             <input type="text" id="cedula" name="cedula" placeholder="Ej: 1102xxxxxx" />
-          </div>
-
+          <div class="form-field"><label for="propietario">Propietario *</label><input type="text" id="propietario" name="propietario" required placeholder="Nombre del cliente" /></div>
+          <div class="form-field"><label for="cedula">Cédula / ID cliente</label><input type="text" id="cedula" name="cedula" placeholder="Ej: 1102xxxxxx" /></div>
           <div class="form-field">
             <label for="aseguradora">Aseguradora</label>
             <select id="aseguradora" name="aseguradora">
-              <option value="">Sin aseguradora</option>
-              <option>Retail</option>
-              <option>CHUBB Seguros</option>
-              <option>Zurich Seguros</option>
-              <option>Latina Seguros</option>
-              <option>AIG Metropolitana</option>
-              <option>VAZ Seguros</option>
-              <option>Seguros Alianza</option>
-              <option>Seguros EquiSuiza</option>
-              <option>Sweaden Seguros</option>
-              <option>Seguros Atlantida</option>
-              <option>Generali</option>
-              <option>Hispana Seguros</option>
-              <option>Seguros Unidos</option>
-              <option>Flota</option>
-              <option>Seguro Constitución</option>
-              <option>Mapfre</option>
-              <option>Aseguradora del Sur</option>
-              <option>Seguros Condor</option>
+              <option value="">Sin aseguradora</option><option>Retail</option><option>CHUBB Seguros</option><option>Zurich Seguros</option><option>Latina Seguros</option><option>AIG Metropolitana</option><option>VAZ Seguros</option><option>Seguros Alianza</option><option>Mapfre</option><option>Aseguradora del Sur</option>
             </select>
           </div>
-
           <div class="form-field">
             <label for="asesor">Asesor de servicio</label>
             <select id="asesor" name="asesor" class="form-select">
-            <option value="">Seleccione asesor</option>
-            <option value="Jhonathan Cevallos">Jhonathan Cevallos</option>
-            <option value="Pablo León">Pablo León</option>
-            <option value="Magno Hugo">Magno Hugo</option>
-            <option value="Marcos Ibarra">Marcos Ibarra</option>
-          </select>
+            <option value="">Seleccione asesor</option><option value="Jhonathan Cevallos">Jhonathan Cevallos</option><option value="Pablo León">Pablo León</option><option value="Magno Hugo">Magno Hugo</option><option value="Marcos Ibarra">Marcos Ibarra</option>
+            </select>
           </div>
-
           <div class="form-field">
             <label for="tecnico">Tecnico encargado</label>
             <select id="tecnico" name="tecnico">
-              <option value="">Seleccione tecnico</option>
-              <option>ANGEL ANGUISACA</option>
-              <option>CARLOS CAJAMARCA</option>
-              <option>DIEGO CAMPOVERDE</option>
-              <option>JUAN ERAS</option>
-              <option>JORGE SANCHEZ</option>
-              <option>TECNICO TOT</option>
-              <option>ROMAN SACA</option>
+              <option value="">Seleccione tecnico</option><option>ANGEL ANGUISACA</option><option>CARLOS CAJAMARCA</option><option>DIEGO CAMPOVERDE</option><option>JUAN ERAS</option><option>JORGE SANCHEZ</option><option>TECNICO TOT</option><option>ROMAN SACA</option>
             </select>
           </div>
-
-         
-
           <div class="form-section-title">Archivo de orden de trabajo</div>
-          <div class="form-field" style="grid-column: 1 / -1;">
-            <label for="archivo_orden">Adjuntar archivo (PDF, imagen, etc.)</label>
-            <input type="file" id="archivo_orden" name="archivo_orden" />
-          </div>
-          <!-- Datos del cliente -->
-<div class="form-field" style="grid-column: span 2;">
-  <label for="archivos_cliente">Datos del cliente</label>
-  <input type="file" id="archivos_cliente" name="archivos_cliente" multiple>
-</div>
-
-<!-- Autorizaciones -->
-<div class="form-field" style="grid-column: span 2;">
-  <label for="archivos_autorizaciones">Autorizaciones</label>
-  <input type="file" id="archivos_autorizaciones" name="archivos_autorizaciones" multiple>
-</div>
-
-<!-- Proformas y fotos -->
-<div class="form-field" style="grid-column: span 2;">
-  <label for="archivos_proformas">Proformas y Fotos</label>
-  <input type="file" id="archivos_proformas" name="archivos_proformas" multiple>
-</div>
-
-          <div class="form-field">
-           <label for="hora_salida">Hora de entrega</label>
-           <input type="time" id="hora_salida" name="hora_salida">
-          </div>
-
-
+          <div class="form-field" style="grid-column: 1 / -1;"><label for="archivo_orden">Adjuntar archivo (PDF, imagen, etc.)</label><input type="file" id="archivo_orden" name="archivo_orden" /></div>
+          <div class="form-field" style="grid-column: span 2;"><label for="archivos_cliente">Datos del cliente</label><input type="file" id="archivos_cliente" name="archivos_cliente" multiple></div>
+          <div class="form-field" style="grid-column: span 2;"><label for="archivos_autorizaciones">Autorizaciones</label><input type="file" id="archivos_autorizaciones" name="archivos_autorizaciones" multiple></div>
+          <div class="form-field" style="grid-column: span 2;"><label for="archivos_proformas">Fotos del vehículo (Ingreso) y Proformas</label><input type="file" id="archivos_proformas" name="archivos_proformas" multiple accept="image/*,application/pdf"></div>
+          <div class="form-field"><label for="hora_salida">Hora de entrega</label><input type="time" id="hora_salida" name="hora_salida"></div>
           <div class="form-section-title">Partes afectadas (daños)</div>
           <div class="form-field" style="grid-column: 1 / -1;">
             <div class="checklist-group">
@@ -1135,12 +523,8 @@ body { margin: 0; padding: 16px; background: #f5f5f7; color: #1a1a1a; }
               <label class="checklist-item"><input type="checkbox" name="danos" value="Lateral derecho" /> Lateral derecho</label>
               <label class="checklist-item"><input type="checkbox" name="danos" value="Lateral izquierdo" /> Lateral izquierdo</label>
               <label class="checklist-item"><input type="checkbox" name="danos" value="Techo" /> Techo</label>
-              <label class="checklist-item"><input type="checkbox" name="danos" value="Interior" /> Interior</label>
-              <label class="checklist-item"><input type="checkbox" name="danos" value="Parabrisas / vidrios" /> Parabrisas / vidrios</label>
-              <label class="checklist-item"><input type="checkbox" name="danos" value="Chasis / estructura" /> Chasis / estructura</label>
             </div>
           </div>
-
           <div class="form-section-title">Equipamiento presente</div>
           <div class="form-field" style="grid-column: 1 / -1;">
             <div class="checklist-group">
@@ -1148,19 +532,10 @@ body { margin: 0; padding: 16px; background: #f5f5f7; color: #1a1a1a; }
               <label class="checklist-item"><input type="checkbox" name="equipamiento" value="Espejos" /> Espejos</label>
               <label class="checklist-item"><input type="checkbox" name="equipamiento" value="Radio / carátula" /> Radio / carátula</label>
               <label class="checklist-item"><input type="checkbox" name="equipamiento" value="Llanta de emergencia" /> Llanta de emergencia</label>
-              <label class="checklist-item"><input type="checkbox" name="equipamiento" value="Llanta de repuesto" /> Llanta de repuesto</label>
               <label class="checklist-item"><input type="checkbox" name="equipamiento" value="Herramientas" /> Herramientas</label>
-              <label class="checklist-item"><input type="checkbox" name="equipamiento" value="Triángulos" /> Triángulos</label>
-              <label class="checklist-item"><input type="checkbox" name="equipamiento" value="Gata / extintor" /> Gata / extintor</label>
-              <label class="checklist-item"><input type="checkbox" name="equipamiento" value="Alfombras" /> Alfombras</label>
-              <label class="checklist-item"><input type="checkbox" name="equipamiento" value="Aros de lujo / copas" /> Aros de lujo / copas</label>
-              <label class="checklist-item"><input type="checkbox" name="equipamiento" value="Emblemas / logos" /> Emblemas / logos</label>
-              <label class="checklist-item"><input type="checkbox" name="equipamiento" value="Antena" /> Antena</label>
-              <label class="checklist-item"><input type="checkbox" name="equipamiento" value="Otros" /> Otros</label>
             </div>
           </div>
         </div>
-
         <div class="form-actions">
           <span id="form-mode-indicator" style="font-size:11px;color:#666;"></span>
           <div class="form-actions-right">
@@ -1170,53 +545,124 @@ body { margin: 0; padding: 16px; background: #f5f5f7; color: #1a1a1a; }
         </div>
       </form>
     </div>
-  </section><!-- ============================
-     VISTA PANEL AUDITORÍA
-============================ -->
-<section id="view-auditoria" class="view">
+  </section>
+
+  <section id="view-auditoria" class="view" style="padding:10px;">
+    <div class="panel-detalle">
+      <button id="btnVolverDesdeAuditoria" class="btn btn-link">&larr; Volver al tablero</button>
+      <h2>Auditoría de movimientos</h2>
+      <p style="font-size:12px;color:#666;">Se registran todos los movimientos de tarjetas realizados en el tablero.</p>
+      <input id="auditoriaSearch" type="text" placeholder="Filtrar por placa..." style="margin: 10px 0; padding: 6px 10px; width: 220px; border-radius: 8px; border: 1px solid #ccc; font-size: 12px;">
+      <div class="auditoria-container">
+        <table id="tablaAuditoria">
+            <thead><tr><th>Fecha</th><th>Hora</th><th>Usuario</th><th>Placa</th><th>Desde</th><th>Hacia</th><th>Acción</th><th>Descripción</th></tr></thead>
+            <tbody id="auditoriaBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+  <section id="view-presupuesto" class="view" style="padding:10px;">
   <div class="panel-detalle">
-    <button id="btnVolverDesdeAuditoria" class="btn btn-link">&larr; Volver al tablero</button>
+    <button id="btnVolverDesdePresupuesto" class="btn btn-link">&larr; Volver al tablero</button>
+    
+    <div style="display:flex; flex-wrap:wrap; justify-content:space-between; align-items:flex-start; margin-bottom:20px; gap:15px;">
+        
+        <div>
+            <h2 style="margin:0; color:#007dc5;">Reporte Financiero</h2>
+            <p style="font-size:12px; color:#666; margin:0 0 10px 0;">Filtrar ingresos por fecha de autorización.</p>
+            
+            <div style="display:flex; gap:10px; align-items:flex-end; background:#f8f9fa; padding:10px; border-radius:8px; border:1px solid #eee;">
+                
+                <div style="display:flex; flex-direction:column;">
+                    <label style="font-size:10px; font-weight:bold; color:#555; margin-bottom:4px;">Año</label>
+                    <select id="filtroAnio" class="input-filtro" style="padding:5px; border-radius:4px; border:1px solid #ccc; font-size:12px;">
+                        <option value="">Todos</option>
+                        <option value="2024">2024</option>
+                        <option value="2025">2025</option>
+                        <option value="2026">2026</option>
+                        <option value="2027">2027</option>
+                        <option value="2028">2028</option>
+                        <option value="2029">2029</option>
+                        <option value="2030">2030</option>
+                    </select>
+                </div>
 
-    <h2>Auditoría de movimientos</h2>
-    <p style="font-size:12px;color:#666;">
-      Se registran todos los movimientos de tarjetas realizados en el tablero.
-    </p>
-    <input
-  id="auditoriaSearch"
-  type="text"
-  placeholder="Filtrar por placa..."
-  style="
-    margin: 10px 0;
-    padding: 6px 10px;
-    width: 220px;
-    border-radius: 8px;
-    border: 1px solid #ccc;
-    font-size: 12px;
-  "
->
+                <div style="display:flex; flex-direction:column;">
+                    <label style="font-size:10px; font-weight:bold; color:#555; margin-bottom:4px;">Mes</label>
+                    <select id="filtroMes" class="input-filtro" style="padding:5px; border-radius:4px; border:1px solid #ccc; font-size:12px;">
+                        <option value="">Todos</option>
+                        <option value="01">Enero</option>
+                        <option value="02">Febrero</option>
+                        <option value="03">Marzo</option>
+                        <option value="04">Abril</option>
+                        <option value="05">Mayo</option>
+                        <option value="06">Junio</option>
+                        <option value="07">Julio</option>
+                        <option value="08">Agosto</option>
+                        <option value="09">Septiembre</option>
+                        <option value="10">Octubre</option>
+                        <option value="11">Noviembre</option>
+                        <option value="12">Diciembre</option>
+                    </select>
+                </div>
 
-    <div class="auditoria-container">
-  <table id="tablaAuditoria">
-      <thead>
-          <tr>
-              <th>Fecha</th>
-              <th>Hora</th>
-              <th>Usuario</th>
-              <th>Placa</th>
-              <th>Desde</th>
-              <th>Hacia</th>
-              <th>Acción</th>
-              <th>Descripción</th>
-          </tr>
-      </thead>
-      <tbody id="auditoriaBody"></tbody>
-  </table>
-</div>
+                <div style="display:flex; flex-direction:column;">
+                    <label style="font-size:10px; font-weight:bold; color:#555; margin-bottom:4px;">Día</label>
+                    <select id="filtroDia" class="input-filtro" style="padding:5px; border-radius:4px; border:1px solid #ccc; font-size:12px;">
+                        <option value="">Todos</option>
+                        <option value="01">1</option><option value="02">2</option><option value="03">3</option><option value="04">4</option><option value="05">5</option>
+                        <option value="06">6</option><option value="07">7</option><option value="08">8</option><option value="09">9</option><option value="10">10</option>
+                        <option value="11">11</option><option value="12">12</option><option value="13">13</option><option value="14">14</option><option value="15">15</option>
+                        <option value="16">16</option><option value="17">17</option><option value="18">18</option><option value="19">19</option><option value="20">20</option>
+                        <option value="21">21</option><option value="22">22</option><option value="23">23</option><option value="24">24</option><option value="25">25</option>
+                        <option value="26">26</option><option value="27">27</option><option value="28">28</option><option value="29">29</option><option value="30">30</option>
+                        <option value="31">31</option>
+                    </select>
+                </div>
+
+                <button onclick="limpiarFiltrosPresupuesto()" class="btn btn-secondary" style="font-size:11px; padding:6px 12px; height: 30px;">
+                    <i class="fa-solid fa-eraser"></i> Limpiar
+                </button>
+            </div>
+        </div>
+
+        <div style="display:flex; gap:10px;">
+            <div style="text-align:right; background:#e3f2fd; padding:10px 15px; border-radius:8px; min-width:140px;">
+                <div style="font-size:10px; color:#007dc5; font-weight:bold; text-transform:uppercase;">Facturación (Subtotal)</div>
+                <div id="granTotalDisplay" style="font-size:20px; font-weight:800; color:#007dc5;">$ 0.00</div>
+            </div>
+
+            <div style="text-align:right; background:#e8f5e9; padding:10px 15px; border-radius:8px; border:1px solid #c8e6c9; min-width:160px;">
+                <div style="font-size:10px; color:#2e7d32; font-weight:bold; text-transform:uppercase;">Facturación + IVA (15%)</div>
+                <div id="granTotalIvaDisplay" style="font-size:20px; font-weight:800; color:#2e7d32;">$ 0.00</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="auditoria-container" style="max-height: none;">
+      <table id="tablaPresupuestoGeneral" style="width:100%; border-collapse:collapse; font-size:13px;">
+        <thead style="background:#f1f5f9; color:#334155;">
+            <tr>
+                <th style="padding:10px; text-align:left;">Sector / Rubro</th>
+                <th style="padding:10px; text-align:right; color:#007dc5;">Ingresos SEGUROS</th>
+                <th style="padding:10px; text-align:right; color:#2e7d32;">Ingresos PRIVADOS</th>
+                <th style="padding:10px; text-align:right; font-weight:800;">TOTAL RUBRO</th>
+            </tr>
+        </thead>
+        <tbody id="bodyPresupuestoGeneral"></tbody>
+        <tfoot style="background:#f8fafc; font-weight:bold; border-top:2px solid #e2e8f0;">
+            <tr>
+                <td style="padding:12px;">TOTALES</td>
+                <td style="padding:12px; text-align:right;" id="footSeguro">$ 0.00</td>
+                <td style="padding:12px; text-align:right;" id="footPrivado">$ 0.00</td>
+                <td style="padding:12px; text-align:right;" id="footTotal">$ 0.00</td>
+            </tr>
+        </tfoot>
+      </table>
+    </div>
+  </div>
 </section>
-
-
-  <!-- VISTA DETALLE VEHÍCULO -->
-  <section id="view-detalle" class="view">
+  <section id="view-detalle" class="view" style="padding:10px;">
     <div class="panel-detalle">
       <div class="detalle-header-actions">
         <button id="btnVolverDesdeDetalle" class="btn btn-link">&larr; Volver al tablero</button>
@@ -1225,11 +671,8 @@ body { margin: 0; padding: 16px; background: #f5f5f7; color: #1a1a1a; }
           <button id="btnEliminarVehiculo" class="btn btn-danger">Eliminar vehículo</button>
         </div>
       </div>
-
-
       <h2 id="detalle-titulo">Detalle del vehículo</h2>
       <small id="detalle-subtitulo"></small>
-
       <div class="detalle-grid">
         <div><span class="detalle-label">VIN:</span> <span id="detalle-vin" class="detalle-value"></span></div>
         <div><span class="detalle-label">Placa:</span> <span id="detalle-placa" class="detalle-value"></span></div>
@@ -1244,941 +687,526 @@ body { margin: 0; padding: 16px; background: #f5f5f7; color: #1a1a1a; }
         <div><span class="detalle-label">Hora entrega:</span> <span id="detalle-hora-salida" class="detalle-value"></span></div>
         <div><span class="detalle-label">Estado actual:</span> <span id="detalle-estado" class="detalle-value"></span></div>
       </div>
+      <div class="detalle-subsection-title">Partes afectadas</div><ul id="detalle-danos" class="detalle-list"></ul>
+      <div class="detalle-subsection-title">Equipamiento presente</div><ul id="detalle-equipamiento" class="detalle-list"></ul>
+      <div class="detalle-subsection-title">Orden de trabajo adjunta</div><div id="detalle-archivo" class="detalle-archivo" style="font-size:12px;color:#555;margin-top:4px;"></div>
+      <div class="detalle-subsection-title">Datos del cliente</div><div id="detalle-archivos-cliente" class="detalle-archivo"></div>
+      <div class="detalle-subsection-title">Autorizaciones</div><div id="detalle-archivos-autorizaciones" class="detalle-archivo"></div>
+      <div class="detalle-subsection-title">Proformas y fotos</div><div id="detalle-archivos-proformas" class="detalle-archivo"></div>
 
-      <div class="detalle-subsection-title">Partes afectadas</div>
-      <ul id="detalle-danos" class="detalle-list"></ul>
-
-      <div class="detalle-subsection-title">Equipamiento presente</div>
-      <ul id="detalle-equipamiento" class="detalle-list"></ul>
-
-      <div class="detalle-subsection-title">Orden de trabajo adjunta</div>
-      <div id="detalle-archivo" class="detalle-archivo" style="font-size:12px;color:#555;margin-top:4px;"></div>
-      
-      <div class="detalle-subsection-title">Datos del cliente</div>
-<div id="detalle-archivos-cliente" class="detalle-archivo"></div>
-
-<div class="detalle-subsection-title">Autorizaciones</div>
-<div id="detalle-archivos-autorizaciones" class="detalle-archivo"></div>
-
-<div class="detalle-subsection-title">Proformas y fotos</div>
-<div id="detalle-archivos-proformas" class="detalle-archivo"></div>
-
-      <!-- NUEVA SECCIÓN: PRESUPUESTO -->
       <div class="detalle-subsection-title">Presupuesto y repuestos</div>
-
-      <div id="presupuesto-resumen" class="presupuesto-resumen">
-        No hay ítems de presupuesto registrados.
-      </div>
-
+      <div id="presupuesto-resumen" class="presupuesto-resumen">No hay ítems de presupuesto registrados.</div>
       <div class="presupuesto-table">
-        <div class="presupuesto-header-row">
-          <div>Tipo / Grupo</div>
-          <div>Código</div>
-          <div>Descripción</div>
-          <div>Cant.</div>
-          <div class="presupuesto-importes">Valor</div>
-        </div>
+        <div class="presupuesto-header-row"><div>Tipo / Grupo</div><div>Código</div><div>Descripción</div><div>Cant.</div><div class="presupuesto-importes">Valor</div></div>
         <div id="presupuesto-list"></div>
       </div>
-
       <form id="presupuestoForm">
         <div class="presupuesto-form-inline">
-          <select id="presupuesto_tipo">
-            <option value="Seguro">Seguro</option>
-            <option value="Privado">Privado</option>
-          </select>
-          <select id="presupuesto_categoria">
-            <option value="Repuesto">Repuesto</option>
-            <option value="Mano de obra">Mano de obra</option>
-            <option value="Servicio tercero">Servicio tercero</option>
-          </select>
+          <select id="presupuesto_tipo"><option value="Seguro">Seguro</option><option value="Privado">Privado</option></select>
+          <select id="presupuesto_categoria"><option value="Repuesto">Repuesto</option><option value="Mano de obra">Mano de obra</option><option value="Servicio tercero">Servicio tercero</option></select>
           <input id="presupuesto_codigo" type="text" placeholder="Código" />
           <input id="presupuesto_desc" type="text" placeholder="Descripción" />
           <input id="presupuesto_cant" type="number" min="1" step="1" placeholder="Cant." />
           <input id="presupuesto_valor" type="number" min="0" step="0.01" placeholder="Valor" />
         </div>
-        <div class="presupuesto-form-actions">
-          <button type="submit" class="btn btn-secondary" style="font-size:11px;padding:4px 10px;">
-            Agregar ítem
-          </button>
-        </div>
+        <div class="presupuesto-form-actions"><button type="submit" class="btn btn-secondary" style="font-size:11px;padding:4px 10px;">Agregar ítem</button></div>
       </form>
 
       <div class="ordenes-header">
         <h3 style="margin:0;font-size:14px;">Órdenes de trabajo (anotaciones)</h3>
         <small>Doble clic en una tarjeta del tablero para ver y agregar órdenes.</small>
       </div>
-
       <div id="ordenesList" class="ordenes-list"></div>
-<form id="ordenForm">
-  <div class="form-grid">
-    <div class="form-field" style="grid-column: span 2;">
-      <label for="orden_descripcion">Descripción de la orden *</label>
-      <textarea id="orden_descripcion" name="orden_descripcion" rows="2" placeholder="Ej: Cambio de parachoques delantero, alineación, revisión de sensores." required></textarea>
+      <form id="ordenForm">
+        <div class="form-grid"><div class="form-field" style="grid-column: span 2;"><label for="orden_descripcion">Descripción de la orden *</label><textarea id="orden_descripcion" name="orden_descripcion" rows="2" placeholder="Ej: Cambio de parachoques delantero, alineación..." required></textarea></div></div>
+        <div class="form-actions"><div class="form-actions-right"><button type="submit" class="btn btn-primary">Agregar orden</button></div></div>
+      </form>
     </div>
-  </div>
-  <div class="form-actions">
-    <div></div>
-    <div class="form-actions-right">
-      <button type="submit" class="btn btn-primary">Agregar orden</button>
-    </div>
-  </div>
-</form>
+  </section>
+</div>
 
+<section id="view-lavador" class="view" style="padding: 16px;">
+    <div class="lavador-header">
+        <div>
+            <h2 style="margin:0;"><i class="fa-solid fa-soap"></i> AXTROM Lavadora</h2>
+            <span style="font-size:12px; opacity:0.9;">Panel de Control de Operario</span>
+        </div>
+        <div>
+            <span id="lavadorUserDisplay" style="font-weight:bold; margin-right:15px;"></span>
+            <button id="btnLogoutLavador" class="btn btn-danger"><i class="fa-solid fa-right-from-bracket"></i> Salir</button>
+        </div>
     </div>
-  <script>
+    
+    <div class="lavador-board">
+        <div class="lavador-column">
+            <div class="column-title"><i class="fa-solid fa-clock"></i> EN ESPERA</div>
+            <div id="lav-list-espera"></div>
+        </div>
+        <div class="lavador-column">
+            <div class="column-title"><i class="fa-solid fa-water"></i> LAVANDO</div>
+            <div id="lav-list-lavando"></div>
+        </div>
+        <div class="lavador-column">
+            <div class="column-title"><i class="fa-solid fa-wind"></i> SECADO / ASPIRADO</div>
+            <div id="lav-list-secado"></div>
+        </div>
+        <div class="lavador-column">
+            <div class="column-title" style="color: #4caf50;"><i class="fa-solid fa-check-double"></i> LISTO</div>
+            <div id="lav-list-listo"></div>
+        </div>
+    </div>
+</section>
 
-    // =========================================
-// LOGIN PROAUTO – USUARIOS Y ROLES (SIN LAVADO)
+<script>
 // =========================================
-
-// MODIFICADO PARA GITHUB: Login simplificado
-function loginSistema() {
-    const usuarioIngresado = document.getElementById("loginUsuario").value.trim();
-    const passwordIngresado = document.getElementById("loginPassword").value.trim();
-
-    // En modo prueba, aceptamos cualquier credencial
-    if (!usuarioIngresado) {
-        alert("Ingrese un usuario para continuar.");
-        return;
-    }
-
-    // Crear usuario temporal
-    window.currentUser = {
-        id: Date.now(),
-        nombre: usuarioIngresado,
-        usuario: usuarioIngresado,
-        rol: "admin", // Dar permisos completos para pruebas
-        activo: true
-    };
-
-    // Ocultar login
-    document.getElementById("loginScreen").style.display = "none";
-    showView("tablero");
-    aplicarPermisosEnInterfaz();
-    mostrarInfoUsuario();
-
-    // Limpiar campos
-    document.getElementById("loginUsuario").value = "";
-    document.getElementById("loginPassword").value = "";
-    
-    // Mensaje informativo
-    console.log("Modo prueba activado - Los datos se guardan en memoria del navegador");
-}
-
-// FUNCIÓN PARA EXPORTAR TODOS LOS DATOS
-function exportarDatosCompletos() {
-    const datosCompletos = {
-        fechaExportacion: new Date().toISOString(),
-        vehicles: vehicles,
-        auditoria: auditoria,
-        usuarios: JSON.parse(localStorage.getItem("proauto_usuarios") || "[]")
-    };
-    
-    const blob = new Blob([JSON.stringify(datosCompletos, null, 2)], { type: "application/json" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `proauto-backup-${new Date().toISOString().split('T')[0]}.json`;
-    a.click();
-    URL.revokeObjectURL(url);
-    alert("Datos exportados correctamente. Guarda este archivo para restaurar más tarde.");
-}
-
-// FUNCIÓN PARA CARGAR RESPALDO COMPLETO
-function cargarRespaldoCompleto(file) {
-    const reader = new FileReader();
-    reader.onload = function(e) {
-        try {
-            const datos = JSON.parse(e.target.result);
-            
-            if (datos.vehicles) vehicles = datos.vehicles;
-            if (datos.auditoria) auditoria = datos.auditoria;
-            if (datos.usuarios) {
-                localStorage.setItem("proauto_usuarios", JSON.stringify(datos.usuarios));
-            }
-            
-            renderBoard();
-            alert("Datos cargados correctamente desde el respaldo.");
-        } catch (error) {
-            alert("Error al cargar el archivo: " + error.message);
-        }
-    };
-    reader.readAsText(file);
-}
-
+// 1. CONFIGURACIÓN DE USUARIOS (Parte Superior)
+// =========================================
 let usuariosSistema = [
-    
-    // =====================
-    // ADMINISTRADORES
-    // =====================
-    {
-        id: 1,
-        nombre: "Jhonathan Cevallos",
-        usuario: "jcevallos",
-        rol: "admin",
-        password: "12345",
-        activo: true
-    },
-    {
-        id: 2,
-        nombre: "Pablo León",
-        usuario: "pleon",
-        rol: "admin",
-        password: "12345",
-        activo: true
-    },
-    {
-        id: 3,
-        nombre: "Magno Hugo",
-        usuario: "mhugo",
-        rol: "admin",
-        password: "12345",
-        activo: true
-    },
-    {
-        id: 4,
-        nombre: "Marcos Ibarra",
-        usuario: "mibarra",
-        rol: "admin",
-        password: "12345",
-        activo: true
-    },
-
-    // =====================
-    // TÉCNICOS
-    // =====================
-    {
-        id: 10,
-        nombre: "Angel Anguisaca",
-        usuario: "aanguisaca",
-        rol: "tecnico",
-        password: "12345",
-        activo: true
-    },
-    {
-        id: 11,
-        nombre: "Carlos Cajamarca",
-        usuario: "ccajamarca",
-        rol: "tecnico",
-        password: "12345",
-        activo: true
-    },
-    {
-        id: 12,
-        nombre: "Diego Campoverde",
-        usuario: "dcampoverde",
-        rol: "tecnico",
-        password: "12345",
-        activo: true
-    },
-    {
-        id: 13,
-        nombre: "Juan Eras",
-        usuario: "jeras",
-        rol: "tecnico",
-        password: "12345",
-        activo: true
-    },
-    {
-        id: 14,
-        nombre: "Jorge Sanchez",
-        usuario: "jsanchez",
-        rol: "tecnico",
-        password: "12345",
-        activo: true
-    },
-    {
-        id: 15,
-        nombre: "Tecnico Tot",
-        usuario: "ttot",
-        rol: "tecnico",
-        password: "12345",
-        activo: true
-    },
-    {
-        id: 16,
-        nombre: "Externo",
-        usuario: "externo1",
-        rol: "tecnico",
-        password: "12345",
-        activo: true
-    },
-    {
-        id: 17,
-        nombre: "Roman Saca",
-        usuario: "rsaca",
-        rol: "tecnico",
-        password: "12345",
-        activo: true
-    }
+    { id: 1, nombre: "Jhonathan Cevallos", usuario: "jcevallos", rol: "admin", password: "12345", activo: true },
+    { id: 5, nombre: "Ronald Sanchez", usuario: "rsanchez", rol: "admin", password: "12345", activo: true },
+    { id: 2, nombre: "Pablo León", usuario: "pleon", rol: "admin", password: "12345", activo: true },
+    { id: 3, nombre: "Magno Hugo", usuario: "mhugo", rol: "admin", password: "12345", activo: true },
+    { id: 4, nombre: "Marcos Ibarra", usuario: "mibarra", rol: "admin", password: "12345", activo: true },
+    { id: 10, nombre: "Angel Anguisaca", usuario: "aanguisaca", rol: "tecnico", password: "12345", activo: true },
+    { id: 11, nombre: "Carlos Cajamarca", usuario: "ccajamarca", rol: "tecnico", password: "12345", activo: true },
+    { id: 12, nombre: "Diego Campoverde", usuario: "dcampoverde", rol: "tecnico", password: "12345", activo: true },
+    { id: 13, nombre: "Juan Eras", usuario: "jeras", rol: "tecnico", password: "12345", activo: true },
+    { id: 14, nombre: "Jorge Sanchez", usuario: "jsanchez", rol: "tecnico", password: "12345", activo: true },
+    { id: 15, nombre: "Tecnico Tot", usuario: "ttot", rol: "tecnico", password: "12345", activo: true },
+    { id: 16, nombre: "Externo", usuario: "externo1", rol: "tecnico", password: "12345", activo: true },
+    { id: 17, nombre: "Roman Saca", usuario: "rsaca", rol: "tecnico", password: "12345", activo: true },
+    { id: 99, nombre: "Operario Lavado", usuario: "lavado", rol: "lavador", password: "1234", activo: true }
 ];
 
+// ESTA LÍNEA ES VITAL: Fuerza la actualización de los datos viejos del navegador
 localStorage.setItem("proauto_usuarios", JSON.stringify(usuariosSistema));
-if (!localStorage.getItem("proauto_usuarios")) {
-    localStorage.setItem("proauto_usuarios", JSON.stringify(usuariosSistema));
-}
 
-// Permisos por rol
 const PERMISOS = {
-  admin: {
-    mover: true,
-    editarVehiculo: true,
-    eliminarVehiculo: true,
-    agregarOT: true,
-    editarPresupuesto: true
-  },
-  asesor: {
-    mover: true,
-    editarVehiculo: true,
-    eliminarVehiculo: false,
-    agregarOT: true,
-    editarPresupuesto: true
-  },
-  tecnico: {
-    mover: true,   // pero con restricciones (las controlaremos abajo)
-    editarVehiculo: false,
-    eliminarVehiculo: false,
-    agregarOT: false,
-    editarPresupuesto: false
-  }
+  admin: { mover: true, editarVehiculo: true, eliminarVehiculo: true, agregarOT: true, editarPresupuesto: true },
+  asesor: { mover: true, editarVehiculo: true, eliminarVehiculo: false, agregarOT: true, editarPresupuesto: true },
+  tecnico: { mover: true, editarVehiculo: false, eliminarVehiculo: false, agregarOT: false, editarPresupuesto: false },
+  lavador: { mover: true, editarVehiculo: false, eliminarVehiculo: false, agregarOT: false, editarPresupuesto: false }
 };
 
-function mostrarResumen() {
-  document.getElementById("vehicle-summary")?.classList.remove("hidden");
+const STATUS_COLUMNS = [
+   { id: "falta_inspeccion", label: "Falta de inspección" },
+   { id: "falta_autorizacion", label: "Falta de autorización" },
+   { id: "autorizado", label: "Autorizado" },
+   { id: "espera_servicio", label: "Espera servicio" },
+   { id: "enderezado", label: "Enderezado" },
+   { id: "preparado", label: "Preparado" },
+   { id: "pintura", label: "Pintura" },
+   // AQUI ESTA LA COLUMNA DE LAVADO QUE SE VOLVERA VERTICAL
+   { id: "en_lavado", label: "En lavado (Subfases)" },
+   { id: "listo", label: "Control de Calidad" }, 
+   { id: "entregado", label: "Entregado" },
+   { id: "perdida_total", label: "Pérdida total" }
+];
+const STATUS_ICONS = {
+  falta_inspeccion: "fa-magnifying-glass", falta_autorizacion: "fa-circle-xmark", autorizado: "fa-circle-check",
+  espera_servicio: "fa-clock", enderezado: "fa-screwdriver-wrench", preparado: "fa-layer-group", pintura: "fa-spray-can",
+  listo: "fa-check-double", en_lavado: "fa-water", entregado: "fa-truck", perdida_total: "fa-triangle-exclamation"
+};
+
+let vehicles = [
+  { id: 1, vin: "3N1AB7AP4HY000001", placa: "NC01020", modelo: "Hyundai Elantra 2013", propietario: "Fabián Souza", aseguradora: "Allianz", asesor: "Rafael Coetano", fecha_ingreso: "2025-01-02", fecha_salida: "2025-01-10", estado: "preparado", danos: ["Frontal"], equipamiento: ["Llave"], archivoOrden: null, presupuesto: [], ordenes: [] },
+  { id: 2, vin: "3N1AB7AP4HY000002", placa: "GI00789", modelo: "Kia Rio 1.4", propietario: "María López", aseguradora: "QBE", asesor: "Guillermo Espinoza", fecha_ingreso: "2025-01-05", fecha_salida: "2025-01-12", estado: "falta_autorizacion", danos: ["Posterior"], equipamiento: [], archivoOrden: null, presupuesto: [], ordenes: [] }
+];
+
+let auditoria = [];
+let currentUser = null;
+// =========================================
+// 🔔 SISTEMA DE NOTIFICACIONES (PEGAR AL INICIO DEL SCRIPT)
+// =========================================
+let notificaciones = JSON.parse(localStorage.getItem("axtrom_notificaciones") || "[]");
+
+// 1. Función para crear una notificación
+function crearNotificacion(rolDestino, usuarioDestino, mensaje) {
+    const nuevaNotif = {
+        id: Date.now(),
+        fecha: new Date().toLocaleString(),
+        rolDestino: rolDestino,       // 'asesor' o 'tecnico'
+        usuarioDestino: usuarioDestino, // Nombre del técnico (opcional)
+        mensaje: mensaje,
+        leida: false
+    };
+    notificaciones.push(nuevaNotif);
+    localStorage.setItem("axtrom_notificaciones", JSON.stringify(notificaciones));
+    
+    // Si la notificación es para mí mismo (ej: prueba), actualizar badge
+    checkNotificaciones(); 
 }
 
-function ocultarResumen() {
-  document.getElementById("vehicle-summary")?.classList.add("hidden");
+// 2. Función para revisar y mostrar notificaciones
+// ==========================================
+// 🔔 FUNCIÓN CORREGIDA: CHECK NOTIFICACIONES
+// ==========================================
+function checkNotificaciones() {
+    if(!currentUser || currentUser.rol === "lavador") return;
+
+    const badge = document.getElementById("notifBadge");
+    const list = document.getElementById("notifList");
+    
+    // Filtro inteligente (Ignora mayúsculas/minúsculas)
+    const misNotif = notificaciones.filter(n => {
+        if(n.leida) return false;
+        
+        // 1. Si soy Admin/Asesor -> Veo todo lo de asesores
+        if (currentUser.rol === "admin" || currentUser.rol === "asesor") {
+            return n.rolDestino === "asesor";
+        }
+        
+        // 2. Si soy Técnico -> Veo lo mío (Comparación insensible a mayúsculas)
+        if (currentUser.rol === "tecnico" && n.rolDestino === "tecnico") {
+            const destino = (n.usuarioDestino || "").toUpperCase();
+            const yo = (currentUser.nombre || "").toUpperCase();
+            return destino === yo;
+        }
+        return false;
+    });
+
+    // Badge Rojo
+    if (badge) {
+        badge.textContent = misNotif.length;
+        badge.style.display = misNotif.length > 0 ? "flex" : "none";
+    }
+
+    // Renderizar Lista
+    if (list) {
+        list.innerHTML = "";
+        // Filtramos para el historial visual también
+        const historial = notificaciones.filter(n => {
+            if (currentUser.rol === "admin" || currentUser.rol === "asesor") return n.rolDestino === "asesor";
+            if (currentUser.rol === "tecnico") {
+                const destino = (n.usuarioDestino || "").toUpperCase();
+                const yo = (currentUser.nombre || "").toUpperCase();
+                return n.rolDestino === "tecnico" && destino === yo;
+            }
+            return false;
+        }).reverse().slice(0, 10);
+
+        if(historial.length === 0) list.innerHTML = "<div style='padding:10px;color:#999;text-align:center;'>Sin notificaciones</div>";
+        
+        historial.forEach(n => {
+            const div = document.createElement("div");
+            div.className = "notif-item " + (n.leida ? "" : "unread");
+            div.innerHTML = `<span style="font-weight:bold;">${n.mensaje}</span><span class="notif-time">${n.fecha}</span>`;
+            list.appendChild(div);
+        });
+    }
+}
+
+
+// IMPORTANTE: Llamar a checkNotificaciones() al hacer Login
+// (Busca tu función loginSistema y agrega checkNotificaciones() al final si no está)
+
+// =========================================
+// LOGICA DE LOGIN Y RUTAS
+// =========================================
+// =========================================
+// 2. SISTEMA DE LOGIN, RUTAS Y PERMISOS (BLOQUE MAESTRO)
+// =========================================
+function loginSistema() {
+    currentUser = null;
+    const usuarioIngresado = document.getElementById("loginUsuario").value.trim();
+    const passwordIngresado = document.getElementById("loginPassword").value.trim();
+    
+    // Leemos siempre la lista fresca que acabamos de guardar en Parte 1
+    let lista = JSON.parse(localStorage.getItem("proauto_usuarios"));
+    const encontrado = lista.find(u => u.usuario === usuarioIngresado && u.password === passwordIngresado && u.activo);
+
+    if (!encontrado) { alert("Usuario o contraseña incorrectos."); return; }
+
+    // Asignamos usuario globalmente
+    currentUser = encontrado;
+    window.currentUser = encontrado; 
+
+    // Limpiamos campos y ocultamos login
+    document.getElementById("loginUsuario").value = "";
+    document.getElementById("loginPassword").value = "";
+    document.getElementById("loginScreen").style.display = "none";
+
+    // RUTAS SEGUN ROL
+    if (currentUser.rol === "lavador") {
+        document.getElementById("main-container").style.display = "none";
+        document.getElementById("view-lavador").style.display = "block";
+        document.getElementById("lavadorUserDisplay").textContent = "OPERARIO: " + currentUser.nombre;
+        renderLavadorView();
+    } else {
+        document.getElementById("view-lavador").style.display = "none";
+        document.getElementById("main-container").style.display = "block";
+        
+        // Carga segura del tablero
+        try {
+            showView("tablero");
+            // Intentamos cargar notificaciones si la función existe
+            if(typeof checkNotificaciones === "function") checkNotificaciones();
+            mostrarInfoUsuario();
+            aplicarPermisosEnInterfaz(); 
+            renderBoard(); 
+        } catch (error) {
+            console.error("Error cargando perfil:", error);
+            alert("Error al cargar perfil. Intente recargar la página.");
+        }
+    }
+}
+
+function logout() {
+  currentUser = null;
+  window.currentUser = null;
+  
+  // Ocultar info de usuario y limpiar tablero visualmente
+  const userBox = document.getElementById("userInfoBox");
+  if(userBox) userBox.style.display = "none";
+  
+  const boardEl = document.getElementById("board");
+  if(boardEl) boardEl.innerHTML = ""; // Limpieza visual
+
+  document.querySelectorAll(".view").forEach(v => v.classList.remove("active"));
+  document.getElementById("view-lavador").style.display = "none";
+  document.getElementById("main-container").style.display = "block"; 
+  document.getElementById("loginScreen").style.display = "flex";
+  
+  // Limpiar buscador
+  const searchInput = document.getElementById("searchInput");
+  if(searchInput) searchInput.value = "";
+  
+  showView("login");
+}
+
+// Listeners de Login
+document.getElementById("btnLogin").onclick = loginSistema;
+document.getElementById("btnLogout").onclick = logout;
+document.getElementById("btnLogoutLavador").onclick = logout;
+
+function showView(name) {
+    if(currentUser && currentUser.rol === "lavador") return;
+    
+    document.querySelectorAll(".view").forEach(v => v.classList.remove("active"));
+    
+    const viewMap = {
+        "login": "view-login",
+        "tablero": "view-tablero",
+        "form": "view-form",
+        "detalle": "view-detalle",
+        "auditoria": "view-auditoria",
+        "presupuesto": "view-presupuesto"
+    };
+
+    const id = viewMap[name];
+    if(id) {
+        const el = document.getElementById(id);
+        if(el) el.classList.add("active");
+    }
 }
 
 function aplicarPermisosEnInterfaz() {
-
+    if(!currentUser) return;
     const role = currentUser.rol;
 
     const btnAuditoria = document.getElementById("btnAuditoria");
-    const btnUsuarios  = document.getElementById("btnUsuarios");
     const btnAgregar   = document.getElementById("btnAgregarVehiculo");
     const btnEditar    = document.getElementById("btnEditarVehiculo");
     const btnEliminar  = document.getElementById("btnEliminarVehiculo");
+    const btnPresupuesto = document.getElementById("btnPresupuesto");
     const presupuestoForm = document.getElementById("presupuestoForm");
 
-    // 🔁 RESET GENERAL (CLAVE)
-    btnAgregar.style.display = "inline-block";
-    btnEditar.style.display = "inline-block";
-    btnEliminar.style.display = "inline-block";
-    presupuestoForm.style.display = "block";
+    // Reset: Mostrar todo primero (por defecto Admin/Asesor)
+    if(btnAgregar) btnAgregar.style.display = "inline-block";
+    if(btnEditar) btnEditar.style.display = "inline-block";
+    if(btnEliminar) btnEliminar.style.display = "inline-block";
+    if(btnPresupuesto) btnPresupuesto.style.display = "inline-block";
+    
+    // Auditoría solo Admin
+    if(btnAuditoria) btnAuditoria.style.display = (role === "admin") ? "inline-block" : "none";
 
-    btnAuditoria.style.display = "none";
-    btnUsuarios.style.display = "none";
-
-    // 🔐 PERMISOS POR ROL
-    if (role === "admin") {
-        btnAuditoria.style.display = "inline-block";
-        btnUsuarios.style.display = "inline-block";
-    }
-
+    // Restricciones TÉCNICO
     if (role === "tecnico") {
-        btnAgregar.style.display = "none";
-        btnEditar.style.display = "none";
-        btnEliminar.style.display = "none";
-        presupuestoForm.style.display = "none";
-
+        if(btnAgregar) btnAgregar.style.display = "none";
+        if(btnEditar) btnEditar.style.display = "none";
+        if(btnEliminar) btnEliminar.style.display = "none";
+        if(btnPresupuesto) btnPresupuesto.style.display = "none";
+        if(presupuestoForm) presupuestoForm.style.display = "none";
+        
+        // Ocultar botones pequeños en tablas internas
         setTimeout(() => {
-            document
-              .querySelectorAll(".presupuesto-btn-edit, .presupuesto-btn-delete")
-              .forEach(b => b.style.display = "none");
+            document.querySelectorAll(".presupuesto-btn-edit, .presupuesto-btn-delete").forEach(b => b.style.display = "none");
         }, 200);
     }
 }
 
-    const STATUS_COLUMNS = [
-       { id: "falta_inspeccion", label: "Falta de inspección" },
-       { id: "falta_autorizacion", label: "Falta de autorización" },
-      { id: "autorizado", label: "Autorizado" },   // 🔵 AQUI SE AGREGA
-      { id: "espera_servicio", label: "Espera servicio" },
-      { id: "enderezado", label: "Enderezado" },
-      { id: "preparado", label: "Preparado" },
-      { id: "pintura", label: "Pintura" },
-      { id: "listo", label: "Control de Calidad" }, 
-      { id: "en_lavado", label: "En lavado" },
-      { id: "entregado", label: "Entregado" },
-      { id: "perdida_total", label: "Pérdida total" }
-      ];
-      const STATUS_ICONS = {
-  falta_inspeccion: "fa-magnifying-glass",
-  falta_autorizacion: "fa-circle-xmark",
-  autorizado: "fa-circle-check",
-  espera_servicio: "fa-clock",
-  enderezado: "fa-screwdriver-wrench",
-  preparado: "fa-layer-group",
-  pintura: "fa-spray-can",
-  listo: "fa-check-double",
-  en_lavado: "fa-water",
-  entregado: "fa-truck",
-  perdida_total: "fa-triangle-exclamation"
-};
-
-    let vehicles = [
-      {
-        id: 1,
-        vin: "3N1AB7AP4HY000001",
-        placa: "NC01020",
-        modelo: "Hyundai Elantra GLS 1.6 2013",
-        propietario: "Fabián Souza",
-        aseguradora: "Allianz",
-        asesor: "Rafael Coetano",
-        fecha_ingreso: "2025-01-02",
-        fecha_salida: "2025-01-10",
-        estado: "preparado",
-        danos: ["Frontal", "Parabrisas / vidrios"],
-        equipamiento: ["Llave / llavero", "Llanta de emergencia", "Herramientas", "Triángulos"],
-        archivoOrden: null,
-        presupuesto: [
-          { id: 1, tipo: "Seguro", categoria: "Repuesto", codigo: "PAR-DEL", descripcion: "Parachoques delantero", cantidad: 1, valor: 110.8 },
-          { id: 2, tipo: "Seguro", categoria: "Mano de obra", codigo: "", descripcion: "Desmontaje y montaje frontal", cantidad: 1, valor: 80.0 }
-        ],
-        ordenes: [
-          { id: 101, fecha: "2025-01-03", hora: "10:15", descripcion: "Inspección inicial de daños por colisión frontal." },
-          { id: 102, fecha: "2025-01-04", hora: "15:40", descripcion: "Solicitud de repuestos a aseguradora." }
-        ]
-      },
-      {
-        id: 2,
-        vin: "3N1AB7AP4HY000002",
-        placa: "GI00789",
-        modelo: "Kia Rio 1.4",
-        propietario: "María López",
-        aseguradora: "QBE",
-        asesor: "Guillermo Espinoza",
-        fecha_ingreso: "2025-01-05",
-        fecha_salida: "2025-01-12",
-        estado: "falta_autorizacion",
-        danos: ["Posterior"],
-        equipamiento: ["Llave / llavero", "Radio / carátula"],
-        archivoOrden: null,
-        presupuesto: [],
-        ordenes: [
-          { id: 201, fecha: "2025-01-05", hora: "09:05", descripcion: "Ingreso a taller y registro fotográfico." }
-        ]
-      },
-      {
-        id: 3,
-        vin: "3N1AB7AP4HY000003",
-        placa: "AZZ1234",
-        modelo: "Chevrolet Spark GT",
-        propietario: "Carlos Pérez",
-        aseguradora: "Latina Seguros",
-        asesor: "Lenin Piedra",
-        fecha_ingreso: "2025-01-03",
-        fecha_salida: "2025-01-11",
-        estado: "espera_servicio",
-        danos: [],
-        equipamiento: ["Llanta de repuesto", "Herramientas"],
-        archivoOrden: null,
-        presupuesto: [],
-        ordenes: []
-      },
-      {
-        id: 4,
-        vin: "3N1AB7AP4HY000004",
-        placa: "GIO001",
-        modelo: "Nissan Versa",
-        propietario: "Juan Herrera",
-        aseguradora: "Mapfre",
-        asesor: "Xavier Farfán",
-        fecha_ingreso: "2024-12-28",
-        fecha_salida: "2025-01-05",
-        estado: "entregado",
-        danos: ["Lateral derecho"],
-        equipamiento: ["Llave / llavero", "Llanta de emergencia", "Herramientas", "Triángulos"],
-        archivoOrden: null,
-        presupuesto: [],
-        ordenes: [
-          { id: 401, fecha: "2024-12-29", hora: "11:30", descripcion: "Reparación de panel trasero y pintado completo." },
-          { id: 402, fecha: "2025-01-03", hora: "16:00", descripcion: "Control de calidad y entrega." }
-        ]
-      },
-    ];
-
-    const board = document.getElementById("board");
-    const form = document.getElementById("vehicleForm");
-    const viewTablero = document.getElementById("view-tablero");
-    const viewForm = document.getElementById("view-form");
-    const viewDetalle = document.getElementById("view-detalle");
-    const searchInput = document.getElementById("searchInput");
-
-    const btnAgregarVehiculo = document.getElementById("btnAgregarVehiculo");
-    const btnVerTablero = document.getElementById("btnVerTablero");
-    const btnCancelarForm = document.getElementById("btnCancelarForm");
-
-    const btnVolverDesdeDetalle = document.getElementById("btnVolverDesdeDetalle");
-    const btnEditarVehiculo = document.getElementById("btnEditarVehiculo");
-    const btnEliminarVehiculo = document.getElementById("btnEliminarVehiculo");
-
-    const formTitle = document.getElementById("form-title");
-    const formSubtitle = document.getElementById("form-subtitle");
-    const formModeIndicator = document.getElementById("form-mode-indicator");
-
-    const detalleTitulo = document.getElementById("detalle-titulo");
-    const detalleSubtitulo = document.getElementById("detalle-subtitulo");
-    const detalleVin = document.getElementById("detalle-vin");
-    const detallePlaca = document.getElementById("detalle-placa");
-    const detalleModelo = document.getElementById("detalle-modelo");
-    const detallePropietario = document.getElementById("detalle-propietario");
-    const detalleAseguradora = document.getElementById("detalle-aseguradora");
-    const detalleAsesor = document.getElementById("detalle-asesor");
-    const detalleFechaIngreso = document.getElementById("detalle-fecha-ingreso");
-    const detalleFechaSalida = document.getElementById("detalle-fecha-salida");
-    const detalleEstado = document.getElementById("detalle-estado");
-    const detalleDanos = document.getElementById("detalle-danos");
-    const detalleEquipamiento = document.getElementById("detalle-equipamiento");
-    const detalleArchivo = document.getElementById("detalle-archivo");
-    const ordenesList = document.getElementById("ordenesList");
-    const ordenForm = document.getElementById("ordenForm");
-    const detalleCedula = document.getElementById("detalle-cedula");
-    const detalleTecnico = document.getElementById("detalle-tecnico");
-
-    const presupuestoResumen = document.getElementById("presupuesto-resumen");
-    const presupuestoList = document.getElementById("presupuesto-list");
-    const presupuestoForm = document.getElementById("presupuestoForm");
-
-    let draggedCardId = null;
-    let currentVehicleId = null;
-    let editingVehicleId = null;
-    let searchQuery = "";
-    // ===============================
-// AUDITORÍA DE MOVIMIENTOS
-// ===============================
-    let auditoria = [];
-function showView(name) {
-    document.querySelectorAll(".view").forEach(v => v.classList.remove("active"));
-
-    if (name === "login") document.getElementById("view-login").classList.add("active");
-    if (name === "tablero") document.getElementById("view-tablero").classList.add("active");
-    if (name === "form") document.getElementById("view-form").classList.add("active");
-    if (name === "detalle") document.getElementById("view-detalle").classList.add("active");
-    if (name === "auditoria") document.getElementById("view-auditoria").classList.add("active");
-    if (name === "usuarios") document.getElementById("view-usuarios").classList.add("active");
+function mostrarInfoUsuario() {
+    const box = document.getElementById("userInfoBox");
+    const name = document.getElementById("userInfoName");
+    const role = document.getElementById("userInfoRole");
+    
+    if (currentUser) {
+        name.textContent = currentUser.nombre;
+        role.textContent = currentUser.rol.toUpperCase();
+        box.style.display = "block";
+    } else { 
+        box.style.display = "none"; 
+    }
 }
 
+// =========================================
+// RENDERIZADO TABLERO PRINCIPAL (MODIFICADO PARA LAVADORA VERTICAL)
+// =========================================
+const board = document.getElementById("board");
+let draggedCardId = null;
 
 
-
-    function resetFormSelectionGroups() {
-      document.querySelectorAll('input[name="danos"]').forEach(chk => chk.checked = false);
-      document.querySelectorAll('input[name="equipamiento"]').forEach(chk => chk.checked = false);
-    }
-    // Procesar archivos múltiples y generar URLs temporales
-function procesarArchivosDesdeInput(input) {
-    const archivos = [];
-    if (input && input.files && input.files.length > 0) {
-        for (const f of input.files) {
-            archivos.push({
-                nombre: f.name,
-                url: URL.createObjectURL(f)
-            });
-        }
-    }
-    return archivos;
-}
-
-    function openFormNew() {
-      editingVehicleId = null;
-      form.reset();
-      resetFormSelectionGroups();
-      formTitle.textContent = "Nuevo vehículo";
-      formSubtitle.textContent = "Registre los datos del vehículo. Se agregará en el estado \"Falta de inspección\".";
-      formModeIndicator.textContent = "Modo: creación";
-      showView("form");
-    }
-
-    function openFormEdit(vehicleId) {
-      const v = vehicles.find(v => v.id === vehicleId);
-      if (!v) return;
-      editingVehicleId = vehicleId;
-
-      formTitle.textContent = "Editar vehículo";
-      formSubtitle.textContent = "Actualice los datos del vehículo. El estado se mantiene según el tablero.";
-      formModeIndicator.textContent = "Modo: edición de " + v.placa;
-
-      form.reset();
-      resetFormSelectionGroups();
-
-      form.elements["vin"].value = v.vin || "";
-      form.elements["placa"].value = v.placa || "";
-      form.elements["modelo"].value = v.modelo || "";
-      form.elements["propietario"].value = v.propietario || "";
-      form.elements["aseguradora"].value = v.aseguradora || "";
-      form.elements["asesor"].value = v.asesor || "";
-      form.elements["cedula"].value = v.cedula || "";
-      form.elements["tecnico"].value = v.tecnico || "";
-      form.elements["fecha_ingreso"].value = v.fecha_ingreso || "";
-      form.elements["fecha_salida"].value = v.fecha_salida || "";
-      // limpiar inputs de archivos adicionales
-      form.elements["archivos_cliente"].value = "";
-      form.elements["archivos_autorizaciones"].value = "";
-      form.elements["archivos_proformas"].value = "";
-
-
-      if (Array.isArray(v.danos)) {
-        document.querySelectorAll('input[name="danos"]').forEach(chk => {
-          chk.checked = v.danos.includes(chk.value);
-        });
-      }
-      if (Array.isArray(v.equipamiento)) {
-        document.querySelectorAll('input[name="equipamiento"]').forEach(chk => {
-          chk.checked = v.equipamiento.includes(chk.value);
-        });
-      }
-
-      const archivoInput = document.getElementById("archivo_orden");
-      archivoInput.value = "";
-
-      showView("form");
-    }
-
-    btnAgregarVehiculo.addEventListener("click", () => {
-      openFormNew();
-    });
-    document.getElementById("btnAuditoria").addEventListener("click", () => {
-    renderAuditoria();
-    showView("auditoria");
-    });
-    document.getElementById("auditoriaSearch").addEventListener("input", () => {
-    renderAuditoria();
-    });
-
-
-const inputCargarLocal = document.getElementById("inputCargarLocal");
-
-if (inputCargarLocal) {
-  inputCargarLocal.addEventListener("change", (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = () => {
-      try {
-        const data = JSON.parse(reader.result);
-        vehicles = data.vehicles || [];
-        auditoria = data.auditoria || [];
-        renderBoard();
-        alert("Respaldo cargado correctamente");
-      } catch (err) {
-        alert("Archivo inválido");
-      }
-    };
-    reader.readAsText(file);
-  });
-}
-
-
-
-
-    document.getElementById("btnVolverDesdeAuditoria").addEventListener("click", () => {
-  showView("tablero");
-});
-
-    searchInput.addEventListener("input", function () {
-      searchQuery = this.value;
-      renderBoard();
-    });
-    btnEliminarVehiculo.addEventListener("click", () => {
-  if (!PERMISOS[window.currentUser.rol].eliminarVehiculo) {
-    alert("No tiene permisos para eliminar vehículos.");
-    return;
+// ===============================================
+// 🔧 CORRECCIÓN FINAL: DINERO OCULTO A TÉCNICOS
+// ===============================================
+// ===============================================
+// 🔧 CORRECCIÓN FINAL: DINERO OCULTO A TÉCNICOS
+// ===============================================
+function renderBoard() {
+  // 1. Vista exclusiva para Lavador
+  if (currentUser && currentUser.rol === "lavador") { 
+      renderLavadorView(); 
+      return; 
   }
 
-  // ... resto del código original
-});
-function renderAuditoria() {
-    const body = document.getElementById("auditoriaBody");
-    body.innerHTML = "";
-
-    const search =
-      (document.getElementById("auditoriaSearch")?.value || "")
-        .toLowerCase()
-        .trim();
-
-    const registros = [...auditoria]
-        .reverse()
-        .filter(reg => {
-            if (!search) return true;
-            return reg.placa && reg.placa.toLowerCase().includes(search);
-        });
-
-    registros.forEach(reg => {
-        const row = document.createElement("tr");
-        row.innerHTML = `
-            <td>${reg.fecha}</td>
-            <td>${reg.hora}</td>
-            <td>${reg.usuario}</td>
-            <td>${reg.placa}</td>
-            <td>${reg.desde || "-"}</td>
-            <td>${reg.hacia || "-"}</td>
-            <td>${reg.accion || "-"}</td>
-            <td>${reg.descripcion || "-"}</td>
-        `;
-        body.appendChild(row);
-    });
-}
-
-
-
-
-
-    btnVerTablero.addEventListener("click", () => {
-      showView("tablero");
-    });
-    
-    btnCancelarForm.addEventListener("click", () => {
-      form.reset();
-      resetFormSelectionGroups();
-      editingVehicleId = null;
-      showView("tablero");
-    });
-
-    btnVolverDesdeDetalle.addEventListener("click", () => {
-      showView("tablero");
-    });
-    // =====================
-// BOTÓN CERRAR SESIÓN
-// =====================
-document.getElementById("btnLogout").addEventListener("click", () => {
-  // Limpiar usuario actual
-  currentUser = null;
-  window.currentUser = null;
-
-  // Ocultar info de usuario
-  document.getElementById("userInfoBox").style.display = "none";
-
-  // Ocultar vistas
-  document.querySelectorAll(".view").forEach(v => v.classList.remove("active"));
-
-  // Mostrar login
-  document.getElementById("loginScreen").style.display = "flex";
-  showView("login");
-});
-
-
-// ===============================
-// GUARDAR RESPALDO LOCAL
-// ===============================
-document.getElementById("btnGuardarLocal").addEventListener("click", () => {
-  const data = {
-    fecha: new Date().toISOString(),
-    usuarios: JSON.parse(localStorage.getItem("proauto_usuarios") || "[]"),
-    auditoria,
-    vehicles
-  };
-
-  const json = JSON.stringify(data, null, 2);
-  const blob = new Blob([json], { type: "application/json" });
-  const url = URL.createObjectURL(blob);
-
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = "pizarra-proauto-backup.json";
-  a.click();
-
-  URL.revokeObjectURL(url);
-});
-
-// ===============================
-// CARGAR RESPALDO LOCAL
-// ===============================
-document.addEventListener("DOMContentLoaded", () => {
-document.getElementById("btnCargarLocal")?.addEventListener("click", cargarLocal);
-});
-
-
-  // Mostrar login nuevamente
-  //document.getElementById("loginScreen").style.display = "flex";
-
-
-    btnEditarVehiculo.addEventListener("click", () => {
-      if (!currentVehicleId) return;
-      openFormEdit(currentVehicleId);
-    });
-
-    btnEliminarVehiculo.addEventListener("click", () => {
-      if (!currentVehicleId) return;
-      const v = vehicles.find(v => v.id === currentVehicleId);
-      const confirmMsg = "¿Eliminar el vehículo " + (v ? v.placa : "") + " del tablero? Esta acción no se puede deshacer.";
-      if (!confirm(confirmMsg)) return;
-      vehicles = vehicles.filter(v => v.id !== currentVehicleId);
-      currentVehicleId = null;
-      renderBoard();
-      showView("tablero");
-    });
-function renderBoard() {
+  const board = document.getElementById("board");
+  if (!board) return;
   board.innerHTML = "";
 
-  // aplicar filtro si existe búsqueda
-  const q = (searchQuery || "").toLowerCase().trim();
-  const data = q
-    ? vehicles.filter(v => {
-        const campos = [
-          v.placa,
-          v.modelo,
-          v.propietario,
-          v.aseguradora,
-          v.asesor,
-          v.tecnico,
-          v.cedula,
-          v.subfase
-        ];
-        return campos.some(campo =>
-          campo && campo.toLowerCase().includes(q)
-        );
-      })
-    : vehicles;
+  const q = (document.getElementById("searchInput").value || "").toLowerCase().trim();
+  
+  // 2. Filtrado inicial por búsqueda
+  let data = q ? vehicles.filter(v => 
+      [v.placa, v.modelo, v.propietario, v.vin].some(c => c && c.toLowerCase().includes(q))
+  ) : vehicles;
 
-  STATUS_COLUMNS.forEach(col => {
+  // 3. LÓGICA DE ROLES (FILTRADO VISUAL)
+  let columnasVisibles = STATUS_COLUMNS; 
+
+  if (currentUser && currentUser.rol === "tecnico") {
+      // Técnico: Solo ve Producción + Salida
+      const permitidas = ["enderezado", "preparado", "pintura", "listo"];
+      columnasVisibles = STATUS_COLUMNS.filter(c => permitidas.includes(c.id));
+
+      // Técnico: Solo ve sus propios vehículos asignados
+      const miNombre = (currentUser.nombre || "").toUpperCase();
+      data = data.filter(v => {
+          const tecnicoAsignado = (v.tecnico || "").toUpperCase();
+          return tecnicoAsignado === miNombre;
+      });
+  }
+
+  // 4. RENDERIZADO DE COLUMNAS
+  columnasVisibles.forEach(col => {
     const columnEl = document.createElement("div");
     columnEl.className = "column";
 
+    // --- HEADER DE LA COLUMNA ---
     const headerEl = document.createElement("div");
     headerEl.className = "column-header";
-
     const titleEl = document.createElement("div");
     titleEl.className = "column-title";
     titleEl.innerHTML = `<i class="fa-solid ${STATUS_ICONS[col.id] || "fa-circle"}"></i> ${col.label}`;
-
-
-    const count = data.filter(v => v.estado === col.id).length;
+    
+    // Filtramos los vehículos de ESTA columna
+    const vehiculosEnColumna = data.filter(v => v.estado === col.id);
+    
     const countEl = document.createElement("div");
     countEl.className = "column-count";
-    countEl.textContent = count;
-
+    countEl.textContent = vehiculosEnColumna.length;
+    
     headerEl.appendChild(titleEl);
     headerEl.appendChild(countEl);
     columnEl.appendChild(headerEl);
 
+    // --- 💰 SUMATORIA DE DINERO ---
+    let totalColumnMoney = 0;
+    const camposSumar = [
+        'seg_repuestos_v', 'seg_enderezado_v', 'seg_pintura_v', 'seg_otros_v',
+        'priv_repuestos_v', 'priv_enderezado_v', 'priv_pintura_v', 'priv_otros_v'
+    ];
 
-    // 🔧 COLUMNA NORMAL (para todas excepto "en servicio")
+    vehiculosEnColumna.forEach(v => {
+        const p = v.presupuestoDesglose || {};
+        camposSumar.forEach(campo => {
+            totalColumnMoney += Number(p[campo]) || 0;
+        });
+    });
+
+    // 🔒 CANDADO DE SEGURIDAD (ESTA ES LA LÍNEA QUE FALTABA EN TU ARCHIVO)
+    // Solo mostramos si hay dinero Y el usuario NO es técnico
+    if (totalColumnMoney > 0 && currentUser.rol !== "tecnico") {
+        const moneyEl = document.createElement("div");
+        moneyEl.style.cssText = "text-align: right; font-size: 11px; font-weight: 800; color: #2e7d32; margin-top: -6px; margin-bottom: 8px; padding-right: 2px;";
+        moneyEl.innerHTML = `<span>$ ${totalColumnMoney.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>`;
+        columnEl.appendChild(moneyEl);
+    }
+
+    // --- DROPZONE (ÁREA DE TARJETAS) ---
     const dropzone = document.createElement("div");
     dropzone.className = "dropzone";
     dropzone.dataset.status = col.id;
-
     dropzone.addEventListener("dragover", handleDragOver);
     dropzone.addEventListener("dragleave", handleDragLeave);
     dropzone.addEventListener("drop", handleDrop);
 
-    data
-      .filter(v => v.estado === col.id)
-      .forEach(vehicle => {
-        const card = createCard(vehicle);
-        dropzone.appendChild(card);
-      });
+    // LÓGICA ESPECIAL LAVADO (VERTICAL)
+    if(col.id === "en_lavado") {
+        const subFases = ["espera", "lavando", "secado", "listo"];
+        const subLabels = { espera: "EN ESPERA", lavando: "LAVANDO", secado: "SECADO/ASPIRADO", listo: "LISTO P/ ENTREGA" };
+        const containerV = document.createElement("div");
+        containerV.className = "lavado-subzone-container";
+
+        subFases.forEach(fase => {
+            const subDiv = document.createElement("div");
+            subDiv.className = "lavado-subzone";
+            subDiv.innerHTML = `<div class="lavado-subzone-title">${subLabels[fase]}</div>`;
+            vehiculosEnColumna.filter(v => (v.lavado_status || "espera") === fase).forEach(vehicle => {
+                const card = createCard(vehicle);
+                subDiv.appendChild(card);
+            });
+            containerV.appendChild(subDiv);
+        });
+        dropzone.appendChild(containerV);
+    } else {
+        // COLUMNA STANDARD
+        vehiculosEnColumna.forEach(vehicle => {
+            const card = createCard(vehicle);
+            dropzone.appendChild(card);
+        });
+    }
 
     columnEl.appendChild(dropzone);
     board.appendChild(columnEl);
   });
 }
-    function showVehicleSummary(vehicle) {
-  const bar = document.getElementById("vehicle-summary");
-  if (!bar) return;
 
-  document.getElementById("vs-placa").textContent = vehicle.placa || "—";
-  document.getElementById("vs-vin").textContent = vehicle.vin || "—";
-  document.getElementById("vs-modelo").textContent = vehicle.modelo || "—";
-
-  document.getElementById("vs-propietario").textContent = vehicle.propietario || "—";
-  document.getElementById("vs-aseguradora").textContent = vehicle.aseguradora || "—";
-  document.getElementById("vs-asesor").textContent = vehicle.asesor || "—";
-  document.getElementById("vs-tecnico").textContent = vehicle.tecnico || "—";
-
-  document.getElementById("vs-fecha-ing").textContent = vehicle.fecha_ingreso || "—";
-  document.getElementById("vs-fecha-sal").textContent = vehicle.fecha_salida || "—";
-
-  const estadoObj = STATUS_COLUMNS.find(e => e.id === vehicle.estado);
-  document.getElementById("vs-estado").textContent =
-    estadoObj ? estadoObj.label : vehicle.estado;
-
-  // Última OT
-  const ultima = vehicle.ordenes?.length ? vehicle.ordenes[vehicle.ordenes.length - 1] : null;
-  document.getElementById("vs-ot").textContent =
-    ultima ? ultima.descripcion : "Sin OT";
-
-  bar.classList.remove("hidden");
-}
-
-document.getElementById("vs-close").addEventListener("click", () => {
-  document.getElementById("vehicle-summary").classList.add("hidden");
-});
-
-
-
- function createCard(vehicle) {
+// =========================================
+// TARJETAS Y DRAG & DROP (ORIGINAL + LAVADORA LOGIC)
+// =========================================
+function createCard(vehicle) {
   const card = document.createElement("div");
   card.className = "card";
   card.draggable = true;
   card.dataset.id = vehicle.id;
-  card.addEventListener("click", () => {
-  showVehicleSummary(vehicle);
-  mostrarResumen();
-  });
-  // última OT (anotación) para mostrar en la tarjeta
-  const ultimaOrden =
-    vehicle.ordenes && vehicle.ordenes.length > 0
-      ? vehicle.ordenes[vehicle.ordenes.length - 1]
-      : null;
-
-  // drag & drop
+  card.addEventListener("click", () => showVehicleSummary(vehicle));
   card.addEventListener("dragstart", handleDragStart);
   card.addEventListener("dragend", handleDragEnd);
-
-  // doble clic -> abre detalle grande
-  card.addEventListener("dblclick", () => {
-    openVehicleDetail(vehicle.id);
-  });
-
-  // un clic -> muestra barra resumen arriba
-  card.addEventListener("click", () => {
-    showVehicleSummary(vehicle);
-  });
+  card.addEventListener("dblclick", () => openVehicleDetail(vehicle.id));
 
   const top = document.createElement("div");
   top.className = "card-top";
-
-  const plate = document.createElement("div");
-  plate.className = "plate";
-  plate.textContent = vehicle.placa;
-
-  const brand = document.createElement("div");
-  brand.className = "brand";
-  brand.textContent = vehicle.modelo;
-
-  top.appendChild(plate);
-  top.appendChild(brand);
+  top.innerHTML = `<div class="plate">${vehicle.placa}</div><div class="brand">${vehicle.modelo}</div>`;
+  card.appendChild(top);
 
   const chipsLine = document.createElement("div");
-
-  if (vehicle.aseguradora) {
-    const insurerChip = document.createElement("span");
-    insurerChip.className = "chip insurer";
-    insurerChip.textContent = vehicle.aseguradora;
-    chipsLine.appendChild(insurerChip);
-  }
-
-  const clientChip = document.createElement("span");
-  clientChip.className = "chip-client";
-  clientChip.textContent = vehicle.propietario || "";
-  chipsLine.appendChild(clientChip);
-
-  if (vehicle.asesor) {
-    const advisorChip = document.createElement("span");
-    advisorChip.className = "chip chip-small";
-    advisorChip.textContent = "Asesor: " + vehicle.asesor;
-    chipsLine.appendChild(advisorChip);
-  }
-
-  card.appendChild(top);
+  if(vehicle.aseguradora) chipsLine.innerHTML += `<span class="chip insurer">${vehicle.aseguradora}</span>`;
+  chipsLine.innerHTML += `<span class="chip-client">${vehicle.propietario}</span>`;
+  if(vehicle.asesor) chipsLine.innerHTML += `<span class="chip chip-small">Asesor: ${vehicle.asesor}</span>`;
   card.appendChild(chipsLine);
 
-  // Descripción de la última OT
+  // Ultima OT
+  const ultimaOrden = vehicle.ordenes?.length ? vehicle.ordenes[vehicle.ordenes.length - 1] : null;
   if (ultimaOrden) {
     const ot = document.createElement("div");
     ot.className = "card-ot";
@@ -2186,487 +1214,147 @@ document.getElementById("vs-close").addEventListener("click", () => {
     card.appendChild(ot);
   }
 
-  // línea extra con técnico, cédula y fecha/hora entrega
   const extra = document.createElement("div");
-extra.className = "card-extra";
-
-const spanTec = document.createElement("span");
-spanTec.className = "card-extra-item";
-spanTec.innerHTML = `<i class="fa-solid fa-user-gear"></i> ${vehicle.tecnico || "—"}`;
-
-const spanCed = document.createElement("span");
-spanCed.className = "card-extra-item";
-spanCed.innerHTML = `<i class="fa-solid fa-id-card-clip"></i> ${vehicle.cedula || "—"}`;
-
-const spanEnt = document.createElement("span");
-spanEnt.className = "card-extra-item";
-spanEnt.innerHTML = `<i class="fa-solid fa-calendar-day"></i> ${vehicle.fecha_salida || "—"}`;
-
-extra.appendChild(spanTec);
-extra.appendChild(spanCed);
-extra.appendChild(spanEnt);
-
-card.appendChild(extra);
-
-
-
+  extra.className = "card-extra";
+  extra.innerHTML = `<span class="card-extra-item"><i class="fa-solid fa-user-gear"></i> ${vehicle.tecnico || "—"}</span>
+                     <span class="card-extra-item"><i class="fa-solid fa-id-card-clip"></i> ${vehicle.cedula || "—"}</span>
+                     <span class="card-extra-item"><i class="fa-solid fa-calendar-day"></i> ${vehicle.fecha_salida || "—"}</span>`;
+  card.appendChild(extra);
   return card;
 }
 
-
-
-    function handleDragStart(e) {
-      draggedCardId = Number(e.target.dataset.id);
-      e.target.classList.add("dragging");
-      e.dataTransfer.effectAllowed = "move";
-    }
-
-    function handleDragEnd(e) {
-      e.target.classList.remove("dragging");
-    }
-
-    function handleDragOver(e) {
-      e.preventDefault();
-      e.currentTarget.classList.add("over");
-      e.dataTransfer.dropEffect = "move";
-    }
-
-    function handleDragLeave(e) {
-      e.currentTarget.classList.remove("over");
-    }
+function handleDragStart(e) { draggedCardId = Number(e.target.dataset.id); e.target.classList.add("dragging"); e.dataTransfer.effectAllowed = "move"; }
+function handleDragEnd(e) { e.target.classList.remove("dragging"); }
+function handleDragOver(e) { e.preventDefault(); e.currentTarget.classList.add("over"); e.dataTransfer.dropEffect = "move"; }
+function handleDragLeave(e) { e.currentTarget.classList.remove("over"); }
 
 function handleDrop(e) {
     e.preventDefault();
-
-    const dropzone = e.currentTarget;
+    const dropzone = e.target.closest(".dropzone"); 
+    if(!dropzone) return;
+    
+    dropzone.classList.remove("over");
     const newStatus = dropzone.dataset.status;
-
     const vehicle = vehicles.find(v => v.id == draggedCardId);
     if (!vehicle) return;
-
     const oldStatus = vehicle.estado;
 
-    // ============================
-    // RESTRICCIONES PARA TÉCNICOS
-    // ============================
-    // ============================
-// RESTRICCIONES PARA TÉCNICOS
-// ============================
-if (window.currentUser && window.currentUser.rol === "tecnico") {
-
-    const columnasTecnico = ["enderezado", "preparado", "pintura", "listo"];
-
-    if (!columnasTecnico.includes(oldStatus)) {
-        alert("No tienes permiso para mover vehículos desde esta columna.");
-        return;
+    // VALIDACION TECNICOS
+    if (window.currentUser && window.currentUser.rol === "tecnico") {
+        const columnasTecnico = ["enderezado", "preparado", "pintura", "listo"];
+        if (!columnasTecnico.includes(oldStatus) || !columnasTecnico.includes(newStatus)) {
+            alert("No tienes permiso para mover vehículos fuera de producción."); return;
+        }
+        const orden = { enderezado: 1, preparado: 2, pintura: 3, listo: 4 };
+        if (orden[newStatus] < orden[oldStatus]) { alert("No tienes permiso para retroceder un vehículo."); return; }
     }
 
-    if (!columnasTecnico.includes(newStatus)) {
-        alert("No tienes permiso para mover vehículos hacia esa columna.");
-        return;
-    }
-
-    const orden = {
-        enderezado: 1,
-        preparado: 2,
-        pintura: 3,
-        listo: 4
-    };
-
-    if (orden[newStatus] < orden[oldStatus]) {
-        alert("No tienes permiso para retroceder un vehículo.");
-        return;
-    }
-}
-
-
-    // ===========================
-    // SI PASA VALIDACIÓN, MOVER
-    // ===========================
     vehicle.estado = newStatus;
+    // INICIO NOTIFICACION MOVIMIENTO
+    if (window.currentUser && window.currentUser.rol === "tecnico") {
+        crearNotificacion("asesor", null, `El técnico ${window.currentUser.nombre} movió el vehículo ${vehicle.placa} a ${newStatus.toUpperCase()}`);
+    }
+    // FIN NOTIFICACION MOVIMIENTO
+    // RESETEAR SUBFASE LAVADORA SI ENTRA A LAVADO
+    if(newStatus === "en_lavado" && oldStatus !== "en_lavado") {
+        vehicle.lavado_status = "espera";
+    // 👇 PEGAR ESTO AQUÍ 👇
+    // Si quien mueve es un TÉCNICO, avisar a los ASESORES
+    if (currentUser.rol === "tecnico") {
+        crearNotificacion("asesor", null, `El técnico ${currentUser.nombre} movió el auto ${vehicle.placa} a ${newStatus.toUpperCase()}`);
+    }
+    // 👆 FIN DE LO PEGADO 👆
+    }
 
     const ahora = new Date();
     auditoria.push({
-        fecha: ahora.toISOString().slice(0, 10),
-        hora: ahora.toTimeString().slice(0, 8),
-        usuario: window.currentUser.nombre,
-        placa: vehicle.placa,
-        desde: STATUS_COLUMNS.find(s => s.id === oldStatus)?.label,
-        hacia: STATUS_COLUMNS.find(s => s.id === newStatus)?.label,
-        accion: "Movimiento",
-        descripcion: `Movido por ${currentUser.nombre}`
+        fecha: ahora.toISOString().slice(0, 10), hora: ahora.toTimeString().slice(0, 8),
+        usuario: window.currentUser.nombre, placa: vehicle.placa, desde: STATUS_COLUMNS.find(s=>s.id===oldStatus)?.label, hacia: STATUS_COLUMNS.find(s=>s.id===newStatus)?.label, accion: "Movimiento", descripcion: `Movido por ${currentUser.nombre}`
     });
-
     draggedCardId = null;
+    // ... código anterior ...
+    
+    // 🔔 NUEVO: SI CAE EN "AUTORIZADO", ABRIR VENTANA DE COSTOS
+    if (newStatus === "autorizado") {
+        abrirModalPresupuesto(vehicle.id);
+    }
+
     renderBoard();
 }
 
-
-
-
-
-    function renderPresupuesto(vehicle) {
-  presupuestoResumen.textContent = "";
-  presupuestoList.innerHTML = "";
-
-  const items = vehicle.presupuesto || [];
-  if (items.length === 0) {
-    presupuestoResumen.textContent = "No hay ítems de presupuesto registrados.";
-    return;
-  }
-
-  let totalSeguro = 0;
-  let totalPrivado = 0;
-  let totalGeneral = 0;
-
-  items.forEach((it, index) => {
-    const cant = Number(it.cantidad) || 0;
-    const valUnit = Number(it.valor) || 0;
-    const subtotal = cant * valUnit;
-
-    if (it.tipo === "Seguro") totalSeguro += subtotal;
-    if (it.tipo === "Privado") totalPrivado += subtotal;
-    totalGeneral += subtotal;
-
-    const row = document.createElement("div");
-    row.className = "presupuesto-row";
-    row.innerHTML = `
-      <div><strong>${it.tipo}</strong> - ${it.categoria || ""}</div>
-      <div>${it.codigo || ""}</div>
-      <div>${it.descripcion || ""}</div>
-      <div>${cant || ""}</div>
-      <div class="presupuesto-importes">${subtotal.toFixed(2)}</div>
-    `;
-
-    // 📌 celda donde va el valor + botones
-    const valorCell = row.querySelector(".presupuesto-importes");
-
-    // CONTENEDOR DE BOTONES
-    const actions = document.createElement("div");
-    actions.className = "presupuesto-actions";
-
-    // 🔵 BOTÓN EDITAR
-    const btnEdit = document.createElement("button");
-    btnEdit.textContent = "Editar";
-    btnEdit.className = "presupuesto-btn presupuesto-btn-edit";
-    btnEdit.addEventListener("click", () => {
-      const tipo = prompt("Tipo (Seguro / Privado):", it.tipo || "");
-      if (tipo === null) return;
-
-      const categoria = prompt("Categoría (Repuesto / Mano de obra / Servicio tercero):", it.categoria || "");
-      if (categoria === null) return;
-
-      const codigo = prompt("Código:", it.codigo || "");
-      if (codigo === null) return;
-
-      const descripcion = prompt("Descripción:", it.descripcion || "");
-      if (descripcion === null) return;
-
-      const cantidadStr = prompt("Cantidad:", String(it.cantidad || 1));
-      if (cantidadStr === null) return;
-
-      const valorStr = prompt("Valor unitario:", String(it.valor || 0));
-      if (valorStr === null) return;
-
-      const vIndex = vehicles.findIndex(v => v.id === vehicle.id);
-      if (vIndex === -1) return;
-
-      const item = vehicles[vIndex].presupuesto[index];
-      item.tipo = tipo.trim() || item.tipo;
-      item.categoria = categoria.trim() || item.categoria;
-      item.codigo = codigo.trim();
-      item.descripcion = descripcion.trim();
-      item.cantidad = Number(cantidadStr) || 1;
-      item.valor = Number(valorStr) || 0;
-
-      openVehicleDetail(vehicle.id, false); // refresca detalle
-    });
-
-    // 🔴 BOTÓN ELIMINAR
-    const btnDelete = document.createElement("button");
-    btnDelete.textContent = "Eliminar";
-    btnDelete.className = "presupuesto-btn presupuesto-btn-delete";
-    btnDelete.addEventListener("click", () => {
-      if (!confirm("¿Eliminar este ítem del presupuesto?")) return;
-
-      const vIndex = vehicles.findIndex(v => v.id === vehicle.id);
-      if (vIndex === -1) return;
-
-      vehicles[vIndex].presupuesto.splice(index, 1);
-      openVehicleDetail(vehicle.id, false); // refresca detalle y totales
-    });
-
-    actions.appendChild(btnEdit);
-    actions.appendChild(btnDelete);
-    valorCell.appendChild(actions);
-
-    presupuestoList.appendChild(row);
-  });
-
-  const lines = [];
-  lines.push("Total general: " + totalGeneral.toFixed(2));
-  if (totalSeguro > 0) lines.push("Seguro: " + totalSeguro.toFixed(2));
-  if (totalPrivado > 0) lines.push("Privado: " + totalPrivado.toFixed(2));
-
-  presupuestoResumen.textContent = lines.join("   |   ");
-}
-
-
-    function openVehicleDetail(vehicleId, switchView = true) {
-      const vehicle = vehicles.find(v => v.id === vehicleId);
-      if (!vehicle) return;
-
-      currentVehicleId = vehicleId;
-function renderListaArchivos(lista, contenedorId) {
-  const cont = document.getElementById(contenedorId);
-  cont.innerHTML = "";
-
-  if (!lista || lista.length === 0) {
-    cont.textContent = "No se adjuntaron archivos.";
-    return;
-  }
-
-  lista.forEach(a => {
-    const link = document.createElement("a");
-    link.href = a.base64;
-    link.download = a.nombre;
-    link.textContent = a.nombre;
-    link.style.display = "block";
-    cont.appendChild(link);
-  });
-}
-
-      function showVehicleSummary(vehicle) {
-  const bar = document.getElementById("vehicle-summary");
-  if (!bar) return;
-
-  document.getElementById("vs-placa").textContent = vehicle.placa || "—";
-  document.getElementById("vs-vin").textContent = vehicle.vin || "—";
-  document.getElementById("vs-modelo").textContent = vehicle.modelo || "—";
-
-  document.getElementById("vs-propietario").textContent = vehicle.propietario || "—";
-  document.getElementById("vs-aseguradora").textContent = vehicle.aseguradora || "Sin aseguradora";
-  document.getElementById("vs-asesor").textContent = vehicle.asesor || "—";
-  document.getElementById("vs-tecnico").textContent = vehicle.tecnico || "—";
-
-  document.getElementById("vs-fecha-ing").textContent = vehicle.fecha_ingreso || "—";
-  document.getElementById("vs-fecha-sal").textContent = vehicle.fecha_salida || "—";
-
-  const statusObj = STATUS_COLUMNS.find(c => c.id === vehicle.estado);
-  document.getElementById("vs-estado").textContent = statusObj ? statusObj.label : vehicle.estado;
-
-  const ultimaOrden = vehicle.ordenes?.length
-    ? vehicle.ordenes[vehicle.ordenes.length - 1].descripcion
-    : "Sin OT registrada";
-
-  document.getElementById("vs-ot").textContent = ultimaOrden;
-
-  bar.classList.remove("hidden");
-}
-
-// Cerrar barra resumen
-document.getElementById("vs-close").addEventListener("click", () => {
-  document.getElementById("vehicle-summary").classList.add("hidden");
-});
-
-      detalleTitulo.textContent = vehicle.placa + " - " + vehicle.modelo;
-      detalleSubtitulo.textContent = "Propietario: " + (vehicle.propietario || "—");
-
-      detalleVin.textContent = vehicle.vin || "—";
-      detallePlaca.textContent = vehicle.placa || "—";
-      detalleModelo.textContent = vehicle.modelo || "—";
-      detallePropietario.textContent = vehicle.propietario || "—";
-      detalleAseguradora.textContent = vehicle.aseguradora || "Sin aseguradora";
-      detalleAsesor.textContent = vehicle.asesor || "—";
-      detalleCedula.textContent = vehicle.cedula || "—";
-      detalleTecnico.textContent = vehicle.tecnico || "—";
-      detalleFechaIngreso.textContent = vehicle.fecha_ingreso || "—";
-      detalleFechaSalida.textContent = vehicle.fecha_salida || "—";
-      const detalleHoraSalida = document.getElementById("detalle-hora-salida");
-    detalleHoraSalida.textContent = vehicle.hora_salida || "—";
-
-      const statusObj = STATUS_COLUMNS.find(c => c.id === vehicle.estado);
-      detalleEstado.textContent = statusObj ? statusObj.label : vehicle.estado;
-
-      detalleDanos.innerHTML = "";
-      if (vehicle.danos && vehicle.danos.length > 0) {
-        vehicle.danos.forEach(d => {
-          const li = document.createElement("li");
-          li.textContent = d;
-          detalleDanos.appendChild(li);
+function renderLavadorView() {
+    ["espera","lavando","secado","listo"].forEach(st => {
+        const div = document.getElementById("lav-list-"+st);
+        if(div) div.innerHTML = "";
+        
+        vehicles.filter(v => v.estado === "en_lavado" && (v.lavado_status || "espera") === st).forEach(v => {
+            const card = document.createElement("div"); card.className = "lavador-card";
+            card.innerHTML = `<div style="font-weight:bold;font-size:18px;">${v.placa}</div><div style="font-size:12px;">${v.modelo}</div>`;
+            
+            const btnNext = document.createElement("button"); 
+            btnNext.className = "btn btn-primary"; 
+            btnNext.style.marginTop = "8px"; 
+            btnNext.style.width = "100%";
+            btnNext.innerHTML = 'Siguiente <i class="fa-solid fa-arrow-right"></i>';
+            
+            btnNext.onclick = () => {
+                const nextMap = { espera: "lavando", lavando: "secado", secado: "listo", listo: "fin" };
+                const next = nextMap[st];
+                
+                if(next === "fin") {
+                    if(confirm("¿Confirmar que el vehículo está listo para entrega?")) {
+                        v.estado = "entregado";
+                        // NOTIFICACIÓN FINAL
+                        crearNotificacion("asesor", null, `✅ Lavado COMPLETADO: ${v.placa} listo para entrega.`);
+                    }
+                } else {
+                    v.lavado_status = next;
+                    // 👇 NOTIFICACIÓN DE PROGRESO 👇
+                    crearNotificacion("asesor", null, `🚿 Lavado: ${v.placa} pasó a fase ${next.toUpperCase()}`);
+                }
+                renderLavadorView();
+            };
+            card.appendChild(btnNext);
+            if(div) div.appendChild(card);
         });
-      } else {
-        const li = document.createElement("li");
-        li.textContent = "Sin daños señalados.";
-        detalleDanos.appendChild(li);
-      }
-
-      detalleEquipamiento.innerHTML = "";
-      if (vehicle.equipamiento && vehicle.equipamiento.length > 0) {
-        vehicle.equipamiento.forEach(d => {
-          const li = document.createElement("li");
-          li.textContent = d;
-          detalleEquipamiento.appendChild(li);
-        });
-      } else {
-        const li = document.createElement("li");
-        li.textContent = "No se registró equipamiento.";
-        detalleEquipamiento.appendChild(li);
-      }
-
-      detalleArchivo.innerHTML = "";
-if (vehicle.archivoOrden && vehicle.archivoOrden.base64) {
-  const link = document.createElement("a");
-  link.href = vehicle.archivoOrden.base64;
-  link.download = vehicle.archivoOrden.nombre || "archivo";
-  link.textContent = "Ver archivo adjunto: " + (vehicle.archivoOrden.nombre || "archivo");
-  detalleArchivo.appendChild(link);
-} else {
-  detalleArchivo.textContent = "No se adjuntó archivo.";
+    });
 }
-renderListaArchivos(vehicle.archivosCliente, "detalle-archivos-cliente");
-renderListaArchivos(vehicle.archivosAutorizaciones, "detalle-archivos-autorizaciones");
-renderListaArchivos(vehicle.archivosProformas, "detalle-archivos-proformas");
-
-
-
-      renderPresupuesto(vehicle);
-      renderOrdenes(vehicle);
-
-      if (switchView) {
-        showView("detalle");
-      }
+function moverLavadora(id, nuevoSubEstado) {
+    const v = vehicles.find(x => x.id === id);
+    if(v) { v.lavado_status = nuevoSubEstado; renderLavadorView(); }
+}
+function sacarDeLavadora(id) {
+    const v = vehicles.find(x => x.id === id);
+    if(v && confirm(`¿Finalizar lavado y mover ${v.placa} a CONTROL DE CALIDAD?`)) {
+        v.estado = "listo"; 
+        renderLavadorView();
     }
-    function renderOrdenes(vehicle) {
-  ordenesList.innerHTML = "";
-  const ordenes = vehicle.ordenes || [];
-
-  if (ordenes.length === 0) {
-    const empty = document.createElement("div");
-    empty.textContent = "No hay órdenes registradas aún.";
-    empty.style.fontSize = "12px";
-    empty.style.color = "#777";
-    ordenesList.appendChild(empty);
-    return;
-  }
-
-  ordenes.forEach(o => {
-    const item = document.createElement("div");
-    item.className = "orden-item";
-
-    // ⭐ Combinar fecha + hora automáticamente
-    let fechaTexto = "Sin fecha";
-    if (o.fecha && o.hora) {
-      fechaTexto = `${o.fecha} ${o.hora}`;
-    } else if (o.fecha) {
-      fechaTexto = o.fecha;
-    }
-
-    // Mostrar fecha
-    const fechaEl = document.createElement("strong");
-    fechaEl.textContent = fechaTexto;
-    item.appendChild(fechaEl);
-
-    // Descripción
-    const descEl = document.createElement("div");
-    descEl.textContent = o.descripcion || "";
-    item.appendChild(descEl);
-
-    // Contenedor de botones
-    const actions = document.createElement("div");
-    actions.className = "orden-actions";
-
-    // BOTÓN EDITAR
-    const btnEdit = document.createElement("button");
-    btnEdit.textContent = "Editar";
-    btnEdit.className = "orden-btn orden-btn-edit";
-    btnEdit.addEventListener("click", () => {
-      const nuevaDescripcion = prompt("Editar descripción:", o.descripcion || "");
-      if (nuevaDescripcion === null) return;
-      // Registrar auditoría por edición
-auditoria.push({
-    fecha,
-    hora,
-    usuario: window.currentUser ? window.currentUser.nombre : "Sistema",
-    placa: nuevaOT.placa,
-    desde: "-",
-    hacia: "-",
-    accion: "Nueva OT",
-    descripcion: "INGRESA EL VEHICULO"
-});
-
-
-      const nuevaFecha = prompt("Editar fecha (YYYY-MM-DD HH:MM):", fechaTexto);
-
-      const vIndex = vehicles.findIndex(v => v.id === vehicle.id);
-      if (vIndex === -1) return;
-
-      const oIndex = vehicles[vIndex].ordenes.findIndex(ord => ord.id === o.id);
-      if (oIndex === -1) return;
-
-      vehicles[vIndex].ordenes[oIndex].descripcion = nuevaDescripcion.trim();
-      vehicles[vIndex].ordenes[oIndex].fecha = nuevaFecha || fechaTexto;
-      openVehicleDetail(vehicle.id, false);
-      renderBoard();
-      renderListaArchivos(vehicle.archivosCliente || [], "detalle-archivos-cliente");
-renderListaArchivos(vehicle.archivosAutorizaciones || [], "detalle-archivos-autorizaciones");
-renderListaArchivos(vehicle.archivosProformas || [], "detalle-archivos-proformas");
-
-    });
-
-    // BOTÓN ELIMINAR
-    const btnDelete = document.createElement("button");
-    btnDelete.textContent = "Eliminar";
-    btnDelete.className = "orden-btn orden-btn-delete";
-    btnDelete.addEventListener("click", () => {
-      if (!confirm("¿Eliminar anotación?")) return;
-
-      const vIndex = vehicles.findIndex(v => v.id === vehicle.id);
-      if (vIndex === -1) return;
-
-      const oIndex = vehicles[vIndex].ordenes.findIndex(ord => ord.id === o.id);
-      if (oIndex === -1) return;
-      // Registrar auditoría por eliminación
-auditoria.push({
-    fecha: new Date().toISOString().slice(0, 10),
-    hora: new Date().toTimeString().slice(0, 8),
-    usuario: window.currentUser ? window.currentUser.nombre : "Sistema",
-    placa: vehicle.placa,
-    accion: "Eliminar OT",
-    descripcion: o.descripcion
-});
-
-      vehicles[vIndex].ordenes.splice(oIndex, 1);
-
-      openVehicleDetail(vehicle.id, false);
-      renderBoard();
-    });
-
-    actions.appendChild(btnEdit);
-    actions.appendChild(btnDelete);
-    item.appendChild(actions);
-
-    ordenesList.appendChild(item);
-  });
 }
 
-    async function procesarArchivosMultiple(inputId) {
+// =========================================
+// FUNCIONALIDADES ORIGINALES RESTAURADAS (ARCHIVOS, PRESUPUESTOS, OT)
+// =========================================
+const form = document.getElementById("vehicleForm");
+const btnAgregarVehiculo = document.getElementById("btnAgregarVehiculo");
+const btnCancelarForm = document.getElementById("btnCancelarForm");
+let editingVehicleId = null;
+
+function resetFormSelectionGroups() {
+    document.querySelectorAll('input[name="danos"]').forEach(chk => chk.checked = false);
+    document.querySelectorAll('input[name="equipamiento"]').forEach(chk => chk.checked = false);
+}
+
+// Manejo de Archivos Base64
+async function procesarArchivosMultiple(inputId) {
   const input = document.getElementById(inputId);
   if (!input || !input.files || input.files.length === 0) return [];
-
   const archivos = [];
-
   for (const file of input.files) {
     const base64 = await convertirArchivoABase64(file);
-    archivos.push({
-      nombre: file.name,
-      tipo: file.type,
-      base64
-    });
+    archivos.push({ nombre: file.name, tipo: file.type, base64 });
   }
   return archivos;
 }
-
 function convertirArchivoABase64(file) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -2676,23 +1364,24 @@ function convertirArchivoABase64(file) {
   });
 }
 
+// Formulario Vehículo
+btnAgregarVehiculo.addEventListener("click", () => {
+    editingVehicleId = null; form.reset(); resetFormSelectionGroups(); showView("form");
+});
+btnCancelarForm.addEventListener("click", () => showView("tablero"));
 
-
-
-    form.addEventListener("submit", async function (e) {
+// ===============================================
+// 🔧 FORMULARIO: ASIGNACIÓN CON ÁREA (FINAL)
+// ===============================================
+form.addEventListener("submit", async function (e) {
   e.preventDefault();
   const formData = new FormData(form);
 
+  // 1. Obtener datos básicos
   const placa = (formData.get("placa") || "").trim();
   const modelo = (formData.get("modelo") || "").trim();
   const propietario = (formData.get("propietario") || "").trim();
   const cedula = (formData.get("cedula") || "").trim();
-
-  if (!placa || !modelo || !propietario) {
-    alert("Placa, modelo y propietario son obligatorios.");
-    return;
-  }
-
   const vin = (formData.get("vin") || "").trim();
   const aseguradora = formData.get("aseguradora") || "";
   const asesor = (formData.get("asesor") || "").trim();
@@ -2700,45 +1389,60 @@ function convertirArchivoABase64(file) {
   const fecha_ingreso = formData.get("fecha_ingreso") || "";
   const fecha_salida = formData.get("fecha_salida") || "";
   const hora_salida = formData.get("hora_salida") || "";
+  
+  if (!placa || !modelo || !propietario) {
+    alert("Placa, modelo y propietario son obligatorios.");
+    return;
+  }
+
   const danos = formData.getAll("danos");
   const equipamiento = formData.getAll("equipamiento");
 
-  // ✅ ARCHIVOS MULTIPLES (base64)
+  // 2. Procesar Archivos
   const archivosCliente = await procesarArchivosMultiple("archivos_cliente");
   const archivosAutorizaciones = await procesarArchivosMultiple("archivos_autorizaciones");
   const archivosProformas = await procesarArchivosMultiple("archivos_proformas");
 
-  // ✅ ARCHIVO PRINCIPAL (base64) - no usar createObjectURL
   const archivoInput = document.getElementById("archivo_orden");
   const file = archivoInput?.files?.[0] || null;
-
   let archivoOrden = null;
   if (file) {
     const base64 = await convertirArchivoABase64(file);
     archivoOrden = { nombre: file.name, tipo: file.type, base64 };
   }
 
+  // Helper para obtener el nombre bonito del área (ej: "falta_inspeccion" -> "Falta de Inspección")
+  // ESTO ES LO QUE FALTABA PARA EL NOMBRE DEL ÁREA
+  const getNombreArea = (idEstado) => {
+      const col = STATUS_COLUMNS.find(c => c.id === idEstado);
+      return col ? col.label : idEstado;
+  };
+
+  // ==========================
+  // MODO EDICIÓN
+  // ==========================
   if (editingVehicleId) {
     const idx = vehicles.findIndex(v => v.id === editingVehicleId);
     if (idx === -1) return;
 
     const original = vehicles[idx];
 
+    // 🔔 NOTIFICACIÓN AL TÉCNICO (Con Área)
+    if (tecnico && original.tecnico !== tecnico) {
+        const nombreArea = getNombreArea(original.estado);
+        crearNotificacion(
+            "tecnico", 
+            tecnico, 
+            `🛠️ Trabajo asignado: ${placa} (${modelo}) en el área de ${nombreArea.toUpperCase()}`
+        );
+    }
+
     vehicles[idx] = {
       ...original,
-      vin,
-      placa,
-      modelo,
-      propietario,
-      cedula,
-      aseguradora,
-      asesor,
-      tecnico,
-      fecha_ingreso,
-      fecha_salida,
-      hora_salida,
-      danos,
-      equipamiento,
+      vin, placa, modelo, propietario, cedula,
+      aseguradora, asesor, tecnico,
+      fecha_ingreso, fecha_salida, hora_salida,
+      danos, equipamiento,
       archivoOrden: archivoOrden || original.archivoOrden,
       archivosCliente: archivosCliente.length ? archivosCliente : (original.archivosCliente || []),
       archivosAutorizaciones: archivosAutorizaciones.length ? archivosAutorizaciones : (original.archivosAutorizaciones || []),
@@ -2746,32 +1450,37 @@ function convertirArchivoABase64(file) {
     };
 
     editingVehicleId = null;
+
+  // ==========================
+  // MODO NUEVO
+  // ==========================
   } else {
+    const estadoInicial = "falta_inspeccion";
+    
     const newVehicle = {
       id: Date.now(),
-      vin,
-      placa,
-      modelo,
-      propietario,
-      cedula,
-      aseguradora,
-      asesor,
-      tecnico,
-      fecha_ingreso,
-      fecha_salida,
-      hora_salida,
-      estado: "falta_inspeccion",
-      danos,
-      equipamiento,
+      vin, placa, modelo, propietario, cedula,
+      aseguradora, asesor, tecnico,
+      fecha_ingreso, fecha_salida, hora_salida,
+      estado: estadoInicial, 
+      danos, equipamiento,
       archivoOrden,
-      archivosCliente,
-      archivosAutorizaciones,
-      archivosProformas,
-      presupuesto: [],
+      archivosCliente, archivosAutorizaciones, archivosProformas,
+      presupuesto: [], 
       ordenes: []
     };
 
     vehicles.push(newVehicle);
+
+    // 🔔 NOTIFICACIÓN AL TÉCNICO (Nuevo con Área)
+    if (tecnico) {
+        const nombreArea = getNombreArea(estadoInicial);
+        crearNotificacion(
+            "tecnico", 
+            tecnico, 
+            `🛠️ Nuevo trabajo: ${placa} (${modelo}) ingresó a ${nombreArea.toUpperCase()}`
+        );
+    }
   }
 
   renderBoard();
@@ -2780,127 +1489,724 @@ function convertirArchivoABase64(file) {
   showView("tablero");
 });
 
-
-    ordenForm.addEventListener("submit", async function (e) {
-  e.preventDefault();
-  if (!currentVehicleId) return;
-
-  const descripcion = (document.getElementById("orden_descripcion").value || "").trim();
-
-  if (!descripcion) {
-    alert("La descripción de la orden es obligatoria.");
-    return;
-  }
-
-  // 📅 Generar fecha y hora actuales
-  const ahora = new Date();
-  const anio = ahora.getFullYear();
-  const mes = String(ahora.getMonth() + 1).padStart(2, "0");
-  const dia = String(ahora.getDate()).padStart(2, "0");
-  const horas = String(ahora.getHours()).padStart(2, "0");
-  const minutos = String(ahora.getMinutes()).padStart(2, "0");
-
-  // Guardamos todo junto: "YYYY-MM-DD HH:MM"
-  const fechaCompleta = `${anio}-${mes}-${dia} ${horas}:${minutos}`;
-
-  const vehicleIndex = vehicles.findIndex(v => v.id === currentVehicleId);
-  if (vehicleIndex === -1) return;
-
-  const nuevaOrden = {
-    id: Date.now(),
-    fecha: fechaCompleta,
-    descripcion
-  };
-
-  if (!Array.isArray(vehicles[vehicleIndex].ordenes)) {
-    vehicles[vehicleIndex].ordenes = [];
-  }
-  vehicles[vehicleIndex].ordenes.push(nuevaOrden);
-// Registrar auditoría por creación de OT
-auditoria.push({
-    fecha: fechaCompleta.split(" ")[0],
-    hora: fechaCompleta.split(" ")[1],
-    usuario: currentUser ? currentUser.nombre : "Sistema",
-    placa: vehicles[vehicleIndex].placa,
-    accion: "Nueva OT",
-    descripcion: descripcion
+// Editar Vehiculo
+document.getElementById("btnEditarVehiculo").addEventListener("click", () => {
+    const v = vehicles.find(v => v.id === window.currentVehicleId);
+    if (!v) return;
+    editingVehicleId = v.id;
+    form.reset(); resetFormSelectionGroups();
+    document.getElementById("vin").value = v.vin || "";
+    document.getElementById("placa").value = v.placa || "";
+    document.getElementById("modelo").value = v.modelo || "";
+    document.getElementById("propietario").value = v.propietario || "";
+    document.getElementById("cedula").value = v.cedula || "";
+    document.getElementById("aseguradora").value = v.aseguradora || "";
+    document.getElementById("asesor").value = v.asesor || "";
+    document.getElementById("tecnico").value = v.tecnico || "";
+    document.getElementById("fecha_ingreso").value = v.fecha_ingreso || "";
+    document.getElementById("fecha_salida").value = v.fecha_salida || "";
+    document.getElementById("hora_salida").value = v.hora_salida || "";
+    if (v.danos) document.querySelectorAll('input[name="danos"]').forEach(chk => chk.checked = v.danos.includes(chk.value));
+    if (v.equipamiento) document.querySelectorAll('input[name="equipamiento"]').forEach(chk => chk.checked = v.equipamiento.includes(chk.value));
+    showView("form");
+});
+document.getElementById("btnEliminarVehiculo").addEventListener("click", () => {
+    if(confirm("¿Eliminar vehículo?")) {
+        vehicles = vehicles.filter(v => v.id !== window.currentVehicleId);
+        renderBoard(); showView("tablero");
+    }
 });
 
-  ordenForm.reset();
-  openVehicleDetail(currentVehicleId, false);
+// ===============================================
+// 💎 NUEVA VISTA DE DETALLE (SEPARADA: FOTOS VS DOCS)
+// ===============================================
+function openVehicleDetail(vehicleId) {
+    const v = vehicles.find(x => x.id == vehicleId);
+    if (!v) return;
+    window.currentVehicleId = vehicleId;
+
+    // 1. Preparar datos financieros
+    const p = v.presupuestoDesglose || {};
+    const sectores = [
+        { id: 'repuestos', label: 'Repuestos' },
+        { id: 'enderezado', label: 'Enderezado' },
+        { id: 'pintura', label: 'Pintura' },
+        { id: 'otros', label: 'Otros' }
+    ];
+    
+    let htmlTablaFinanciera = "";
+    let tSeg = 0, tPriv = 0;
+
+    sectores.forEach(sec => {
+        const valSeg = Number(p[`seg_${sec.id}_v`]) || 0;
+        const valPriv = Number(p[`priv_${sec.id}_v`]) || 0;
+        tSeg += valSeg; tPriv += valPriv;
+
+        if (valSeg > 0 || valPriv > 0) {
+            htmlTablaFinanciera += `
+                <tr>
+                    <td>${sec.label}</td>
+                    <td>$ ${valSeg.toFixed(2)}</td>
+                    <td>$ ${valPriv.toFixed(2)}</td>
+                    <td style="font-weight:bold;">$ ${(valSeg + valPriv).toFixed(2)}</td>
+                </tr>
+            `;
+        }
+    });
+
+    const granTotal = tSeg + tPriv;
+    htmlTablaFinanciera += `
+        <tr class="fin-total-row">
+            <td>TOTALES</td>
+            <td>$ ${tSeg.toFixed(2)}</td>
+            <td>$ ${tPriv.toFixed(2)}</td>
+            <td>$ ${granTotal.toFixed(2)}</td>
+        </tr>
+    `;
+
+    // 2. CLASIFICACIÓN DE ARCHIVOS (FOTOS vs DOCUMENTOS)
+    let htmlGaleria = "";
+    let htmlDocumentos = "";
+    
+    // Recopilamos TODOS los archivos en una sola lista para clasificarlos
+    const todosLosArchivos = [
+        ...(v.archivoOrden ? [v.archivoOrden] : []), // El archivo único de OT
+        ...(v.archivosCliente || []),
+        ...(v.archivosAutorizaciones || []),
+        ...(v.archivosProformas || [])
+    ];
+
+    if (todosLosArchivos.length === 0) {
+        htmlGaleria = `<div style="padding:20px; text-align:center; color:#999; border:2px dashed #eee; border-radius:8px; font-size:12px;">Sin imágenes</div>`;
+        htmlDocumentos = `<div style="padding:15px; text-align:center; color:#999; font-size:12px;">Sin documentos adjuntos</div>`;
+    } else {
+        // Barrido para separar
+        let hayFotos = false;
+        let hayDocs = false;
+
+        todosLosArchivos.forEach(f => {
+            if (f.tipo.includes("image")) {
+                // ES IMAGEN -> A LA GALERÍA
+                hayFotos = true;
+                htmlGaleria += `
+                    <div class="gallery-item" onclick="abrirFotoGrande('${f.base64}')" title="${f.nombre}">
+                        <img src="${f.base64}" class="gallery-img">
+                        <div class="gallery-overlay">${f.nombre}</div>
+                    </div>
+                `;
+            } else {
+                // ES DOCUMENTO (PDF, DOC, ETC) -> A LA LISTA DE DOCS
+                hayDocs = true;
+                let icono = "fa-file-lines";
+                if(f.tipo.includes("pdf")) icono = "fa-file-pdf";
+                
+                htmlDocumentos += `
+                    <div class="doc-item">
+                        <i class="fa-solid ${icono} doc-icon"></i>
+                        <a href="${f.base64}" download="${f.nombre}" class="doc-link">${f.nombre}</a>
+                        <a href="${f.base64}" download="${f.nombre}" class="doc-download" title="Descargar"><i class="fa-solid fa-download"></i></a>
+                    </div>
+                `;
+            }
+        });
+
+        if(!hayFotos) htmlGaleria = `<div style="padding:20px; text-align:center; color:#999; border:2px dashed #eee; border-radius:8px; font-size:12px;">Sin imágenes</div>`;
+        if(!hayDocs) htmlDocumentos = `<div style="padding:15px; text-align:center; color:#999; font-size:12px;">Sin documentos adjuntos</div>`;
+    }
+
+    // 3. CONSTRUIR EL HTML COMPLETO
+    const panel = document.querySelector("#view-detalle .panel-detalle");
+    
+    panel.innerHTML = `
+        <div class="detail-header-card">
+            <div>
+                <h1 style="margin:0; font-size:24px;">${v.placa}</h1>
+                <div style="opacity:0.9; font-size:14px;">${v.modelo}</div>
+            </div>
+            <div style="text-align:right;">
+                <div style="background:rgba(255,255,255,0.2); padding:5px 12px; border-radius:20px; font-size:12px; display:inline-block;">
+                    ${v.estado.toUpperCase().replace("_", " ")}
+                </div>
+                <div style="margin-top:5px; font-size:12px;">VIN: ${v.vin || "N/A"}</div>
+            </div>
+        </div>
+
+        <div style="margin-bottom:20px; display:flex; justify-content:space-between;">
+            <button id="btnVolverDetalleCustom" class="btn btn-link">&larr; Volver al tablero</button>
+            <div style="display:flex; gap:10px;">
+                <button onclick="editarVehiculoDesdeDetalle(${v.id})" class="btn btn-secondary"><i class="fa-solid fa-pen"></i> Editar Datos</button>
+                <button onclick="eliminarVehiculoDesdeDetalle(${v.id})" class="btn btn-danger"><i class="fa-solid fa-trash"></i> Eliminar</button>
+            </div>
+        </div>
+
+        <div class="detail-main-grid">
+            <div>
+                <div class="detail-card">
+                    <h3><i class="fa-solid fa-circle-info"></i> Información General</h3>
+                    <div class="info-row"><span class="info-label">Propietario</span> <span class="info-val">${v.propietario}</span></div>
+                    <div class="info-row"><span class="info-label">Cédula / RUC</span> <span class="info-val">${v.cedula || "-"}</span></div>
+                    <div class="info-row"><span class="info-label">Aseguradora</span> <span class="info-val">${v.aseguradora || "-"}</span></div>
+                    <div class="info-row"><span class="info-label">Asesor</span> <span class="info-val">${v.asesor || "-"}</span></div>
+                    <div class="info-row"><span class="info-label">Técnico</span> <span class="info-val">${v.tecnico || "Sin asignar"}</span></div>
+                </div>
+
+                <div class="detail-card">
+                    <h3><i class="fa-solid fa-file-invoice-dollar"></i> Valores Autorizados</h3>
+                    <table class="fin-table">
+                        <thead><tr><th>Rubro</th><th>Seguro</th><th>Cliente</th><th>Total</th></tr></thead>
+                        <tbody>${htmlTablaFinanciera || '<tr><td colspan="4" style="text-align:center; padding:20px; color:#999;">Sin valores registrados</td></tr>'}</tbody>
+                    </table>
+                </div>
+                
+                <div class="detail-card">
+                     <h3><i class="fa-solid fa-list-check"></i> Historial de Órdenes</h3>
+                     <div id="listaOrdenesCustom" style="max-height:150px; overflow-y:auto; margin-bottom:10px;"></div>
+                     <form id="formOrdenCustom" style="display:flex; gap:5px;">
+                        <input type="text" id="inputOrdenCustom" placeholder="Nueva orden / comentario..." style="flex:1; padding:6px; border:1px solid #ddd; border-radius:6px;">
+                        <button type="submit" class="btn btn-primary" style="padding:6px 12px;">Agregar</button>
+                     </form>
+                </div>
+            </div>
+
+            <div>
+                <div class="detail-card">
+                    <h3><i class="fa-solid fa-calendar"></i> Fechas</h3>
+                    <div class="info-row"><span class="info-label">Ingreso</span> <span class="info-val">${v.fecha_ingreso || "-"}</span></div>
+                    <div class="info-row"><span class="info-label">Salida Est.</span> <span class="info-val">${v.fecha_salida || "-"}</span></div>
+                    <div class="info-row"><span class="info-label">Hora Entrega</span> <span class="info-val">${v.hora_salida || "-"}</span></div>
+                </div>
+
+                <div class="detail-card">
+                    <h3><i class="fa-solid fa-images"></i> Galería de Fotos</h3>
+                    <div class="gallery-grid">
+                        ${htmlGaleria}
+                    </div>
+                </div>
+
+                <div class="detail-card">
+                    <h3><i class="fa-solid fa-folder-open"></i> Documentos y Órdenes</h3>
+                    <div class="doc-list">
+                        ${htmlDocumentos}
+                    </div>
+                </div>
+                
+                <div class="detail-card">
+                    <h3><i class="fa-solid fa-car-crash"></i> Estado Inicial</h3>
+                    <div style="font-size:12px; color:#555; margin-bottom:5px;"><strong>Daños:</strong> ${v.danos ? v.danos.join(", ") : "Ninguno"}</div>
+                    <div style="font-size:12px; color:#555;"><strong>Equipamiento:</strong> ${v.equipamiento ? v.equipamiento.join(", ") : "Ninguno"}</div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    // --- LÓGICA DE BOTONES INTERNOS ---
+    document.getElementById("btnVolverDetalleCustom").onclick = () => showView("tablero");
+
+    const renderOrdenesCustom = () => {
+        const div = document.getElementById("listaOrdenesCustom");
+        div.innerHTML = "";
+        (v.ordenes || []).forEach(o => {
+            div.innerHTML += `<div style="background:#f8fafc; padding:8px; border-radius:6px; margin-bottom:5px; font-size:12px; border-left:3px solid #007dc5;">
+                <div style="font-weight:bold; font-size:10px; color:#999;">${o.fecha}</div>
+                <div>${o.descripcion}</div>
+            </div>`;
+        });
+    };
+    renderOrdenesCustom();
+
+    document.getElementById("formOrdenCustom").onsubmit = (e) => {
+        e.preventDefault();
+        const txt = document.getElementById("inputOrdenCustom").value;
+        if(!txt) return;
+        v.ordenes.push({ fecha: new Date().toLocaleString(), descripcion: txt });
+        renderOrdenesCustom();
+        document.getElementById("inputOrdenCustom").value = "";
+        if(typeof guardarCambios === "function") guardarCambios();
+    };
+
+    showView("detalle");
+}
+
+// --- FUNCIONES AUXILIARES NUEVAS ---
+function abrirFotoGrande(base64) {
+    const w = window.open("");
+    w.document.write(`<img src="${base64}" style="width:100%; height:auto;">`);
+}
+
+function editarVehiculoDesdeDetalle(id) {
+    const v = vehicles.find(x => x.id == id);
+    if (!v) return;
+    editingVehicleId = v.id;
+    // Llenar formulario con lógica existente
+    form.reset(); resetFormSelectionGroups();
+    document.getElementById("vin").value = v.vin || "";
+    document.getElementById("placa").value = v.placa || "";
+    document.getElementById("modelo").value = v.modelo || "";
+    document.getElementById("propietario").value = v.propietario || "";
+    document.getElementById("cedula").value = v.cedula || "";
+    document.getElementById("aseguradora").value = v.aseguradora || "";
+    document.getElementById("asesor").value = v.asesor || "";
+    document.getElementById("tecnico").value = v.tecnico || "";
+    document.getElementById("fecha_ingreso").value = v.fecha_ingreso || "";
+    document.getElementById("fecha_salida").value = v.fecha_salida || "";
+    document.getElementById("hora_salida").value = v.hora_salida || "";
+    if (v.danos) document.querySelectorAll('input[name="danos"]').forEach(chk => chk.checked = v.danos.includes(chk.value));
+    if (v.equipamiento) document.querySelectorAll('input[name="equipamiento"]').forEach(chk => chk.checked = v.equipamiento.includes(chk.value));
+    showView("form");
+}
+
+function eliminarVehiculoDesdeDetalle(id) {
+    if(confirm("¿Eliminar este vehículo permanentemente?")) {
+        vehicles = vehicles.filter(x => x.id != id);
+        if(typeof guardarCambios === "function") guardarCambios();
+        renderBoard();
+        showView("tablero");
+    }
+}
+
+// ===============================================
+// 🔄 FUNCIONES VITALES RESTAURADAS
+// ===============================================
+
+// 1. Resumen Flotante (Click simple en tarjeta)
+function showVehicleSummary(v) {
+    document.getElementById("vs-placa").textContent = v.placa;
+    document.getElementById("vs-modelo").textContent = v.modelo;
+    document.getElementById("vs-estado").textContent = v.estado;
+    // Llenar resto de datos para el resumen flotante
+    document.getElementById("vs-vin").textContent = v.vin || "-";
+    document.getElementById("vs-propietario").textContent = v.propietario || "-";
+    document.getElementById("vs-aseguradora").textContent = v.aseguradora || "-";
+    document.getElementById("vs-asesor").textContent = v.asesor || "-";
+    document.getElementById("vs-tecnico").textContent = v.tecnico || "-";
+    document.getElementById("vs-fecha-ing").textContent = v.fecha_ingreso || "-";
+    document.getElementById("vs-fecha-sal").textContent = v.fecha_salida || "-";
+    
+    // Ultima OT en resumen
+    const ultOT = v.ordenes && v.ordenes.length > 0 ? v.ordenes[v.ordenes.length - 1].descripcion : "Ninguna";
+    document.getElementById("vs-ot").textContent = ultOT;
+
+    document.getElementById("vehicleSummary").classList.add("show");
+}
+document.getElementById("vs-close").addEventListener("click", () => document.getElementById("vehicleSummary").classList.remove("show"));
+
+// 2. Auditoría
+document.getElementById("btnAuditoria").addEventListener("click", () => {
+    const body = document.getElementById("auditoriaBody"); body.innerHTML = "";
+    auditoria.reverse().forEach(a => { body.innerHTML += `<tr><td>${a.fecha}</td><td>${a.hora}</td><td>${a.usuario}</td><td>${a.placa}</td><td>${a.desde}</td><td>${a.hacia}</td><td>${a.accion}</td><td>${a.descripcion}</td></tr>`; });
+    showView("auditoria");
 });
+document.getElementById("btnVolverDesdeAuditoria").addEventListener("click", () => showView("tablero"));
 
+// 3. LocalStorage (Respaldos)
+document.getElementById("btnGuardarLocal").addEventListener("click", () => {
+    const blob = new Blob([JSON.stringify({ vehicles, auditoria })], { type: "application/json" });
+    const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = "backup.json"; a.click();
+});
+document.getElementById("inputCargarLocalInput").addEventListener("change", (e) => {
+    const r = new FileReader(); r.onload = () => { const d = JSON.parse(r.result); vehicles = d.vehicles; auditoria = d.auditoria; renderBoard(); };
+    r.readAsText(e.target.files[0]);
+});
+document.getElementById("btnCargarLocal").addEventListener("click", () => document.getElementById("inputCargarLocalInput").click());
 
-    presupuestoForm.addEventListener("submit", function (e) {
-      e.preventDefault();
-      if (!currentVehicleId) return;
+// 4. Buscador
+document.getElementById("searchInput").addEventListener("input", renderBoard);
 
-      const tipo = document.getElementById("presupuesto_tipo").value || "Seguro";
-      const categoria = document.getElementById("presupuesto_categoria").value || "Repuesto";
-      const codigo = document.getElementById("presupuesto_codigo").value.trim();
-      const desc = document.getElementById("presupuesto_desc").value.trim();
-      const cantVal = document.getElementById("presupuesto_cant").value;
-      const valorVal = document.getElementById("presupuesto_valor").value;
-
-      const cantidad = cantVal ? Number(cantVal) : 1;
-      const valor = valorVal ? Number(valorVal) : 0;
-
-      if (!desc && !codigo) {
-        alert("Ingrese al menos un código o una descripción.");
-        return;
-      }
-
-      const idx = vehicles.findIndex(v => v.id === currentVehicleId);
-      if (idx === -1) return;
-
-      if (!Array.isArray(vehicles[idx].presupuesto)) {
-        vehicles[idx].presupuesto = [];
-      }
-
-      vehicles[idx].presupuesto.push({
-        id: Date.now(),
-        tipo,
-        categoria,
-        codigo,
-        descripcion: desc,
-        cantidad,
-        valor
-      });
-
-      document.getElementById("presupuesto_codigo").value = "";
-      document.getElementById("presupuesto_desc").value = "";
-      document.getElementById("presupuesto_cant").value = "";
-      document.getElementById("presupuesto_valor").value = "";
-
-      openVehicleDetail(currentVehicleId, false);
-    });
-
-    // ==============================
-    // CONFIGURACIÓN FINAL PARA GITHUB
-    // ==============================
-    document.addEventListener('DOMContentLoaded', function() {
-      // Botón de exportación
-      document.getElementById('btnExportarTodo').addEventListener('click', exportarDatosCompletos);
-      
-      // Configurar carga de respaldo
-      document.getElementById('inputCargarLocal')?.addEventListener('change', function(e) {
-          if (e.target.files[0]) {
-              cargarRespaldoCompleto(e.target.files[0]);
-          }
-      });
-      
-      // Mensaje inicial
-      console.warn("MODO PRUEBA GITHUB PAGES ACTIVADO");
-      console.warn("Exporta regularmente tus datos para no perderlos");
-      
-      // Configurar login
-      document.getElementById("btnLogin").addEventListener("click", loginSistema);
-    });
-
+// 5. Botón Ver Tablero
+document.getElementById("btnVerTablero").addEventListener("click", () => {
+    const searchInput = document.getElementById("searchInput");
+    if(searchInput) {
+        searchInput.value = ""; 
+        if(typeof searchQuery !== 'undefined') searchQuery = ""; 
+    }
+    showView("tablero");
     renderBoard();
-  </script>
+});
+
+// ===============================================
+// 🔧 LÓGICA UI NOTIFICACIONES (FINAL Y CORREGIDA)
+// ===============================================
+const btnCampanaEl = document.getElementById("btnNotificaciones");
+const panelNotifEl = document.getElementById("notifPanel");
+const btnMarkReadEl = document.getElementById("btnMarkRead");
+
+if (btnCampanaEl && panelNotifEl) {
+    // 1. Limpiar eventos previos (clonar nodo)
+    const newBtn = btnCampanaEl.cloneNode(true);
+    btnCampanaEl.parentNode.replaceChild(newBtn, btnCampanaEl);
+
+    // 2. Al hacer click en la campana
+    newBtn.addEventListener("click", (e) => {
+        e.stopPropagation(); // Evita que el clic llegue al documento
+        const isClosed = !panelNotifEl.classList.contains("show");
+        
+        // Cerrar cualquier otro menú si hubiera
+        document.querySelectorAll(".show").forEach(el => el.classList.remove("show"));
+        
+        if (isClosed) {
+            panelNotifEl.classList.add("show");
+            checkNotificaciones(); // Refrescar lista al abrir
+        }
+    });
+
+    // 3. Al hacer click DENTRO del panel (no cerrar)
+    panelNotifEl.addEventListener("click", (e) => {
+        e.stopPropagation();
+    });
+
+    // 4. Al hacer click AFUERA (en cualquier parte de la pantalla)
+    document.addEventListener("click", () => {
+        panelNotifEl.classList.remove("show");
+    });
+}
+
+// Lógica del botón "Marcar leídas" (CORREGIDO DEFINITIVO)
+if (btnMarkReadEl) {
+    // Limpiar eventos previos para evitar duplicados
+    const newMark = btnMarkReadEl.cloneNode(true);
+    btnMarkReadEl.parentNode.replaceChild(newMark, btnMarkReadEl);
+
+    newMark.addEventListener("click", (e) => {
+        e.stopPropagation(); // Evita que el panel se cierre al hacer clic
+        if(!currentUser) return;
+        
+        let cambios = false;
+        
+        // Recorremos todas las notificaciones
+        notificaciones.forEach(n => {
+            // 1. Si soy Asesor O Admin -> Marco leídas las de asesores
+            const esParaAsesor = (n.rolDestino === "asesor") && (currentUser.rol === "asesor" || currentUser.rol === "admin");
+            
+            // 2. Si soy Técnico -> Marco leídas las mías (IGNORANDO MAYÚSCULAS)
+            let esParaTecnico = false;
+            if (currentUser.rol === "tecnico" && n.rolDestino === "tecnico") {
+                const destino = (n.usuarioDestino || "").toUpperCase();
+                const yo = (currentUser.nombre || "").toUpperCase();
+                if (destino === yo) {
+                    esParaTecnico = true;
+                }
+            }
+
+            // Si es para mí (Asesor o Técnico), la marco
+            if (esParaAsesor || esParaTecnico) {
+                if(!n.leida) {
+                    n.leida = true;
+                    cambios = true;
+                }
+            }
+        });
+        
+        // Si hubo cambios, guardamos y actualizamos visualmente
+        if(cambios) {
+            localStorage.setItem("axtrom_notificaciones", JSON.stringify(notificaciones));
+            checkNotificaciones(); // Esto quita el fondo azul y el número rojo al instante
+        }
+    });
+}
+
+// ===============================================
+// 💰 LÓGICA DE PRESUPUESTO INTERACTIVO (FINAL)
+// ===============================================
+let vehiculoEnEdicionPresupuesto = null;
+
+function abrirModalPresupuesto(idVehiculo) {
+    const v = vehicles.find(x => x.id === idVehiculo);
+    if(!v) return;
+    
+    vehiculoEnEdicionPresupuesto = idVehiculo;
+    document.getElementById("modalPlacaTitulo").textContent = v.placa;
+    
+    // Cargar datos
+    const datos = v.presupuestoDesglose || {};
+    
+    // Lista de campos
+    const camposSeg = ['seg_repuestos_v', 'seg_enderezado_v', 'seg_pintura_v', 'seg_otros_v'];
+    const camposPriv = ['priv_repuestos_v', 'priv_enderezado_v', 'priv_pintura_v', 'priv_otros_v'];
+    
+    // Llenar inputs y verificar si hay datos para activar checks
+    let haySeguro = false;
+    let hayPrivado = false;
+
+    [...camposSeg, ...camposPriv].forEach(id => {
+        const val = datos[id] || "";
+        document.getElementById(id).value = val;
+        
+        // Si hay un valor mayor a 0, marcamos que existe esa sección
+        if(Number(val) > 0) {
+            if(id.startsWith('seg')) haySeguro = true;
+            if(id.startsWith('priv')) hayPrivado = true;
+        }
+    });
+
+    // Configurar estado visual inicial (Checks y Despliegue)
+    configurarSeccion('secSeguro', 'checkSeguro', haySeguro);
+    configurarSeccion('secPrivado', 'checkPrivado', hayPrivado);
+
+    calcularTotalesPresupuesto();
+    document.getElementById("modalPresupuesto").style.display = "flex";
+}
+
+// Función auxiliar para forzar estado visual
+function configurarSeccion(idSeccion, idCheck, activo) {
+    const div = document.getElementById(idSeccion);
+    const chk = document.getElementById(idCheck);
+    const header = div.previousElementSibling; // El encabezado gris
+
+    chk.checked = activo;
+    if (activo) {
+        div.classList.add("show");
+        header.classList.add("active");
+    } else {
+        div.classList.remove("show");
+        header.classList.remove("active");
+    }
+}
+
+// Función disparada por el Click
+function toggleSection(idSeccion, fromCheckbox = false) {
+    const div = document.getElementById(idSeccion);
+    const header = div.previousElementSibling;
+    const chk = header.querySelector("input[type='checkbox']");
+
+    // Si clicamos el header (gris), invertimos el check. 
+    // Si clicamos directo el check, ya cambió su estado solo.
+    if (!fromCheckbox) {
+        chk.checked = !chk.checked;
+    }
+
+    // Mostrar u ocultar basado en el estado final del check
+    if (chk.checked) {
+        div.classList.add("show");
+        header.classList.add("active");
+    } else {
+        div.classList.remove("show");
+        header.classList.remove("active");
+    }
+}
+
+function cerrarModalPresupuesto() {
+    document.getElementById("modalPresupuesto").style.display = "none";
+}
+
+function guardarModalPresupuesto() {
+    const idx = vehicles.findIndex(v => v.id === vehiculoEnEdicionPresupuesto);
+    if(idx === -1) return;
+
+    const inputs = document.querySelectorAll('.pres-input');
+    const nuevosDatos = {};
+    inputs.forEach(inp => nuevosDatos[inp.id] = inp.value);
+
+    vehicles[idx].presupuestoDesglose = nuevosDatos;
+    
+    if(typeof guardarCambios === "function") guardarCambios();
+    
+    cerrarModalPresupuesto();
+}
+
+// Event Listeners para cálculo
+setTimeout(() => {
+    document.querySelectorAll('.pres-input').forEach(input => {
+        input.addEventListener('input', calcularTotalesPresupuesto);
+    });
+}, 500);
+
+function calcularTotalesPresupuesto() {
+    let totalSeg = 0;
+    let totalPriv = 0;
+
+    document.querySelectorAll('.calc-seg').forEach(inp => totalSeg += Number(inp.value) || 0);
+    document.querySelectorAll('.calc-priv').forEach(inp => totalPriv += Number(inp.value) || 0);
+
+    const spanSeg = document.getElementById("totalSeguroDisplay");
+    const spanPriv = document.getElementById("totalPrivadoDisplay");
+    
+    if(spanSeg) spanSeg.textContent = totalSeg > 0 ? "$ " + totalSeg.toFixed(2) : "0.00";
+    if(spanPriv) spanPriv.textContent = totalPriv > 0 ? "$ " + totalPriv.toFixed(2) : "0.00";
+}
+
+// ===============================================
+// 📊 LÓGICA DE REPORTE DE PRESUPUESTOS (FILTROS ELEGANTES)
+// ===============================================
+
+// 1. Configurar botones
+const btnPresupuestoMain = document.getElementById("btnPresupuesto");
+if (btnPresupuestoMain) {
+    btnPresupuestoMain.addEventListener("click", () => {
+        limpiarFiltrosPresupuesto();
+        showView("presupuesto");
+    });
+}
+document.getElementById("btnVolverDesdePresupuesto").addEventListener("click", () => showView("tablero"));
+
+// 2. Listeners para los selects
+const selectsFiltro = ["filtroAnio", "filtroMes", "filtroDia"];
+selectsFiltro.forEach(id => {
+    document.getElementById(id).addEventListener("change", renderPresupuestoGeneral);
+});
+
+function limpiarFiltrosPresupuesto() {
+    document.getElementById("filtroAnio").value = "";
+    document.getElementById("filtroMes").value = "";
+    document.getElementById("filtroDia").value = "";
+    renderPresupuestoGeneral();
+}
+
+// 3. Función Principal
+function renderPresupuestoGeneral() {
+    const sectores = [
+        { id: "repuestos", label: "Repuestos" },
+        { id: "enderezado", label: "Enderezado" },
+        { id: "pintura", label: "Pintura" },
+        { id: "otros", label: "Otros" }
+    ];
+
+    // Obtener valores de los 3 Selects
+    const fAnio = document.getElementById("filtroAnio").value; // "2024"
+    const fMes = document.getElementById("filtroMes").value;   // "01", "02"...
+    const fDia = document.getElementById("filtroDia").value;   // "01", "31"...
+
+    // Acumuladores
+    let totales = {
+        seguro: { repuestos:0, enderezado:0, pintura:0, otros:0 },
+        privado: { repuestos:0, enderezado:0, pintura:0, otros:0 }
+    };
+
+    vehicles.forEach(v => {
+        if (!v.fecha_ingreso) return; // Si no tiene fecha, no cuenta
+
+        // LÓGICA DE FILTRADO JERÁRQUICO
+        let coincide = true;
+
+        // 1. Si hay Año seleccionado, debe coincidir el inicio (YYYY)
+        if (fAnio && !v.fecha_ingreso.startsWith(fAnio)) {
+            coincide = false;
+        }
+
+        // 2. Si hay Mes seleccionado, debe coincidir el mes (YYYY-MM)
+        // Nota: El mes solo funciona bien si el año también se selecciona, 
+        // o si queremos buscar "Todos los eneros de la historia" (poco común pero posible).
+        // Aquí asumimos coincidencia de cadena: "2025-01-15".
+        if (fMes) {
+            // fecha_ingreso es "YYYY-MM-DD". Split en guiones.
+            const partes = v.fecha_ingreso.split("-"); // [YYYY, MM, DD]
+            if (partes[1] !== fMes) coincide = false;
+        }
+
+        // 3. Si hay Día seleccionado
+        if (fDia) {
+            const partes = v.fecha_ingreso.split("-");
+            if (partes[2] !== fDia) coincide = false;
+        }
+        
+        if (!coincide) return;
+
+        // Sumar valores
+        const p = v.presupuestoDesglose || {};
+        sectores.forEach(sec => {
+            totales.seguro[sec.id] += Number(p[`seg_${sec.id}_v`]) || 0;
+            totales.privado[sec.id] += Number(p[`priv_${sec.id}_v`]) || 0;
+        });
+    });
+
+    // Renderizar Tabla
+    const tbody = document.getElementById("bodyPresupuestoGeneral");
+    tbody.innerHTML = "";
+
+    let granTotalSeg = 0;
+    let granTotalPriv = 0;
+
+    sectores.forEach(sec => {
+        const valSeg = totales.seguro[sec.id];
+        const valPriv = totales.privado[sec.id];
+        const subTotal = valSeg + valPriv;
+
+        granTotalSeg += valSeg;
+        granTotalPriv += valPriv;
+
+        const row = document.createElement("tr");
+        row.style.borderBottom = "1px solid #eee";
+        row.innerHTML = `
+            <td style="padding:12px;">${sec.label}</td>
+            <td style="padding:12px; text-align:right;">$ ${valSeg.toFixed(2)}</td>
+            <td style="padding:12px; text-align:right;">$ ${valPriv.toFixed(2)}</td>
+            <td style="padding:12px; text-align:right; font-weight:bold; background:#f9f9f9;">$ ${subTotal.toFixed(2)}</td>
+        `;
+        tbody.appendChild(row);
+    });
+
+    // CÁLCULOS FINALES
+    const granTotal = granTotalSeg + granTotalPriv;
+    const IVA_PORCENTAJE = 0.15; // 15% Ecuador
+    const granTotalConIva = granTotal * (1 + IVA_PORCENTAJE);
+    
+    document.getElementById("footSeguro").textContent = "$ " + granTotalSeg.toFixed(2);
+    document.getElementById("footPrivado").textContent = "$ " + granTotalPriv.toFixed(2);
+    document.getElementById("footTotal").textContent = "$ " + granTotal.toFixed(2);
+    
+    document.getElementById("granTotalDisplay").textContent = "$ " + granTotal.toFixed(2);
+    document.getElementById("granTotalIvaDisplay").textContent = "$ " + granTotalConIva.toFixed(2);
+}
+</script>
+<div id="modalPresupuesto" class="modal-overlay">
+  <div class="modal-content">
+    <div style="padding:15px; border-bottom:1px solid #eee;">
+      <h3 style="margin:0; font-size:16px;">Detalle de Valores - <span id="modalPlacaTitulo"></span></h3>
+      <p style="margin:0; font-size:11px; color:#666;">Seleccione el tipo de cobro e ingrese los valores.</p>
+    </div>
+
+    <div style="padding: 15px; max-height: 60vh; overflow-y: auto;">
+      
+      <div class="pres-section-container">
+          <div class="pres-toggle-header" onclick="toggleSection('secSeguro')">
+              <input type="checkbox" id="checkSeguro" class="big-check" onclick="event.stopPropagation(); toggleSection('secSeguro', true)">
+              <div style="flex:1;">Valores por <strong>SEGURO</strong></div>
+              <span id="totalSeguroDisplay" style="font-weight:bold; color:#007dc5;">0.00</span>
+          </div>
+          
+          <div id="secSeguro" class="pres-content-body">
+              <table class="pres-table">
+                <thead>
+                    <tr><th style="width:60%">Sectores</th><th style="text-align: right;">Venta ($)</th></tr>
+                </thead>
+                <tbody>
+                  <tr><td class="pres-row-bg">Repuestos</td><td><input type="number" id="seg_repuestos_v" class="pres-input calc-seg" placeholder="0.00"></td></tr>
+                  <tr><td class="pres-row-bg">Enderezado</td><td><input type="number" id="seg_enderezado_v" class="pres-input calc-seg" placeholder="0.00"></td></tr>
+                  <tr><td class="pres-row-bg">Pintura</td><td><input type="number" id="seg_pintura_v" class="pres-input calc-seg" placeholder="0.00"></td></tr>
+                  <tr><td class="pres-row-bg">Otros</td><td><input type="number" id="seg_otros_v" class="pres-input calc-seg" placeholder="0.00"></td></tr>
+                </tbody>
+              </table>
+          </div>
+      </div>
+
+      <div class="pres-section-container">
+          <div class="pres-toggle-header" onclick="toggleSection('secPrivado')">
+              <input type="checkbox" id="checkPrivado" class="big-check" onclick="event.stopPropagation(); toggleSection('secPrivado', true)">
+              <div style="flex:1;">Valores <strong>PRIVADOS</strong> (Cliente)</div>
+              <span id="totalPrivadoDisplay" style="font-weight:bold; color:#007dc5;">0.00</span>
+          </div>
+          
+          <div id="secPrivado" class="pres-content-body">
+              <table class="pres-table">
+                <thead>
+                    <tr><th style="width:60%">Sectores</th><th style="text-align: right;">Venta ($)</th></tr>
+                </thead>
+                <tbody>
+                  <tr><td class="pres-row-bg">Repuestos</td><td><input type="number" id="priv_repuestos_v" class="pres-input calc-priv" placeholder="0.00"></td></tr>
+                  <tr><td class="pres-row-bg">Enderezado</td><td><input type="number" id="priv_enderezado_v" class="pres-input calc-priv" placeholder="0.00"></td></tr>
+                  <tr><td class="pres-row-bg">Pintura</td><td><input type="number" id="priv_pintura_v" class="pres-input calc-priv" placeholder="0.00"></td></tr>
+                  <tr><td class="pres-row-bg">Otros</td><td><input type="number" id="priv_otros_v" class="pres-input calc-priv" placeholder="0.00"></td></tr>
+                </tbody>
+              </table>
+          </div>
+      </div>
+
+    </div>
+
+    <div class="pres-footer">
+      <button onclick="cerrarModalPresupuesto()" class="btn btn-secondary">Cancelar</button>
+      <button onclick="guardarModalPresupuesto()" class="btn btn-primary">Guardar Valores</button>
+    </div>
+  </div>
+</div>
 </body>
-
 </html>
-
-
