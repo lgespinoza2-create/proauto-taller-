@@ -818,20 +818,25 @@ let currentUser = null;
 // =========================================
 let notificaciones = JSON.parse(localStorage.getItem("axtrom_notificaciones") || "[]");
 
-// 1. Función para crear una notificación
 function crearNotificacion(rolDestino, usuarioDestino, mensaje) {
     const nuevaNotif = {
         id: Date.now(),
         fecha: new Date().toLocaleString(),
-        rolDestino: rolDestino,       // 'asesor' o 'tecnico'
-        usuarioDestino: usuarioDestino, // Nombre del técnico (opcional)
+        rolDestino: rolDestino,
+        usuarioDestino: usuarioDestino,
         mensaje: mensaje,
         leida: false
     };
     notificaciones.push(nuevaNotif);
-    localStorage.setItem("axtrom_notificaciones", JSON.stringify(notificaciones));
     
-    // Si la notificación es para mí mismo (ej: prueba), actualizar badge
+    // 👇 ESTO ES VITAL: GUARDAR CAMBIOS INMEDIATAMENTE PARA QUE SUBA A LA NUBE
+    if(typeof guardarCambios === "function") {
+        guardarCambios();
+    } else {
+        // Fallback si no existe la función aún
+        localStorage.setItem("axtrom_notificaciones", JSON.stringify(notificaciones));
+    }
+    
     checkNotificaciones(); 
 }
 
@@ -1912,7 +1917,8 @@ if (btnMarkReadEl) {
         // Si hubo cambios, guardamos y actualizamos visualmente
         if(cambios) {
             localStorage.setItem("axtrom_notificaciones", JSON.stringify(notificaciones));
-            checkNotificaciones(); // Esto quita el fondo azul y el número rojo al instante
+            checkNotificaciones();
+            if(typeof guardarCambios === "function") guardarCambios(); // <--- AGREGAR ESTO
         }
     });
 }
@@ -2165,10 +2171,11 @@ function renderPresupuestoGeneral() {
 const API_URL = "https://script.google.com/macros/s/AKfycbwhx7b0lNnEeKBj3bjtGlIVvj911LF_-u6P-snKTfl34nutMr09-Z09dUtbw8dkwzBw/exec"; // <--- ¡IMPORTANTE! PEGA TU URL AQUÍ
 
 async function cargarDatosDeNube() {
-    // Mostrar indicador de carga (opcional)
     const btnRefresh = document.getElementById("btnVerTablero");
-    const textoOriginal = btnRefresh.innerHTML;
-    btnRefresh.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Cargando...';
+    if(btnRefresh) {
+        const textoOriginal = btnRefresh.innerHTML;
+        btnRefresh.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Cargando...';
+    }
 
     try {
         const response = await fetch(API_URL);
@@ -2176,31 +2183,33 @@ async function cargarDatosDeNube() {
         
         if (data.vehicles && Array.isArray(data.vehicles)) {
             vehicles = data.vehicles;
-            console.log("Vehículos cargados de la nube:", vehicles.length);
         }
         if (data.auditoria && Array.isArray(data.auditoria)) {
             auditoria = data.auditoria;
         }
+        // 👇 ESTO ES LO NUEVO: CARGAR NOTIFICACIONES 👇
+        if (data.notificaciones && Array.isArray(data.notificaciones)) {
+            notificaciones = data.notificaciones;
+            checkNotificaciones(); // Actualizar la campanita al instante
+        }
         
-        // Guardamos copia local por si se va el internet
         localStorage.setItem("axtrom_vehicles", JSON.stringify(vehicles));
-        renderBoard(); // Actualizar tablero visualmente
+        localStorage.setItem("axtrom_notificaciones", JSON.stringify(notificaciones)); // Respaldo local
+        renderBoard();
         
     } catch (error) {
         console.error("Error cargando de nube:", error);
-        alert("No se pudo sincronizar con la nube. Usando datos locales.");
     } finally {
-        btnRefresh.innerHTML = textoOriginal;
+        if(btnRefresh) btnRefresh.innerHTML = '<i class="fa-solid fa-table-columns"></i> Ver tablero';
     }
 }
-
 function guardarEnNube() {
-    // Esta función se ejecuta en segundo plano
     fetch(API_URL, {
         method: "POST",
         body: JSON.stringify({
             vehicles: vehicles,
-            auditoria: auditoria
+            auditoria: auditoria,
+            notificaciones: notificaciones // <--- AHORA ENVIAMOS ESTO TAMBIÉN
         })
     })
     .then(res => res.json())
