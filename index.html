@@ -895,12 +895,7 @@ function checkNotificaciones() {
 }
 
 
-// IMPORTANTE: Llamar a checkNotificaciones() al hacer Login
-// (Busca tu función loginSistema y agrega checkNotificaciones() al final si no está)
 
-// =========================================
-// LOGICA DE LOGIN Y RUTAS
-// =========================================
 // =========================================
 // 2. SISTEMA DE LOGIN, RUTAS Y PERMISOS (BLOQUE MAESTRO)
 // =========================================
@@ -923,7 +918,16 @@ function loginSistema() {
     document.getElementById("loginUsuario").value = "";
     document.getElementById("loginPassword").value = "";
     document.getElementById("loginScreen").style.display = "none";
-
+    if(typeof cargarDatosDeNube === "function") {
+        console.log("Conectando con Google Sheets...");
+        cargarDatosDeNube(); // Descarga inmediata
+        
+        // Activar auto-actualización cada 30 segundos
+        setInterval(() => {
+            console.log("Sincronizando cambios...");
+            cargarDatosDeNube();
+        }, 30000);
+    }
     // RUTAS SEGUN ROL
     if (currentUser.rol === "lavador") {
         document.getElementById("main-container").style.display = "none";
@@ -1054,9 +1058,7 @@ const board = document.getElementById("board");
 let draggedCardId = null;
 
 
-// ===============================================
-// 🔧 CORRECCIÓN FINAL: DINERO OCULTO A TÉCNICOS
-// ===============================================
+
 // ===============================================
 // 🔧 CORRECCIÓN FINAL: DINERO OCULTO A TÉCNICOS
 // ===============================================
@@ -2200,15 +2202,7 @@ function guardarEnNube() {
 // 🔄 AUTO-SINCRONIZACIÓN
 // =========================================
 // 1. Cargar datos al iniciar sesión (Modificar loginSistema)
-const originalLogin = loginSistema;
-loginSistema = function() {
-    originalLogin(); // Ejecuta el login normal
-    if (currentUser) {
-        cargarDatosDeNube(); // Descarga los datos más recientes
-        // Activar auto-recarga cada 30 segundos para ver cambios de otros
-        setInterval(cargarDatosDeNube, 30000); 
-    }
-};
+
 
 // 2. Guardar datos cada vez que se hace un cambio importante
 // Modificamos la función de guardado local para que también mande a la nube
