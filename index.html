@@ -1522,12 +1522,15 @@ document.getElementById("btnEliminarVehiculo").addEventListener("click", () => {
 // ===============================================
 // 💎 NUEVA VISTA DE DETALLE (SEPARADA: FOTOS VS DOCS)
 // ===============================================
+// ===============================================
+// 💎 VISTA DETALLE PROTEGIDA (Oculta dinero a técnicos)
+// ===============================================
 function openVehicleDetail(vehicleId) {
     const v = vehicles.find(x => x.id == vehicleId);
     if (!v) return;
     window.currentVehicleId = vehicleId;
 
-    // 1. Preparar datos financieros
+    // 1. Preparar datos financieros (Calculamos igual, pero decidimos si mostrar luego)
     const p = v.presupuestoDesglose || {};
     const sectores = [
         { id: 'repuestos', label: 'Repuestos' },
@@ -1566,13 +1569,29 @@ function openVehicleDetail(vehicleId) {
         </tr>
     `;
 
-    // 2. CLASIFICACIÓN DE ARCHIVOS (FOTOS vs DOCUMENTOS)
+    // 🔒 CANDADO DE SEGURIDAD PARA DETALLE
+    // Definimos qué se muestra en la tarjeta financiera
+    let bloqueFinanciero = "";
+    
+    // Si NO es técnico, mostramos la tabla. Si ES técnico, se queda vacío.
+    if (currentUser && currentUser.rol !== "tecnico") {
+        bloqueFinanciero = `
+            <div class="detail-card">
+                <h3><i class="fa-solid fa-file-invoice-dollar"></i> Valores Autorizados</h3>
+                <table class="fin-table">
+                    <thead><tr><th>Rubro</th><th>Seguro</th><th>Cliente</th><th>Total</th></tr></thead>
+                    <tbody>${htmlTablaFinanciera || '<tr><td colspan="4" style="text-align:center; padding:20px; color:#999;">Sin valores registrados</td></tr>'}</tbody>
+                </table>
+            </div>
+        `;
+    }
+
+    // 2. CLASIFICACIÓN DE ARCHIVOS
     let htmlGaleria = "";
     let htmlDocumentos = "";
     
-    // Recopilamos TODOS los archivos en una sola lista para clasificarlos
     const todosLosArchivos = [
-        ...(v.archivoOrden ? [v.archivoOrden] : []), // El archivo único de OT
+        ...(v.archivoOrden ? [v.archivoOrden] : []), 
         ...(v.archivosCliente || []),
         ...(v.archivosAutorizaciones || []),
         ...(v.archivosProformas || [])
@@ -1582,13 +1601,11 @@ function openVehicleDetail(vehicleId) {
         htmlGaleria = `<div style="padding:20px; text-align:center; color:#999; border:2px dashed #eee; border-radius:8px; font-size:12px;">Sin imágenes</div>`;
         htmlDocumentos = `<div style="padding:15px; text-align:center; color:#999; font-size:12px;">Sin documentos adjuntos</div>`;
     } else {
-        // Barrido para separar
         let hayFotos = false;
         let hayDocs = false;
 
         todosLosArchivos.forEach(f => {
             if (f.tipo.includes("image")) {
-                // ES IMAGEN -> A LA GALERÍA
                 hayFotos = true;
                 htmlGaleria += `
                     <div class="gallery-item" onclick="abrirFotoGrande('${f.base64}')" title="${f.nombre}">
@@ -1597,7 +1614,6 @@ function openVehicleDetail(vehicleId) {
                     </div>
                 `;
             } else {
-                // ES DOCUMENTO (PDF, DOC, ETC) -> A LA LISTA DE DOCS
                 hayDocs = true;
                 let icono = "fa-file-lines";
                 if(f.tipo.includes("pdf")) icono = "fa-file-pdf";
@@ -1616,7 +1632,7 @@ function openVehicleDetail(vehicleId) {
         if(!hayDocs) htmlDocumentos = `<div style="padding:15px; text-align:center; color:#999; font-size:12px;">Sin documentos adjuntos</div>`;
     }
 
-    // 3. CONSTRUIR EL HTML COMPLETO
+    // 3. CONSTRUIR EL HTML
     const panel = document.querySelector("#view-detalle .panel-detalle");
     
     panel.innerHTML = `
@@ -1652,13 +1668,7 @@ function openVehicleDetail(vehicleId) {
                     <div class="info-row"><span class="info-label">Técnico</span> <span class="info-val">${v.tecnico || "Sin asignar"}</span></div>
                 </div>
 
-                <div class="detail-card">
-                    <h3><i class="fa-solid fa-file-invoice-dollar"></i> Valores Autorizados</h3>
-                    <table class="fin-table">
-                        <thead><tr><th>Rubro</th><th>Seguro</th><th>Cliente</th><th>Total</th></tr></thead>
-                        <tbody>${htmlTablaFinanciera || '<tr><td colspan="4" style="text-align:center; padding:20px; color:#999;">Sin valores registrados</td></tr>'}</tbody>
-                    </table>
-                </div>
+                ${bloqueFinanciero}
                 
                 <div class="detail-card">
                      <h3><i class="fa-solid fa-list-check"></i> Historial de Órdenes</h3>
