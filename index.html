@@ -2232,6 +2232,109 @@ function guardarCambios() {
     // Guardado Nube (Drive)
     guardarEnNube();
 }
+// ================================================================
+// 🚑 PARCHE DE CORRECCIÓN: SINCRONIZACIÓN DE NOTIFICACIONES
+// ================================================================
+
+// 1. Sobrescribir función para enviar también notificaciones a la nube
+guardarEnNube = function() {
+    fetch(API_URL, {
+        method: "POST",
+        body: JSON.stringify({
+            vehicles: vehicles,
+            auditoria: auditoria,
+            notificaciones: notificaciones // <--- ¡ESTO ES LO NUEVO!
+        })
+    })
+    .then(res => res.json())
+    .then(d => console.log("Guardado en nube exitoso"))
+    .catch(e => console.error("Error guardando en nube", e));
+};
+
+// 2. Sobrescribir función para descargar notificaciones de la nube
+cargarDatosDeNube = async function() {
+    const btnRefresh = document.getElementById("btnVerTablero");
+    if(btnRefresh) {
+        const textoOriginal = btnRefresh.innerHTML;
+        btnRefresh.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Cargando...';
+    }
+
+    try {
+        const response = await fetch(API_URL);
+        const data = await response.json();
+        
+        if (data.vehicles && Array.isArray(data.vehicles)) {
+            vehicles = data.vehicles;
+        }
+        if (data.auditoria && Array.isArray(data.auditoria)) {
+            auditoria = data.auditoria;
+        }
+        // 👇 AHORA SÍ LEEMOS LAS NOTIFICACIONES
+        if (data.notificaciones && Array.isArray(data.notificaciones)) {
+            notificaciones = data.notificaciones;
+            // Guardamos copia local por si acaso
+            localStorage.setItem("axtrom_notificaciones", JSON.stringify(notificaciones));
+            checkNotificaciones(); // Actualizar campanita
+        }
+        
+        localStorage.setItem("axtrom_vehicles", JSON.stringify(vehicles));
+        renderBoard();
+        
+    } catch (error) {
+        console.error("Error cargando de nube:", error);
+    } finally {
+        if(btnRefresh) btnRefresh.innerHTML = '<i class="fa-solid fa-table-columns"></i> Ver tablero';
+    }
+};
+
+// 3. Sobrescribir crearNotificacion para que guarde INMEDIATAMENTE
+crearNotificacion = function(rolDestino, usuarioDestino, mensaje) {
+    const nuevaNotif = {
+        id: Date.now(),
+        fecha: new Date().toLocaleString(),
+        rolDestino: rolDestino,
+        usuarioDestino: usuarioDestino,
+        mensaje: mensaje,
+        leida: false
+    };
+    notificaciones.push(nuevaNotif);
+    
+    // Guardar en nube al instante
+    guardarEnNube(); 
+    checkNotificaciones(); 
+};
+
+// 4. Actualizar botón de "Marcar leídas" para que guarde en nube
+const btnMarkFix = document.getElementById("btnMarkRead");
+if(btnMarkFix) {
+    // Clonamos para limpiar eventos viejos
+    const newBtn = btnMarkFix.cloneNode(true);
+    btnMarkFix.parentNode.replaceChild(newBtn, btnMarkFix);
+    
+    newBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        if(!currentUser) return;
+        let cambios = false;
+        notificaciones.forEach(n => {
+            const esParaAsesor = (n.rolDestino === "asesor") && (currentUser.rol === "asesor" || currentUser.rol === "admin");
+            let esParaTecnico = false;
+            if (currentUser.rol === "tecnico" && n.rolDestino === "tecnico") {
+                const destino = (n.usuarioDestino || "").toUpperCase();
+                const yo = (currentUser.nombre || "").toUpperCase();
+                if (destino === yo) esParaTecnico = true;
+            }
+            if ((esParaAsesor || esParaTecnico) && !n.leida) {
+                n.leida = true;
+                cambios = true;
+            }
+        });
+        
+        if(cambios) {
+            guardarEnNube(); // <--- GUARDAR EN NUBE AL MARCAR LEÍDAS
+            checkNotificaciones();
+        }
+    });
+}
 </script>
 <div id="modalPresupuesto" class="modal-overlay">
   <div class="modal-content">
