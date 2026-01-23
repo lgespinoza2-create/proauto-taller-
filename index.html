@@ -2,7 +2,8 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <title>Corporación PROAUTO - Tablero de Taller + Lavado</title>
+  <title>AXTROM</title>
+  <link rel="icon" type="image/png" href="favicon.png?v=3">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <style>
     /* =========================================================
@@ -451,6 +452,7 @@
     <button id="btnAuditoria" class="btn btn-secondary"><i class="fa-solid fa-clipboard-check"></i> Auditoría</button>
     <button id="btnPresupuesto" class="btn btn-secondary"><i class="fa-solid fa-file-invoice-dollar"></i> Presupuesto</button>
     <button id="btnGuardarLocal" class="btn btn-secondary">
+    
       <input type="file" id="inputCargarLocal" accept="application/json" style="display:none" />
       <i class="fa-solid fa-floppy-disk"></i> Guardar respaldo
     </button>
@@ -458,6 +460,9 @@
       <i class="fa-solid fa-folder-open"></i> Cargar respaldo
       <input type="file" id="inputCargarLocalInput" accept="application/json" style="display:none" />
     </button>
+    <button id="btnVerFacturados" class="btn btn-primary" style="background:#2e7d32;">
+    <i class="fa-solid fa-file-invoice-dollar"></i> Facturados
+</button>
   </div>
 
   <div style="display:flex;justify-content:flex-end;margin-bottom:8px;padding:0 10px;">
@@ -494,7 +499,7 @@
           <div class="form-field">
             <label for="aseguradora">Aseguradora</label>
             <select id="aseguradora" name="aseguradora">
-              <option value="">Sin aseguradora</option><option>Retail</option><option>CHUBB Seguros</option><option>Zurich Seguros</option><option>Latina Seguros</option><option>AIG Metropolitana</option><option>VAZ Seguros</option><option>Seguros Alianza</option><option>Mapfre</option><option>Aseguradora del Sur</option>
+              <option value="">Sin aseguradora</option><option>Retail</option><option>CHUBB Seguros</option><option>Zurich Seguros</option><option>Latina Seguros</option><option>AIG Metropolitana</option><option>VAZ Seguros</option><option>Seguros Alianza</option><option>Mapfre</option><option>Aseguradora del Sur</option><option>Seguros Unidos S.A.</option><option>EQUISUIZA</option><option>Generali Ecuador</option>
             </select>
           </div>
           <div class="form-field">
@@ -800,7 +805,8 @@ const STATUS_COLUMNS = [
    { id: "en_lavado", label: "En lavado (Subfases)" },
    { id: "listo", label: "Control de Calidad" }, 
    { id: "entregado", label: "Entregado" },
-   { id: "perdida_total", label: "Pérdida total" }
+   { id: "perdida_total", label: "Pérdida total" },
+   { id: "facturados", label: "Vehículos Facturados ⏳" }
 ];
 const STATUS_ICONS = {
   falta_inspeccion: "fa-magnifying-glass", falta_autorizacion: "fa-circle-xmark", autorizado: "fa-circle-check",
@@ -1065,7 +1071,7 @@ let draggedCardId = null;
 
 
 // ===============================================
-// 🔧 CORRECCIÓN FINAL: DINERO OCULTO A TÉCNICOS
+// 🔧 CORRECCIÓN: TABLERO (M.O. INCLUYE 'OTROS')
 // ===============================================
 function renderBoard() {
   // 1. Vista exclusiva para Lavador
@@ -1124,27 +1130,39 @@ function renderBoard() {
     headerEl.appendChild(countEl);
     columnEl.appendChild(headerEl);
 
-    // --- 💰 SUMATORIA DE DINERO ---
-    let totalColumnMoney = 0;
-    const camposSumar = [
-        'seg_repuestos_v', 'seg_enderezado_v', 'seg_pintura_v', 'seg_otros_v',
-        'priv_repuestos_v', 'priv_enderezado_v', 'priv_pintura_v', 'priv_otros_v'
-    ];
+    // --- 💰 DESGLOSE DE DINERO (M.O. + OTROS vs REPUESTOS) ---
+    let totalMO = 0;   // Enderezado + Pintura + OTROS
+    let totalRep = 0;  // Repuestos
 
     vehiculosEnColumna.forEach(v => {
         const p = v.presupuestoDesglose || {};
-        camposSumar.forEach(campo => {
-            totalColumnMoney += Number(p[campo]) || 0;
-        });
+        
+        // 1. Sumar Mano de Obra (Enderezado + Pintura + Otros)
+        totalMO += (Number(p['seg_enderezado_v']) || 0) + 
+                   (Number(p['seg_pintura_v']) || 0) + 
+                   (Number(p['seg_otros_v']) || 0) +     // <-- Agregado Otros (Seguro)
+                   (Number(p['priv_enderezado_v']) || 0) + 
+                   (Number(p['priv_pintura_v']) || 0) +
+                   (Number(p['priv_otros_v']) || 0);     // <-- Agregado Otros (Privado)
+
+        // 2. Sumar Repuestos
+        totalRep += (Number(p['seg_repuestos_v']) || 0) + 
+                    (Number(p['priv_repuestos_v']) || 0);
     });
 
-    // 🔒 CANDADO DE SEGURIDAD (ESTA ES LA LÍNEA QUE FALTABA EN TU ARCHIVO)
+    // 🔒 CANDADO DE SEGURIDAD
     // Solo mostramos si hay dinero Y el usuario NO es técnico
-    if (totalColumnMoney > 0 && currentUser.rol !== "tecnico") {
-        const moneyEl = document.createElement("div");
-        moneyEl.style.cssText = "text-align: right; font-size: 11px; font-weight: 800; color: #2e7d32; margin-top: -6px; margin-bottom: 8px; padding-right: 2px;";
-        moneyEl.innerHTML = `<span>$ ${totalColumnMoney.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>`;
-        columnEl.appendChild(moneyEl);
+    if ((totalMO > 0 || totalRep > 0) && currentUser.rol !== "tecnico") {
+        const moneyContainer = document.createElement("div");
+        moneyContainer.style.cssText = "text-align: right; font-size: 10px; font-weight: 700; margin-top: -6px; margin-bottom: 8px; padding-right: 2px; line-height: 1.3;";
+        
+        const fmt = (n) => n.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+
+        moneyContainer.innerHTML = `
+            <div style="color: #007dc5;">M.O: $ ${fmt(totalMO)}</div>
+            <div style="color: #e65100;">Rep: $ ${fmt(totalRep)}</div>
+        `;
+        columnEl.appendChild(moneyContainer);
     }
 
     // --- DROPZONE (ÁREA DE TARJETAS) ---
@@ -1257,9 +1275,18 @@ function handleDrop(e) {
     // 1. CAMBIAR ESTADO
     vehicle.estado = newStatus;
     
-    // 2. NOTIFICACIONES (Solo una vez)
     if (window.currentUser && window.currentUser.rol === "tecnico") {
         crearNotificacion("asesor", null, `El técnico ${window.currentUser.nombre} movió el vehículo ${vehicle.placa} a ${newStatus.toUpperCase()}`);
+    }
+
+    // 2. NUEVO: NOTIFICACIÓN AL TÉCNICO (Si mueve un Admin/Asesor)
+    // Solo si el carro tiene técnico asignado y quien mueve NO es ese técnico
+    if (window.currentUser.rol !== "tecnico" && vehicle.tecnico) {
+        crearNotificacion("tecnico", vehicle.tecnico, `⚠️ Taller: ${window.currentUser.nombre} movió tu asignación ${vehicle.placa} a ${newStatus.toUpperCase()}`);
+    }
+    // AGREGAR ESTO:
+    if (newStatus === "facturados") {
+        vehicle.fecha_facturado = Date.now(); // Marca de tiempo de inicio
     }
 
     // 3. LÓGICA LAVADORA
@@ -2334,6 +2361,190 @@ if(btnMarkFix) {
             checkNotificaciones();
         }
     });
+}
+// =========================================
+// 🛒 SISTEMA DE FACTURACIÓN AUTOMÁTICA
+// =========================================
+
+// 1. Configurar el botón para ver la lista
+document.getElementById("btnVerFacturados").addEventListener("click", () => {
+    mostrarListaFacturados();
+});
+
+// 2. Función para archivar automáticamente (Regla de 10 minutos)
+// 2. Función para archivar automáticamente (CORREGIDA PARA NO ATASCAR CARROS)
+function revisarFacturadosAntiguos() {
+    const TIEMPO_LIMITE = 10 * 60 * 1000; // 10 minutos
+    const ahora = Date.now();
+    let huboCambios = false;
+
+    vehicles.forEach(v => {
+        if (v.estado === "facturados") {
+            // CORRECCIÓN: Si no tiene fecha (se quedó estancado), le ponemos una vieja
+            // para que se archive en el siguiente ciclo.
+            if (!v.fecha_facturado) {
+                v.fecha_facturado = ahora - (TIEMPO_LIMITE + 1000); 
+            }
+
+            if (ahora - v.fecha_facturado > TIEMPO_LIMITE) {
+                v.estado = "facturados_archivado"; 
+                huboCambios = true;
+                console.log(`Auto-archivando vehículo ${v.placa}`);
+            }
+        }
+    });
+
+    if (huboCambios) {
+        if(typeof guardarCambios === "function") guardarCambios();
+        if(typeof renderBoard === "function") renderBoard();
+    }
+}
+
+
+// 3. Activar el reloj de revisión (Cada 1 minuto revisa)
+setInterval(revisarFacturadosAntiguos, 60000);
+
+// 4. Modificar handleDrop para marcar la hora de llegada
+// (PEGA ESTE PEQUEÑO BLOQUE DENTRO DE TU FUNCIÓN handleDrop EXISTENTE)
+/* Busca donde dice: vehicle.estado = newStatus;
+   Y agrega esto justo debajo:
+*/
+/*
+   if (newStatus === "facturados") {
+       vehicle.fecha_facturado = Date.now(); // Guardamos la hora exacta
+   }
+*/
+
+// 5. Vista de Lista de Facturados (MEJORADA: TOTALES + ACCIONES)
+function mostrarListaFacturados() {
+    // Filtramos los archivados
+    const lista = vehicles.filter(v => v.estado === "facturados_archivado");
+    
+    // --- CÁLCULO DE TOTALES ---
+    let sumaSubtotal = 0;
+    
+    lista.forEach(v => {
+        const p = v.presupuestoDesglose || {};
+        const campos = ['seg_repuestos_v','seg_enderezado_v','seg_pintura_v','seg_otros_v','priv_repuestos_v','priv_enderezado_v','priv_pintura_v','priv_otros_v'];
+        campos.forEach(k => sumaSubtotal += Number(p[k]||0));
+    });
+
+    const totalIVA = sumaSubtotal * 0.15;
+    const granTotal = sumaSubtotal + totalIVA;
+
+    // --- HTML DE LA VENTANA ---
+    let html = `
+    <div style="padding:25px; background:white; border-radius:12px; margin:20px auto; max-width:900px; box-shadow:0 10px 40px rgba(0,0,0,0.3); font-family:system-ui;">
+        
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; border-bottom:1px solid #eee; padding-bottom:15px;">
+            <div>
+                <h2 style="margin:0; color:#2e7d32; font-size:22px;"><i class="fa-solid fa-file-invoice-dollar"></i> Historial Facturados</h2>
+                <span style="font-size:12px; color:#666;">Vehículos procesados y archivados</span>
+            </div>
+            <button id="btnCloseFacturados" class="btn btn-secondary">Cerrar</button>
+        </div>
+
+        <div style="display:flex; gap:15px; margin-bottom:20px; justify-content:flex-end;">
+            <div style="background:#f1f8e9; padding:10px 20px; border-radius:8px; text-align:right; border:1px solid #c5e1a5;">
+                <div style="font-size:11px; color:#558b2f; font-weight:bold;">SUBTOTAL</div>
+                <div style="font-size:18px; font-weight:800; color:#33691e;">$ ${sumaSubtotal.toLocaleString('en-US', {minimumFractionDigits: 2})}</div>
+            </div>
+            <div style="background:#fff3e0; padding:10px 20px; border-radius:8px; text-align:right; border:1px solid #ffe0b2;">
+                <div style="font-size:11px; color:#ef6c00; font-weight:bold;">IVA (15%)</div>
+                <div style="font-size:18px; font-weight:800; color:#e65100;">$ ${totalIVA.toLocaleString('en-US', {minimumFractionDigits: 2})}</div>
+            </div>
+            <div style="background:#e3f2fd; padding:10px 20px; border-radius:8px; text-align:right; border:1px solid #bbdefb;">
+                <div style="font-size:11px; color:#1565c0; font-weight:bold;">TOTAL NETO</div>
+                <div style="font-size:20px; font-weight:800; color:#0d47a1;">$ ${granTotal.toLocaleString('en-US', {minimumFractionDigits: 2})}</div>
+            </div>
+        </div>
+
+        <div style="max-height:400px; overflow-y:auto; border:1px solid #eee; border-radius:8px;">
+            <table style="width:100%; border-collapse:collapse; font-size:12px;">
+                <thead style="background:#f8fafc; position:sticky; top:0;">
+                    <tr>
+                        <th style="padding:12px; text-align:left; color:#64748b;">Placa / Modelo</th>
+                        <th style="padding:12px; text-align:left; color:#64748b;">Cliente</th>
+                        <th style="padding:12px; text-align:right; color:#64748b;">Fecha Archivo</th>
+                        <th style="padding:12px; text-align:right; color:#64748b;">Monto ($)</th>
+                        <th style="padding:12px; text-align:center; color:#64748b;">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+    `;
+
+    if(lista.length === 0) {
+        html += `<tr><td colspan="5" style="padding:30px; text-align:center; color:#999;">No hay vehículos facturados en el histórico.</td></tr>`;
+    } else {
+        lista.forEach(v => {
+            const fecha = v.fecha_facturado ? new Date(v.fecha_facturado).toLocaleString() : "---";
+            
+            let totalRow = 0;
+            const p = v.presupuestoDesglose || {};
+            ['seg_repuestos_v','seg_enderezado_v','seg_pintura_v','seg_otros_v','priv_repuestos_v','priv_enderezado_v','priv_pintura_v','priv_otros_v'].forEach(k => totalRow += Number(p[k]||0));
+
+            html += `
+                <tr style="border-bottom:1px solid #f1f5f9; background:white;">
+                    <td style="padding:10px;">
+                        <div style="font-weight:bold; color:#333;">${v.placa}</div>
+                        <div style="font-size:11px; color:#666;">${v.modelo}</div>
+                    </td>
+                    <td style="padding:10px;">${v.propietario}</td>
+                    <td style="padding:10px; text-align:right;">${fecha}</td>
+                    <td style="padding:10px; text-align:right; font-weight:bold; color:#0d47a1;">$ ${totalRow.toFixed(2)}</td>
+                    <td style="padding:10px; text-align:center;">
+                        <button onclick="editarDesdeFacturados(${v.id})" class="btn" style="background:#e3f2fd; color:#0277bd; padding:4px 8px; border-radius:4px;" title="Editar"><i class="fa-solid fa-pen"></i></button>
+                        <button onclick="eliminarDefinitivo(${v.id})" class="btn" style="background:#ffebee; color:#c62828; padding:4px 8px; border-radius:4px;" title="Eliminar"><i class="fa-solid fa-xmark"></i></button>
+                    </td>
+                </tr>
+            `;
+        });
+    }
+
+    html += `</tbody></table></div></div>`;
+    
+    // Crear el Overlay
+    const overlay = document.createElement("div");
+    overlay.id = "overlayFacturados";
+    overlay.style = "position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:10000; display:flex; justify-content:center; overflow-y:auto;";
+    overlay.innerHTML = html;
+    
+    // Cerrar eventos
+    const cerrarModal = () => { if(document.body.contains(overlay)) document.body.removeChild(overlay); };
+    
+    overlay.addEventListener("click", (e) => { if(e.target === overlay) cerrarModal(); });
+    
+    // Hack para el botón cerrar dentro del HTML
+    setTimeout(() => {
+        const btn = document.getElementById("btnCloseFacturados");
+        if(btn) btn.onclick = cerrarModal;
+    }, 50);
+
+    document.body.appendChild(overlay);
+}
+
+// --- FUNCIONES EXTRA PARA LOS BOTONES DE LA TABLA ---
+
+// 1. Eliminar (X pequeña)
+function eliminarDefinitivo(id) {
+    if(confirm("¿Estás seguro de eliminar este registro histórico permanentemente?")) {
+        vehicles = vehicles.filter(v => v.id !== id);
+        guardarCambios();
+        // Recargar la lista visualmente cerrando y abriendo (o actualizando el DOM, truco rápido: cerrar)
+        const ov = document.getElementById("overlayFacturados");
+        if(ov) document.body.removeChild(ov);
+        mostrarListaFacturados(); 
+    }
+}
+
+// 2. Editar (Lápiz)
+function editarDesdeFacturados(id) {
+    // Cerramos el modal de facturados
+    const ov = document.getElementById("overlayFacturados");
+    if(ov) document.body.removeChild(ov);
+    
+    // Usamos la función de editar que ya tienes, que lleva al formulario
+    editarVehiculoDesdeDetalle(id); 
 }
 </script>
 <div id="modalPresupuesto" class="modal-overlay">
