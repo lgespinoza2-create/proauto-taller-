@@ -624,6 +624,12 @@
                         <option value="31">31</option>
                     </select>
                 </div>
+                <div style="display:flex; flex-direction:column; justify-content:center; margin-right:10px;">
+    <label style="font-size:11px; font-weight:bold; color:#d32f2f; cursor:pointer; display:flex; align-items:center; background:#ffebee; padding:4px 8px; border-radius:4px; border:1px solid #ffcdd2;">
+        <input type="checkbox" id="filtroConSalida" style="margin-right:6px;">
+        Solo con Fecha Salida (Proyección)
+    </label>
+</div>
 
                 <button onclick="limpiarFiltrosPresupuesto()" class="btn btn-secondary" style="font-size:11px; padding:6px 12px; height: 30px;">
                     <i class="fa-solid fa-eraser"></i> Limpiar
@@ -2088,6 +2094,7 @@ document.getElementById("btnVolverDesdePresupuesto").addEventListener("click", (
 const selectsFiltro = ["filtroAnio", "filtroMes", "filtroDia"];
 selectsFiltro.forEach(id => {
     document.getElementById(id).addEventListener("change", renderPresupuestoGeneral);
+    document.getElementById("filtroConSalida").addEventListener("change", renderPresupuestoGeneral);
 });
 
 function limpiarFiltrosPresupuesto() {
@@ -2097,7 +2104,7 @@ function limpiarFiltrosPresupuesto() {
     renderPresupuestoGeneral();
 }
 
-// 3. Función Principal
+
 function renderPresupuestoGeneral() {
     const sectores = [
         { id: "repuestos", label: "Repuestos" },
@@ -2106,10 +2113,27 @@ function renderPresupuestoGeneral() {
         { id: "otros", label: "Otros" }
     ];
 
-    // Obtener valores de los 3 Selects
-    const fAnio = document.getElementById("filtroAnio").value; // "2024"
-    const fMes = document.getElementById("filtroMes").value;   // "01", "02"...
-    const fDia = document.getElementById("filtroDia").value;   // "01", "31"...
+    // Obtener valores de los filtros
+    const fAnio = document.getElementById("filtroAnio").value;
+    const fMes = document.getElementById("filtroMes").value;
+    const fDia = document.getElementById("filtroDia").value;
+    
+    // Obtener estado del Checkbox (Proyección)
+    const soloConSalida = document.getElementById("filtroConSalida")?.checked;
+
+    // 🛡️ CANDADO DE SEGURIDAD (Esto faltaba en tu código)
+    // Si NO hay ningún filtro activo, mostramos todo en cero y salimos.
+    if (!fAnio && !fMes && !fDia && !soloConSalida) {
+        document.getElementById("bodyPresupuestoGeneral").innerHTML = 
+            '<tr><td colspan="4" style="text-align:center; padding:30px; color:#999; font-style:italic;"><i class="fa-solid fa-filter"></i> Aplique un filtro (Año, Mes o Proyección) para visualizar valores.</td></tr>';
+        
+        document.getElementById("footSeguro").textContent = "$ 0.00";
+        document.getElementById("footPrivado").textContent = "$ 0.00";
+        document.getElementById("footTotal").textContent = "$ 0.00";
+        document.getElementById("granTotalDisplay").textContent = "$ 0.00";
+        document.getElementById("granTotalIvaDisplay").textContent = "$ 0.00";
+        return; 
+    }
 
     // Acumuladores
     let totales = {
@@ -2118,29 +2142,34 @@ function renderPresupuestoGeneral() {
     };
 
     vehicles.forEach(v => {
-        if (!v.fecha_ingreso) return; // Si no tiene fecha, no cuenta
+        // 🧠 CEREBRO DEL CAMBIO: SELECCIÓN DE FECHA INTELIGENTE
+        // (Esto es lo que corrige el error de febrero)
+        let fechaParaFiltrar = "";
+        
+        if (soloConSalida) {
+            // MODO PROYECCIÓN: Usamos Fecha de SALIDA
+            if (!v.fecha_salida) return; 
+            fechaParaFiltrar = v.fecha_salida;
+        } else {
+            // MODO NORMAL: Usamos Fecha de INGRESO
+            if (!v.fecha_ingreso) return; 
+            fechaParaFiltrar = v.fecha_ingreso;
+        }
 
-        // LÓGICA DE FILTRADO JERÁRQUICO
+        // APLICAMOS LOS FILTROS SOBRE LA FECHA ELEGIDA (NO SIEMPRE INGRESO)
         let coincide = true;
 
-        // 1. Si hay Año seleccionado, debe coincidir el inicio (YYYY)
-        if (fAnio && !v.fecha_ingreso.startsWith(fAnio)) {
+        if (fAnio && !fechaParaFiltrar.startsWith(fAnio)) {
             coincide = false;
         }
 
-        // 2. Si hay Mes seleccionado, debe coincidir el mes (YYYY-MM)
-        // Nota: El mes solo funciona bien si el año también se selecciona, 
-        // o si queremos buscar "Todos los eneros de la historia" (poco común pero posible).
-        // Aquí asumimos coincidencia de cadena: "2025-01-15".
         if (fMes) {
-            // fecha_ingreso es "YYYY-MM-DD". Split en guiones.
-            const partes = v.fecha_ingreso.split("-"); // [YYYY, MM, DD]
+            const partes = fechaParaFiltrar.split("-"); 
             if (partes[1] !== fMes) coincide = false;
         }
 
-        // 3. Si hay Día seleccionado
         if (fDia) {
-            const partes = v.fecha_ingreso.split("-");
+            const partes = fechaParaFiltrar.split("-");
             if (partes[2] !== fDia) coincide = false;
         }
         
@@ -2182,7 +2211,7 @@ function renderPresupuestoGeneral() {
 
     // CÁLCULOS FINALES
     const granTotal = granTotalSeg + granTotalPriv;
-    const IVA_PORCENTAJE = 0.15; // 15% Ecuador
+    const IVA_PORCENTAJE = 0.15; 
     const granTotalConIva = granTotal * (1 + IVA_PORCENTAJE);
     
     document.getElementById("footSeguro").textContent = "$ " + granTotalSeg.toFixed(2);
@@ -2415,28 +2444,13 @@ setInterval(revisarFacturadosAntiguos, 60000);
    }
 */
 
-// 5. Vista de Lista de Facturados (MEJORADA: TOTALES + ACCIONES)
+// 5. Vista de Lista de Facturados (CON FILTROS DE AÑO Y MES)
 function mostrarListaFacturados() {
-    // Filtramos los archivados
-    const lista = vehicles.filter(v => v.estado === "facturados_archivado");
-    
-    // --- CÁLCULO DE TOTALES ---
-    let sumaSubtotal = 0;
-    
-    lista.forEach(v => {
-        const p = v.presupuestoDesglose || {};
-        const campos = ['seg_repuestos_v','seg_enderezado_v','seg_pintura_v','seg_otros_v','priv_repuestos_v','priv_enderezado_v','priv_pintura_v','priv_otros_v'];
-        campos.forEach(k => sumaSubtotal += Number(p[k]||0));
-    });
-
-    const totalIVA = sumaSubtotal * 0.15;
-    const granTotal = sumaSubtotal + totalIVA;
-
-    // --- HTML DE LA VENTANA ---
-    let html = `
-    <div style="padding:25px; background:white; border-radius:12px; margin:20px auto; max-width:900px; box-shadow:0 10px 40px rgba(0,0,0,0.3); font-family:system-ui;">
+    // Definir estructura HTML con los selectores de filtro
+    const htmlEstructura = `
+    <div style="padding:25px; background:white; border-radius:12px; margin:20px auto; max-width:950px; box-shadow:0 10px 40px rgba(0,0,0,0.3); font-family:system-ui; display:flex; flex-direction:column; max-height:90vh;">
         
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; border-bottom:1px solid #eee; padding-bottom:15px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; border-bottom:1px solid #eee; padding-bottom:15px;">
             <div>
                 <h2 style="margin:0; color:#2e7d32; font-size:22px;"><i class="fa-solid fa-file-invoice-dollar"></i> Historial Facturados</h2>
                 <span style="font-size:12px; color:#666;">Vehículos procesados y archivados</span>
@@ -2444,22 +2458,51 @@ function mostrarListaFacturados() {
             <button id="btnCloseFacturados" class="btn btn-secondary">Cerrar</button>
         </div>
 
+        <div style="display:flex; gap:15px; background:#f8f9fa; padding:12px; border-radius:8px; margin-bottom:20px; align-items:center; border:1px solid #e9ecef;">
+            <div style="font-size:12px; font-weight:bold; color:#555;"><i class="fa-solid fa-filter"></i> Filtrar por:</div>
+            
+            <select id="filtroFactAnio" style="padding:6px; border-radius:6px; border:1px solid #ccc; font-size:12px; cursor:pointer;">
+                <option value="">Todos los Años</option>
+                <option value="2024">2024</option>
+                <option value="2025">2025</option>
+                <option value="2026">2026</option>
+                <option value="2027">2027</option>
+                <option value="2028">2028</option>
+            </select>
+
+            <select id="filtroFactMes" style="padding:6px; border-radius:6px; border:1px solid #ccc; font-size:12px; cursor:pointer;">
+                <option value="">Todos los Meses</option>
+                <option value="01">Enero</option>
+                <option value="02">Febrero</option>
+                <option value="03">Marzo</option>
+                <option value="04">Abril</option>
+                <option value="05">Mayo</option>
+                <option value="06">Junio</option>
+                <option value="07">Julio</option>
+                <option value="08">Agosto</option>
+                <option value="09">Septiembre</option>
+                <option value="10">Octubre</option>
+                <option value="11">Noviembre</option>
+                <option value="12">Diciembre</option>
+            </select>
+        </div>
+
         <div style="display:flex; gap:15px; margin-bottom:20px; justify-content:flex-end;">
             <div style="background:#f1f8e9; padding:10px 20px; border-radius:8px; text-align:right; border:1px solid #c5e1a5;">
                 <div style="font-size:11px; color:#558b2f; font-weight:bold;">SUBTOTAL</div>
-                <div style="font-size:18px; font-weight:800; color:#33691e;">$ ${sumaSubtotal.toLocaleString('en-US', {minimumFractionDigits: 2})}</div>
+                <div id="factSubtotal" style="font-size:18px; font-weight:800; color:#33691e;">$ 0.00</div>
             </div>
             <div style="background:#fff3e0; padding:10px 20px; border-radius:8px; text-align:right; border:1px solid #ffe0b2;">
                 <div style="font-size:11px; color:#ef6c00; font-weight:bold;">IVA (15%)</div>
-                <div style="font-size:18px; font-weight:800; color:#e65100;">$ ${totalIVA.toLocaleString('en-US', {minimumFractionDigits: 2})}</div>
+                <div id="factIVA" style="font-size:18px; font-weight:800; color:#e65100;">$ 0.00</div>
             </div>
             <div style="background:#e3f2fd; padding:10px 20px; border-radius:8px; text-align:right; border:1px solid #bbdefb;">
                 <div style="font-size:11px; color:#1565c0; font-weight:bold;">TOTAL NETO</div>
-                <div style="font-size:20px; font-weight:800; color:#0d47a1;">$ ${granTotal.toLocaleString('en-US', {minimumFractionDigits: 2})}</div>
+                <div id="factTotal" style="font-size:20px; font-weight:800; color:#0d47a1;">$ 0.00</div>
             </div>
         </div>
 
-        <div style="max-height:400px; overflow-y:auto; border:1px solid #eee; border-radius:8px;">
+        <div style="overflow-y:auto; border:1px solid #eee; border-radius:8px; flex:1;">
             <table style="width:100%; border-collapse:collapse; font-size:12px;">
                 <thead style="background:#f8fafc; position:sticky; top:0;">
                     <tr>
@@ -2470,21 +2513,81 @@ function mostrarListaFacturados() {
                         <th style="padding:12px; text-align:center; color:#64748b;">Acciones</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody id="bodyFacturados">
+                    </tbody>
+            </table>
+        </div>
+    </div>
     `;
 
-    if(lista.length === 0) {
-        html += `<tr><td colspan="5" style="padding:30px; text-align:center; color:#999;">No hay vehículos facturados en el histórico.</td></tr>`;
-    } else {
-        lista.forEach(v => {
-            const fecha = v.fecha_facturado ? new Date(v.fecha_facturado).toLocaleString() : "---";
-            
-            let totalRow = 0;
-            const p = v.presupuestoDesglose || {};
-            ['seg_repuestos_v','seg_enderezado_v','seg_pintura_v','seg_otros_v','priv_repuestos_v','priv_enderezado_v','priv_pintura_v','priv_otros_v'].forEach(k => totalRow += Number(p[k]||0));
+    // 1. Crear e inyectar el Overlay
+    const overlay = document.createElement("div");
+    overlay.id = "overlayFacturados";
+    overlay.style = "position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:10000; display:flex; justify-content:center; align-items:center; padding:20px;";
+    overlay.innerHTML = htmlEstructura;
+    document.body.appendChild(overlay);
 
-            html += `
-                <tr style="border-bottom:1px solid #f1f5f9; background:white;">
+    // 2. Función interna para renderizar la tabla según los filtros
+    const renderTablaFacturados = () => {
+        const fAnio = document.getElementById("filtroFactAnio").value;
+        const fMes = document.getElementById("filtroFactMes").value;
+        
+        // FILTRADO
+        const listaFiltrada = vehicles.filter(v => {
+            // Solo los archivados
+            if (v.estado !== "facturados_archivado") return false;
+            
+            // Si por error no tiene fecha, lo mostramos si no hay filtros, o lo ocultamos si hay.
+            if (!v.fecha_facturado) return fAnio === "" && fMes === ""; 
+
+            const fechaObj = new Date(v.fecha_facturado);
+            const vAnio = fechaObj.getFullYear().toString();
+            // getMonth() da 0 para Enero, así que sumamos 1 y aseguramos 2 dígitos ("01", "02")
+            const vMes = (fechaObj.getMonth() + 1).toString().padStart(2, '0');
+
+            if (fAnio && vAnio !== fAnio) return false;
+            if (fMes && vMes !== fMes) return false;
+            
+            return true;
+        });
+
+        // ORDENAR: Más recientes primero
+        listaFiltrada.sort((a, b) => b.fecha_facturado - a.fecha_facturado);
+
+        // CÁLCULO DE TOTALES
+        let sumaSubtotal = 0;
+        listaFiltrada.forEach(v => {
+            const p = v.presupuestoDesglose || {};
+            const campos = ['seg_repuestos_v','seg_enderezado_v','seg_pintura_v','seg_otros_v','priv_repuestos_v','priv_enderezado_v','priv_pintura_v','priv_otros_v'];
+            campos.forEach(k => sumaSubtotal += Number(p[k]||0));
+        });
+
+        const totalIVA = sumaSubtotal * 0.15;
+        const granTotal = sumaSubtotal + totalIVA;
+
+        // Actualizar tarjetas de dinero
+        document.getElementById("factSubtotal").textContent = "$ " + sumaSubtotal.toLocaleString('en-US', {minimumFractionDigits: 2});
+        document.getElementById("factIVA").textContent = "$ " + totalIVA.toLocaleString('en-US', {minimumFractionDigits: 2});
+        document.getElementById("factTotal").textContent = "$ " + granTotal.toLocaleString('en-US', {minimumFractionDigits: 2});
+
+        // Actualizar Tabla
+        const tbody = document.getElementById("bodyFacturados");
+        tbody.innerHTML = "";
+
+        if(listaFiltrada.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="5" style="padding:40px; text-align:center; color:#999; font-style:italic;">No se encontraron vehículos facturados con estos filtros.</td></tr>`;
+        } else {
+            listaFiltrada.forEach(v => {
+                const fecha = new Date(v.fecha_facturado).toLocaleString();
+                
+                let totalRow = 0;
+                const p = v.presupuestoDesglose || {};
+                ['seg_repuestos_v','seg_enderezado_v','seg_pintura_v','seg_otros_v','priv_repuestos_v','priv_enderezado_v','priv_pintura_v','priv_otros_v'].forEach(k => totalRow += Number(p[k]||0));
+
+                const tr = document.createElement("tr");
+                tr.style.borderBottom = "1px solid #f1f5f9";
+                tr.style.background = "white";
+                tr.innerHTML = `
                     <td style="padding:10px;">
                         <div style="font-weight:bold; color:#333;">${v.placa}</div>
                         <div style="font-size:11px; color:#666;">${v.modelo}</div>
@@ -2493,36 +2596,33 @@ function mostrarListaFacturados() {
                     <td style="padding:10px; text-align:right;">${fecha}</td>
                     <td style="padding:10px; text-align:right; font-weight:bold; color:#0d47a1;">$ ${totalRow.toFixed(2)}</td>
                     <td style="padding:10px; text-align:center;">
-                        <button onclick="editarDesdeFacturados(${v.id})" class="btn" style="background:#e3f2fd; color:#0277bd; padding:4px 8px; border-radius:4px;" title="Editar"><i class="fa-solid fa-pen"></i></button>
-                        <button onclick="eliminarDefinitivo(${v.id})" class="btn" style="background:#ffebee; color:#c62828; padding:4px 8px; border-radius:4px;" title="Eliminar"><i class="fa-solid fa-xmark"></i></button>
+                        <button class="btn-edit-fact" style="background:#e3f2fd; color:#0277bd; border:none; padding:4px 8px; border-radius:4px; cursor:pointer;" title="Editar"><i class="fa-solid fa-pen"></i></button>
+                        <button class="btn-del-fact" style="background:#ffebee; color:#c62828; border:none; padding:4px 8px; border-radius:4px; cursor:pointer; margin-left:5px;" title="Eliminar"><i class="fa-solid fa-xmark"></i></button>
                     </td>
-                </tr>
-            `;
-        });
-    }
+                `;
+                
+                // Asignar eventos a los botones
+                tr.querySelector(".btn-edit-fact").onclick = () => editarDesdeFacturados(v.id);
+                tr.querySelector(".btn-del-fact").onclick = () => eliminarDefinitivo(v.id);
 
-    html += `</tbody></table></div></div>`;
-    
-    // Crear el Overlay
-    const overlay = document.createElement("div");
-    overlay.id = "overlayFacturados";
-    overlay.style = "position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:10000; display:flex; justify-content:center; overflow-y:auto;";
-    overlay.innerHTML = html;
-    
-    // Cerrar eventos
+                tbody.appendChild(tr);
+            });
+        }
+    };
+
+    // 3. Activar Listeners (Eventos)
+    document.getElementById("filtroFactAnio").addEventListener("change", renderTablaFacturados);
+    document.getElementById("filtroFactMes").addEventListener("change", renderTablaFacturados);
+
+    // 4. Cerrar Modal
     const cerrarModal = () => { if(document.body.contains(overlay)) document.body.removeChild(overlay); };
     
+    document.getElementById("btnCloseFacturados").onclick = cerrarModal;
     overlay.addEventListener("click", (e) => { if(e.target === overlay) cerrarModal(); });
-    
-    // Hack para el botón cerrar dentro del HTML
-    setTimeout(() => {
-        const btn = document.getElementById("btnCloseFacturados");
-        if(btn) btn.onclick = cerrarModal;
-    }, 50);
 
-    document.body.appendChild(overlay);
+    // 5. Carga inicial (sin filtros o con todo)
+    renderTablaFacturados();
 }
-
 // --- FUNCIONES EXTRA PARA LOS BOTONES DE LA TABLA ---
 
 // 1. Eliminar (X pequeña)
