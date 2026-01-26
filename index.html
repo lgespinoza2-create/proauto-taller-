@@ -381,21 +381,115 @@
 </head>
 <body>
 
-<div id="loginScreen" style="position:fixed;top:0;left:0;width:100%;height:100%;background:#eef1f5;display:flex;align-items:center;justify-content:center;z-index:99999;font-family:system-ui;">
-  <div style="background:white;padding:32px;border-radius:14px;width:360px;box-shadow:0 6px 20px rgba(0,0,0,0.15);text-align:center;">
-    <img src="logo_axis.png" alt="AXIS" style="height:120px;margin-top:32px;margin-bottom:36px;">
-    <section id="view-login" class="view active" style="padding:40px; text-align:center;">
-    <h2>Ingreso al sistema</h2>
-    <p style="margin-bottom:20px;color:#666;">Ingrese su usuario y contraseña</p>
-    <div style="max-width:300px;margin:0 auto;text-align:left;">
-        <label>Usuario</label>
-        <input id="loginUsuario" type="text" class="input" placeholder="usuario" style="width:100%;margin-bottom:10px;">
-        <label>Contraseña</label>
-        <input id="loginPassword" type="password" class="input" placeholder="******" style="width:100%;margin-bottom:20px;">
-        <button id="btnLogin" class="btn btn-primary" style="width:100%;">Ingresar</button>
+<div id="loginScreen">
+  <style>
+    /* Contenedor Principal */
+    #loginScreen {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: linear-gradient(135deg, #0a1120 0%, #002b4d 100%);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 99999; font-family: 'Segoe UI', system-ui, sans-serif;
+      overflow: hidden;
+    }
+    
+    /* Patrón de puntitos sutil */
+    #loginScreen::before {
+      content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+      background-image: radial-gradient(#ffffff 1px, transparent 1px);
+      background-size: 30px 30px; opacity: 0.03; pointer-events: none;
+    }
+
+    /* SOMBRA GIGANTE DEL ÍCONO A LA DERECHA */
+    #loginScreen::after {
+      content: ""; position: absolute; top: 50%; right: -5%; width: 70vh; height: 70vh;
+      background-image: url('favicon.png'); background-repeat: no-repeat;
+      background-position: center; background-size: contain;
+      transform: translateY(-50%) rotate(-15deg);
+      opacity: 0.05; filter: grayscale(100%) contrast(200%);
+      pointer-events: none; z-index: -1;
+    }
+
+    .login-card {
+      background: rgba(255, 255, 255, 0.97);
+      backdrop-filter: blur(15px);
+      width: 400px; padding: 45px;
+      border-radius: 24px;
+      box-shadow: 0 30px 60px rgba(0,0,0,0.4), inset 0 0 0 1px rgba(255,255,255,0.5);
+      text-align: center; position: relative;
+      animation: slideUp 0.7s cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+
+    @keyframes slideUp { from { transform: translateY(50px) scale(0.95); opacity: 0; } to { transform: translateY(0) scale(1); opacity: 1; } }
+
+    /* ✅ CAMBIO AQUÍ: LOGO MÁS GRANDE */
+    .login-logo { 
+      height: 150px; /* Antes era 75px */
+      margin-bottom: 25px; object-fit: contain;
+      filter: drop-shadow(0 5px 8px rgba(0,0,0,0.25)); /* Sombra un poco más fuerte */
+    }
+    
+    .login-title { margin: 0; color: #0f172a; font-size: 26px; font-weight: 900; letter-spacing: -0.5px; }
+    .login-subtitle { margin: 8px 0 35px; color: #64748b; font-size: 14px; font-weight: 500; }
+
+    .input-group-login { position: relative; margin-bottom: 18px; text-align: left; }
+    
+    .input-group-login i {
+      position: absolute; left: 16px; top: 50%; transform: translateY(-50%);
+      color: #94a3b8; font-size: 15px; transition: color 0.3s;
+    }
+
+    .input-login {
+      width: 100%; padding: 14px 14px 14px 45px;
+      border: 2px solid #e2e8f0; border-radius: 12px;
+      font-size: 15px; outline: none; transition: all 0.3s;
+      background: #f1f5f9; color: #334155; font-weight: 500;
+    }
+
+    .input-login:focus { border-color: #007dc5; background: white; box-shadow: 0 0 0 4px rgba(0, 125, 197, 0.15); }
+    .input-login:focus + i { color: #007dc5; }
+
+    .btn-login-main {
+      width: 100%; padding: 16px; margin-top: 15px;
+      background: linear-gradient(90deg, #007dc5 0%, #004e7a 100%);
+      color: white; border: none; border-radius: 12px;
+      font-size: 16px; font-weight: 800; cursor: pointer; letter-spacing: 0.5px;
+      transition: transform 0.2s, box-shadow 0.2s, filter 0.2s;
+      box-shadow: 0 10px 25px -5px rgba(0, 125, 197, 0.5);
+    }
+
+    .btn-login-main:hover { transform: translateY(-3px); box-shadow: 0 15px 35px -5px rgba(0, 125, 197, 0.6); filter: brightness(110%); }
+    .btn-login-main:active { transform: translateY(0); }
+
+    .login-footer { margin-top: 30px; font-size: 12px; color: #94a3b8; font-weight: 500; }
+  </style>
+
+  <div class="login-card">
+    <img src="logo_axis.png" alt="AXTROM" class="login-logo">
+    
+    <h2 class="login-title">Bienvenido</h2>
+    <p class="login-subtitle">Sistema de Gestión de Taller</p>
+
+    <div id="view-login" class="view active">
+        <div class="input-group-login">
+            <input id="loginUsuario" type="text" class="input-login" placeholder="Usuario" autocomplete="off">
+            <i class="fa-solid fa-user"></i>
+        </div>
+        <div class="input-group-login">
+            <input id="loginPassword" type="password" class="input-login" placeholder="Contraseña">
+            <i class="fa-solid fa-lock"></i>
+        </div>
+        <button id="btnLogin" class="btn-login-main">
+            INICIAR SESIÓN <i class="fa-solid fa-chevron-right" style="margin-left:10px; font-size:14px;"></i>
+        </button>
     </div>
-    </section>
+
+    <div class="login-footer">
+        © 2026 Powered by AXTROM Tech
+    </div>
   </div>
+</div>
+  </div>
+</div>
 </div>
 
 <div id="main-container">
@@ -995,6 +1089,11 @@ function logout() {
 
 // Listeners de Login
 document.getElementById("btnLogin").onclick = loginSistema;
+document.getElementById("loginPassword").addEventListener("keypress", function(event) {
+  if (event.key === "Enter") {
+    loginSistema();
+  }
+});
 document.getElementById("btnLogout").onclick = logout;
 document.getElementById("btnLogoutLavador").onclick = logout;
 
@@ -1841,12 +1940,55 @@ function showVehicleSummary(v) {
 }
 document.getElementById("vs-close").addEventListener("click", () => document.getElementById("vehicleSummary").classList.remove("show"));
 
-// 2. Auditoría
+// 2. Auditoría (MEJORADA CON BUSCADOR)
+function renderizarAuditoria(filtro = "") {
+    const body = document.getElementById("auditoriaBody"); 
+    body.innerHTML = "";
+    
+    // Usamos una copia [...auditoria] para no desordenar la lista original
+    // reverse() hace que salgan los movimientos más nuevos primero
+    const listaVisual = [...auditoria].reverse(); 
+    
+    // Aplicar filtro si existe
+    const listaFiltrada = listaVisual.filter(a => {
+        if (!filtro) return true;
+        const texto = filtro.toLowerCase();
+        // Busca por Placa O por Usuario
+        return (a.placa && a.placa.toLowerCase().includes(texto)) || 
+               (a.usuario && a.usuario.toLowerCase().includes(texto));
+    });
+
+    // Dibujar tabla
+    listaFiltrada.forEach(a => { 
+        body.innerHTML += `
+        <tr>
+            <td>${a.fecha}</td>
+            <td>${a.hora}</td>
+            <td>${a.usuario}</td>
+            <td style="font-weight:bold;">${a.placa}</td>
+            <td>${a.desde}</td>
+            <td>${a.hacia}</td>
+            <td>${a.accion}</td>
+            <td style="font-size:11px; color:#555;">${a.descripcion}</td>
+        </tr>`; 
+    });
+}
+
+// Botón para abrir
 document.getElementById("btnAuditoria").addEventListener("click", () => {
-    const body = document.getElementById("auditoriaBody"); body.innerHTML = "";
-    auditoria.reverse().forEach(a => { body.innerHTML += `<tr><td>${a.fecha}</td><td>${a.hora}</td><td>${a.usuario}</td><td>${a.placa}</td><td>${a.desde}</td><td>${a.hacia}</td><td>${a.accion}</td><td>${a.descripcion}</td></tr>`; });
+    // Limpiamos el buscador al abrir
+    const input = document.getElementById("auditoriaSearch");
+    if(input) input.value = "";
+    
+    renderizarAuditoria(); // Mostrar todo
     showView("auditoria");
 });
+
+// Evento para el Buscador (ESTO FALTABA)
+document.getElementById("auditoriaSearch").addEventListener("input", (e) => {
+    renderizarAuditoria(e.target.value);
+});
+
 document.getElementById("btnVolverDesdeAuditoria").addEventListener("click", () => showView("tablero"));
 
 // 3. LocalStorage (Respaldos)
@@ -2708,5 +2850,6 @@ function editarDesdeFacturados(id) {
     </div>
   </div>
 </div>
+
 </body>
 </html>
