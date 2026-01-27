@@ -495,7 +495,7 @@
 <div id="main-container">
   <header class="header header-proauto">
     <div class="header-left">
-      <img src="logo_axis.png" alt="AXIS" class="logo logo-header" />
+      <img src="logo_axiis.png" alt="AXIS" class="logo logo-header" />
       <div>
        <h1>Tablero de vehículos en taller</h1>
         <p class="subtitle">Gestión visual de órdenes de trabajo - AXIS</p>
@@ -591,9 +591,17 @@
           <div class="form-field"><label for="propietario">Propietario *</label><input type="text" id="propietario" name="propietario" required placeholder="Nombre del cliente" /></div>
           <div class="form-field"><label for="cedula">Cédula / ID cliente</label><input type="text" id="cedula" name="cedula" placeholder="Ej: 1102xxxxxx" /></div>
           <div class="form-field">
+    <label for="contacto">Teléfono / Celular</label>
+    <input type="tel" id="contacto" name="contacto" placeholder="Ej: 0991234567" />
+</div>
+<div class="form-field">
+    <label for="correo">Correo Electrónico</label>
+    <input type="email" id="correo" name="correo" placeholder="cliente@ejemplo.com" />
+</div>
+          <div class="form-field">
             <label for="aseguradora">Aseguradora</label>
             <select id="aseguradora" name="aseguradora">
-              <option value="">Sin aseguradora</option><option>Retail</option><option>CHUBB Seguros</option><option>Zurich Seguros</option><option>Latina Seguros</option><option>AIG Metropolitana</option><option>VAZ Seguros</option><option>Seguros Alianza</option><option>Mapfre</option><option>Aseguradora del Sur</option><option>Seguros Unidos S.A.</option><option>EQUISUIZA</option><option>Generali Ecuador</option><option>Flotas</option><option>Sweaden Seguros</option>
+              <option value="">Sin aseguradora</option><option>Retail</option><option>CHUBB Seguros</option><option>Zurich Seguros</option><option>Latina Seguros</option><option>AIG Metropolitana</option><option>VAZ Seguros</option><option>Seguros Alianza</option><option>Mapfre</option><option>Aseguradora del Sur</option><option>Seguros Unidos S.A.</option><option>EQUISUIZA</option><option>Generali Ecuador</option><option>Flotas</option><option>Sweaden Seguros</option><option>Seguros Atlantida</option>
             </select>
           </div>
           <div class="form-field">
@@ -1509,6 +1517,9 @@ btnCancelarForm.addEventListener("click", () => showView("tablero"));
 // ===============================================
 // 🔧 FORMULARIO: ASIGNACIÓN CON ÁREA (FINAL)
 // ===============================================
+// ===============================================
+// 🔧 FORMULARIO: GUARDADO CON CONTACTO Y CORREO
+// ===============================================
 form.addEventListener("submit", async function (e) {
   e.preventDefault();
   const formData = new FormData(form);
@@ -1518,6 +1529,11 @@ form.addEventListener("submit", async function (e) {
   const modelo = (formData.get("modelo") || "").trim();
   const propietario = (formData.get("propietario") || "").trim();
   const cedula = (formData.get("cedula") || "").trim();
+  
+  // 👇 NUEVOS DATOS DE CONTACTO 👇
+  const contacto = (formData.get("contacto") || "").trim();
+  const correo = (formData.get("correo") || "").trim();
+  
   const vin = (formData.get("vin") || "").trim();
   const aseguradora = formData.get("aseguradora") || "";
   const asesor = (formData.get("asesor") || "").trim();
@@ -1526,6 +1542,7 @@ form.addEventListener("submit", async function (e) {
   const fecha_salida = formData.get("fecha_salida") || "";
   const hora_salida = formData.get("hora_salida") || "";
   
+  // Validación
   if (!placa || !modelo || !propietario) {
     alert("Placa, modelo y propietario son obligatorios.");
     return;
@@ -1534,7 +1551,7 @@ form.addEventListener("submit", async function (e) {
   const danos = formData.getAll("danos");
   const equipamiento = formData.getAll("equipamiento");
 
-  // 2. Procesar Archivos
+  // 2. Procesar Archivos (Mantenemos tu lógica asíncrona)
   const archivosCliente = await procesarArchivosMultiple("archivos_cliente");
   const archivosAutorizaciones = await procesarArchivosMultiple("archivos_autorizaciones");
   const archivosProformas = await procesarArchivosMultiple("archivos_proformas");
@@ -1547,8 +1564,7 @@ form.addEventListener("submit", async function (e) {
     archivoOrden = { nombre: file.name, tipo: file.type, base64 };
   }
 
-  // Helper para obtener el nombre bonito del área (ej: "falta_inspeccion" -> "Falta de Inspección")
-  // ESTO ES LO QUE FALTABA PARA EL NOMBRE DEL ÁREA
+  // Helper para el nombre del área (Mantenido)
   const getNombreArea = (idEstado) => {
       const col = STATUS_COLUMNS.find(c => c.id === idEstado);
       return col ? col.label : idEstado;
@@ -1563,19 +1579,16 @@ form.addEventListener("submit", async function (e) {
 
     const original = vehicles[idx];
 
-    // 🔔 NOTIFICACIÓN AL TÉCNICO (Con Área)
+    // Notificación cambio técnico
     if (tecnico && original.tecnico !== tecnico) {
         const nombreArea = getNombreArea(original.estado);
-        crearNotificacion(
-            "tecnico", 
-            tecnico, 
-            `🛠️ Trabajo asignado: ${placa} (${modelo}) en el área de ${nombreArea.toUpperCase()}`
-        );
+        crearNotificacion("tecnico", tecnico, `🛠️ Trabajo asignado: ${placa} (${modelo}) en el área de ${nombreArea.toUpperCase()}`);
     }
 
     vehicles[idx] = {
       ...original,
       vin, placa, modelo, propietario, cedula,
+      contacto, correo, // <--- GUARDAMOS AQUÍ LOS NUEVOS DATOS
       aseguradora, asesor, tecnico,
       fecha_ingreso, fecha_salida, hora_salida,
       danos, equipamiento,
@@ -1596,6 +1609,7 @@ form.addEventListener("submit", async function (e) {
     const newVehicle = {
       id: Date.now(),
       vin, placa, modelo, propietario, cedula,
+      contacto, correo, // <--- GUARDAMOS AQUÍ LOS NUEVOS DATOS
       aseguradora, asesor, tecnico,
       fecha_ingreso, fecha_salida, hora_salida,
       estado: estadoInicial, 
@@ -1608,45 +1622,49 @@ form.addEventListener("submit", async function (e) {
 
     vehicles.push(newVehicle);
 
-    // 🔔 NOTIFICACIÓN AL TÉCNICO (Nuevo con Área)
     if (tecnico) {
         const nombreArea = getNombreArea(estadoInicial);
-        crearNotificacion(
-            "tecnico", 
-            tecnico, 
-            `🛠️ Nuevo trabajo: ${placa} (${modelo}) ingresó a ${nombreArea.toUpperCase()}`
-        );
+        crearNotificacion("tecnico", tecnico, `🛠️ Nuevo trabajo: ${placa} (${modelo}) ingresó a ${nombreArea.toUpperCase()}`);
     }
   }
-  // Al final, antes de renderBoard():
-    guardarCambios(); // <--- IMPORTANTE
-    renderBoard();
-    form.reset();
+
+  // ==========================
+  // FINALIZACIÓN (Código Limpio)
+  // ==========================
+  guardarCambios(); 
   renderBoard();
   form.reset();
   resetFormSelectionGroups();
   showView("tablero");
 });
 
-// Editar Vehiculo
+// Editar Vehiculo (CORREGIDO: Ahora carga Contacto y Correo)
 document.getElementById("btnEditarVehiculo").addEventListener("click", () => {
     const v = vehicles.find(v => v.id === window.currentVehicleId);
     if (!v) return;
     editingVehicleId = v.id;
     form.reset(); resetFormSelectionGroups();
+    
     document.getElementById("vin").value = v.vin || "";
     document.getElementById("placa").value = v.placa || "";
     document.getElementById("modelo").value = v.modelo || "";
     document.getElementById("propietario").value = v.propietario || "";
     document.getElementById("cedula").value = v.cedula || "";
+
+    // 👇 AQUÍ ESTABA EL PROBLEMA: FALTABAN ESTAS DOS LÍNEAS 👇
+    document.getElementById("contacto").value = v.contacto || "";
+    document.getElementById("correo").value = v.correo || "";
+
     document.getElementById("aseguradora").value = v.aseguradora || "";
     document.getElementById("asesor").value = v.asesor || "";
     document.getElementById("tecnico").value = v.tecnico || "";
     document.getElementById("fecha_ingreso").value = v.fecha_ingreso || "";
     document.getElementById("fecha_salida").value = v.fecha_salida || "";
     document.getElementById("hora_salida").value = v.hora_salida || "";
+    
     if (v.danos) document.querySelectorAll('input[name="danos"]').forEach(chk => chk.checked = v.danos.includes(chk.value));
     if (v.equipamiento) document.querySelectorAll('input[name="equipamiento"]').forEach(chk => chk.checked = v.equipamiento.includes(chk.value));
+    
     showView("form");
 });
 document.getElementById("btnEliminarVehiculo").addEventListener("click", () => {
@@ -1800,6 +1818,8 @@ function openVehicleDetail(vehicleId) {
                     <h3><i class="fa-solid fa-circle-info"></i> Información General</h3>
                     <div class="info-row"><span class="info-label">Propietario</span> <span class="info-val">${v.propietario}</span></div>
                     <div class="info-row"><span class="info-label">Cédula / RUC</span> <span class="info-val">${v.cedula || "-"}</span></div>
+                    <div class="info-row"><span class="info-label">Teléfono</span> <span class="info-val">${v.contacto || "-"}</span></div>
+                    <div class="info-row"><span class="info-label">Correo</span> <span class="info-val">${v.correo || "-"}</span></div>
                     <div class="info-row"><span class="info-label">Aseguradora</span> <span class="info-val">${v.aseguradora || "-"}</span></div>
                     <div class="info-row"><span class="info-label">Asesor</span> <span class="info-val">${v.asesor || "-"}</span></div>
                     <div class="info-row"><span class="info-label">Técnico</span> <span class="info-val">${v.tecnico || "Sin asignar"}</span></div>
@@ -1886,21 +1906,26 @@ function editarVehiculoDesdeDetalle(id) {
     const v = vehicles.find(x => x.id == id);
     if (!v) return;
     editingVehicleId = v.id;
-    // Llenar formulario con lógica existente
+    
     form.reset(); resetFormSelectionGroups();
+    
     document.getElementById("vin").value = v.vin || "";
     document.getElementById("placa").value = v.placa || "";
     document.getElementById("modelo").value = v.modelo || "";
     document.getElementById("propietario").value = v.propietario || "";
     document.getElementById("cedula").value = v.cedula || "";
+    document.getElementById("contacto").value = v.contacto || "";
+    document.getElementById("correo").value = v.correo || "";
     document.getElementById("aseguradora").value = v.aseguradora || "";
     document.getElementById("asesor").value = v.asesor || "";
     document.getElementById("tecnico").value = v.tecnico || "";
     document.getElementById("fecha_ingreso").value = v.fecha_ingreso || "";
     document.getElementById("fecha_salida").value = v.fecha_salida || "";
     document.getElementById("hora_salida").value = v.hora_salida || "";
+    
     if (v.danos) document.querySelectorAll('input[name="danos"]').forEach(chk => chk.checked = v.danos.includes(chk.value));
     if (v.equipamiento) document.querySelectorAll('input[name="equipamiento"]').forEach(chk => chk.checked = v.equipamiento.includes(chk.value));
+    
     showView("form");
 }
 
@@ -2853,4 +2878,5 @@ function editarDesdeFacturados(id) {
 
 </body>
 </html>
+
 
