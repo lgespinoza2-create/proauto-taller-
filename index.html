@@ -630,16 +630,7 @@
               <label class="checklist-item"><input type="checkbox" name="danos" value="Lateral derecho" /> Lateral derecho</label>
               <label class="checklist-item"><input type="checkbox" name="danos" value="Lateral izquierdo" /> Lateral izquierdo</label>
               <label class="checklist-item"><input type="checkbox" name="danos" value="Techo" /> Techo</label>
-            </div>
-          </div>
-          <div class="form-section-title">Equipamiento presente</div>
-          <div class="form-field" style="grid-column: 1 / -1;">
-            <div class="checklist-group">
-              <label class="checklist-item"><input type="checkbox" name="equipamiento" value="Llave / llavero" /> Llave / llavero</label>
-              <label class="checklist-item"><input type="checkbox" name="equipamiento" value="Espejos" /> Espejos</label>
-              <label class="checklist-item"><input type="checkbox" name="equipamiento" value="Radio / carátula" /> Radio / carátula</label>
-              <label class="checklist-item"><input type="checkbox" name="equipamiento" value="Llanta de emergencia" /> Llanta de emergencia</label>
-              <label class="checklist-item"><input type="checkbox" name="equipamiento" value="Herramientas" /> Herramientas</label>
+              <label class="checklist-item"><input type="checkbox" name="danos" value="Parabrisas/Vidrios" /> Parabrisas/Vidrios</label>
             </div>
           </div>
         </div>
@@ -805,7 +796,6 @@
         <div><span class="detalle-label">Estado actual:</span> <span id="detalle-estado" class="detalle-value"></span></div>
       </div>
       <div class="detalle-subsection-title">Partes afectadas</div><ul id="detalle-danos" class="detalle-list"></ul>
-      <div class="detalle-subsection-title">Equipamiento presente</div><ul id="detalle-equipamiento" class="detalle-list"></ul>
       <div class="detalle-subsection-title">Orden de trabajo adjunta</div><div id="detalle-archivo" class="detalle-archivo" style="font-size:12px;color:#555;margin-top:4px;"></div>
       <div class="detalle-subsection-title">Datos del cliente</div><div id="detalle-archivos-cliente" class="detalle-archivo"></div>
       <div class="detalle-subsection-title">Autorizaciones</div><div id="detalle-archivos-autorizaciones" class="detalle-archivo"></div>
@@ -1553,7 +1543,6 @@ form.addEventListener("submit", async function (e) {
   }
 
   const danos = formData.getAll("danos");
-  const equipamiento = formData.getAll("equipamiento");
 
   // 2. Procesar Archivos (Mantenemos tu lógica asíncrona)
   const archivosCliente = await procesarArchivosMultiple("archivos_cliente");
@@ -1873,8 +1862,6 @@ function openVehicleDetail(vehicleId) {
                 <div class="detail-card">
                     <h3><i class="fa-solid fa-car-crash"></i> Estado Inicial</h3>
                     <div style="font-size:12px; color:#555; margin-bottom:5px;"><strong>Daños:</strong> ${v.danos ? v.danos.join(", ") : "Ninguno"}</div>
-                    <div style="font-size:12px; color:#555;"><strong>Equipamiento:</strong> ${v.equipamiento ? v.equipamiento.join(", ") : "Ninguno"}</div>
-                </div>
             </div>
         </div>
     `;
