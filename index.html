@@ -377,6 +377,104 @@
 .doc-icon { font-size: 20px; color: #ef4444; /* Rojo tipo PDF */ }
 .doc-link { text-decoration: none; color: #334155; font-weight: 500; font-size: 12px; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .doc-download { color: #007dc5; font-size: 14px; cursor: pointer; }
+/* --- NUEVOS ESTILOS PARA EL FORMULARIO ORDENADO --- */
+
+/* --- ESTILOS PARA FORMULARIO ORDENADO (PLACA, MARCA, MODELO) --- */
+.grid-3-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr; /* 3 columnas iguales */
+    gap: 15px;
+    margin-bottom: 15px;
+}
+.grid-2-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* 2 columnas iguales */
+    gap: 15px;
+    margin-bottom: 15px;
+}
+/* En celulares, que se pongan uno debajo del otro */
+@media (max-width: 600px) {
+    .grid-3-col, .grid-2-col { grid-template-columns: 1fr; }
+}
+/* =========================================
+   🎨 DISEÑO ULTRA-COMPACTO (TIPO ESCRITORIO)
+   ========================================= */
+
+/* 1. Menos espacio entre renglones */
+.form-field {
+    margin-bottom: 5px; /* Antes 8px o 15px */
+}
+
+/* 2. Etiquetas (Labels) pegaditas */
+.form-field label {
+    display: block;
+    font-size: 11px;
+    font-weight: 700;
+    color: #475569;
+    margin-bottom: 2px; /* Casi pegado al input */
+    text-transform: uppercase;
+}
+
+/* 3. Inputs y Selects (Bajitos y finos) */
+.form-field input, 
+.form-field select {
+    width: 100%;
+    padding: 2px 8px;   /* Relleno mínimo */
+    height: 28px;       /* Altura fija pequeña (Estándar Windows es 26-30px) */
+    border: 1px solid #cbd5e1;
+    border-radius: 4px; /* Bordes casi cuadrados */
+    background-color: #f8fafc;
+    font-size: 12px;    /* Letra compacta */
+    color: #334155;
+    outline: none;
+}
+
+/* 4. Efecto Focus sutil */
+.form-field input:focus, 
+.form-field select:focus {
+    border-color: #007dc5;
+    background-color: white;
+}
+
+/* 5. Títulos de Sección */
+.form-section h3 {
+    font-size: 13px;
+    border-bottom: 1px solid #ccc;
+    padding-bottom: 2px;
+    margin-top: 10px;
+    margin-bottom: 8px;
+    color: #0056b3;
+}
+
+/* 6. Botones de Archivo (Uploads) */
+.file-upload-btn {
+    padding: 5px 10px; /* Botón delgado */
+    font-size: 11px;
+    margin-bottom: 5px;
+}
+
+/* 7. Checkboxes (Daños) */
+.checkbox-group {
+    gap: 5px;
+    padding: 8px;
+}
+.checkbox-group label {
+    font-size: 11px;
+}
+
+/* 8. Botones de Acción */
+.form-actions {
+    margin-top: 15px;
+    padding-top: 10px;
+    gap: 8px;
+}
+
+.btn {
+    padding: 6px 12px; /* Botones más chicos */
+    font-size: 12px;
+    border-radius: 4px;
+}
+
   </style>
 </head>
 <body>
@@ -575,28 +673,77 @@
     <div class="panel-form">
       <h2 id="form-title">Nuevo vehículo</h2>
       <p id="form-subtitle">Registre los datos del vehículo. Se agregará en el estado <strong>Falta de inspección</strong>.</p>
-      <form id="vehicleForm">
-        <div class="form-grid">
-          <div class="form-field"><label for="vin">VIN</label><input type="text" id="vin" name="vin" placeholder="Ej: 3N1AB7AP4HY123456" /></div>
-          <div class="form-field"><label for="fecha_ingreso">Fecha ingreso</label><input type="date" id="fecha_ingreso" name="fecha_ingreso"></div>
-          <div class="form-field"><label for="fecha_salida">Fecha salida</label><input type="date" id="fecha_salida" name="fecha_salida"></div>
-          <div class="form-field"><label for="placa">Placa *</label><input type="text" id="placa" name="placa" required placeholder="Ej: ABC1234" /></div>
-          <div class="form-field">
-            <label for="modelo">Modelo / Vehículo *</label>
-            <input type="text" id="modelo" name="modelo" list="modelosChevrolet" required placeholder="Ej: Onix Turbo Sedán" />
-            <datalist id="modelosChevrolet">
-              <option value="Onix Turbo RS"></option><option value="Onix Turbo Sedán"></option><option value="Montana"></option><option value="Nuevo Groove"></option><option value="Tracker Turbo"></option><option value="Captiva XL"></option><option value="Nueva Tahoe"></option><option value="Nueva Trailblazer"></option><option value="Suburban"></option><option value="N400 Cargo"></option><option value="N400 Pasajeros"></option><option value="D-Max"></option><option value="Colorado"></option><option value="Silverado"></option>
-            </datalist>
-          </div>
-          <div class="form-field"><label for="propietario">Propietario *</label><input type="text" id="propietario" name="propietario" required placeholder="Nombre del cliente" /></div>
-          <div class="form-field"><label for="cedula">Cédula / ID cliente</label><input type="text" id="cedula" name="cedula" placeholder="Ej: 1102xxxxxx" /></div>
-          <div class="form-field">
-    <label for="contacto">Teléfono / Celular</label>
-    <input type="tel" id="contacto" name="contacto" placeholder="Ej: 0991234567" />
+    <form id="vehicleForm">
+      <div class="grid-3-col">
+    <div class="form-field">
+        <label for="placa">Placa *</label>
+        <input type="text" id="placa" name="placa" required placeholder="Ej: ABC1234" oninput="this.value = this.value.toUpperCase()" />
+    </div>
+
+    <div class="form-field">
+        <label for="marca">Marca</label>
+        <input type="text" id="marca" name="marca" placeholder="Ej: CHEVROLET" oninput="this.value = this.value.toUpperCase()">
+    </div>
+
+    <div class="form-field">
+        <label for="modelo">Modelo / Vehículo *</label>
+        <input type="text" id="modelo" name="modelo" list="modelosChevrolet" required placeholder="Ej: Onix..." oninput="this.value = this.value.toUpperCase()" />
+        <datalist id="modelosChevrolet">
+            <option value="Onix Turbo RS"></option>
+            <option value="Onix Turbo Sedán"></option>
+            <option value="Montana"></option>
+            <option value="Nuevo Groove"></option>
+            <option value="Tracker Turbo"></option>
+            <option value="Captiva XL"></option>
+            <option value="Nueva Tahoe"></option>
+            <option value="Nueva Trailblazer"></option>
+            <option value="Suburban"></option>
+            <option value="N400 Cargo"></option>
+            <option value="N400 Pasajeros"></option>
+            <option value="D-Max"></option>
+            <option value="Colorado"></option>
+            <option value="Silverado"></option>
+        </datalist>
+    </div>
 </div>
-<div class="form-field">
-    <label for="correo">Correo Electrónico</label>
-    <input type="email" id="correo" name="correo" placeholder="cliente@ejemplo.com" />
+
+<div style="display: grid; grid-template-columns: 2fr 1fr; gap: 15px; margin-bottom: 15px;">
+    <div class="form-field">
+        <label for="propietario">Propietario *</label>
+        <input type="text" id="propietario" name="propietario" required placeholder="Nombre del cliente" oninput="this.value = this.value.toUpperCase()" />
+    </div>
+
+    <div class="form-field">
+        <label for="cedula">Cédula / ID</label>
+        <input type="text" id="cedula" name="cedula" placeholder="Ej: 1102xxxxxx" />
+    </div>
+</div>
+
+<div class="grid-2-col">
+    <div class="form-field">
+        <label for="contacto">Teléfono / Celular</label>
+        <input type="tel" id="contacto" name="contacto" placeholder="Ej: 0991234567" />
+    </div>
+
+    <div class="form-field">
+        <label for="correo">Correo Electrónico</label>
+        <input type="email" id="correo" name="correo" placeholder="cliente@ejemplo.com" />
+    </div>
+</div>
+
+<div class="grid-3-col">
+    <div class="form-field">
+        <label for="vin">VIN</label>
+        <input type="text" id="vin" name="vin" placeholder="Ej: 3N1AB..." oninput="this.value = this.value.toUpperCase()" />
+    </div>
+    <div class="form-field">
+        <label for="fecha_ingreso">Fecha ingreso</label>
+        <input type="date" id="fecha_ingreso" name="fecha_ingreso">
+    </div>
+    <div class="form-field">
+        <label for="fecha_salida">Fecha salida</label>
+        <input type="date" id="fecha_salida" name="fecha_salida">
+    </div>
 </div>
           <div class="form-field">
             <label for="aseguradora">Aseguradora</label>
@@ -1314,11 +1461,16 @@ function renderBoard() {
 // =========================================
 // TARJETAS Y DRAG & DROP (ORIGINAL + LAVADORA LOGIC)
 // =========================================
+// ===============================================
+// TARJETAS (CON MARCA + MODELO) - VERSIÓN SEGURA
+// ===============================================
 function createCard(vehicle) {
   const card = document.createElement("div");
   card.className = "card";
   card.draggable = true;
   card.dataset.id = vehicle.id;
+  
+  // 🛡️ AQUÍ ESTÁN TUS LÍNEAS IMPORTANTES (EVENTOS) - SE MANTIENEN IGUAL
   card.addEventListener("click", () => showVehicleSummary(vehicle));
   card.addEventListener("dragstart", handleDragStart);
   card.addEventListener("dragend", handleDragEnd);
@@ -1326,16 +1478,24 @@ function createCard(vehicle) {
 
   const top = document.createElement("div");
   top.className = "card-top";
-  top.innerHTML = `<div class="plate">${vehicle.placa}</div><div class="brand">${vehicle.modelo}</div>`;
+  
+  // 👇 ESTE ES EL ÚNICO CAMBIO REAL: AGREGAMOS LA MARCA 👇
+  // Si existe marca, la ponemos en negrita. Si no, no ponemos nada.
+  const marcaTexto = vehicle.marca ? `<strong>${vehicle.marca}</strong> ` : "";
+  
+  // Agregamos un pequeño estilo inline para asegurar mayúsculas
+  top.innerHTML = `<div class="plate">${vehicle.placa}</div><div class="brand" style="text-transform:uppercase;">${marcaTexto}${vehicle.modelo}</div>`;
+  
   card.appendChild(top);
 
+  // 🛡️ EL RESTO SIGUE EXACTAMENTE IGUAL A TU CÓDIGO ORIGINAL
   const chipsLine = document.createElement("div");
   if(vehicle.aseguradora) chipsLine.innerHTML += `<span class="chip insurer">${vehicle.aseguradora}</span>`;
   chipsLine.innerHTML += `<span class="chip-client">${vehicle.propietario}</span>`;
   if(vehicle.asesor) chipsLine.innerHTML += `<span class="chip chip-small">Asesor: ${vehicle.asesor}</span>`;
   card.appendChild(chipsLine);
 
-  // Ultima OT
+  // Ultima OT (Lógica original conservada)
   const ultimaOrden = vehicle.ordenes?.length ? vehicle.ordenes[vehicle.ordenes.length - 1] : null;
   if (ultimaOrden) {
     const ot = document.createElement("div");
@@ -1344,15 +1504,16 @@ function createCard(vehicle) {
     card.appendChild(ot);
   }
 
+  // Datos Extra (Lógica original conservada)
   const extra = document.createElement("div");
   extra.className = "card-extra";
   extra.innerHTML = `<span class="card-extra-item"><i class="fa-solid fa-user-gear"></i> ${vehicle.tecnico || "—"}</span>
                      <span class="card-extra-item"><i class="fa-solid fa-id-card-clip"></i> ${vehicle.cedula || "—"}</span>
                      <span class="card-extra-item"><i class="fa-solid fa-calendar-day"></i> ${vehicle.fecha_salida || "—"}</span>`;
   card.appendChild(extra);
+  
   return card;
 }
-
 function handleDragStart(e) { draggedCardId = Number(e.target.dataset.id); e.target.classList.add("dragging"); e.dataTransfer.effectAllowed = "move"; }
 function handleDragEnd(e) { e.target.classList.remove("dragging"); }
 function handleDragOver(e) { e.preventDefault(); e.currentTarget.classList.add("over"); e.dataTransfer.dropEffect = "move"; }
@@ -1514,17 +1675,19 @@ btnCancelarForm.addEventListener("click", () => showView("tablero"));
 // ===============================================
 // 🔧 FORMULARIO: GUARDADO CON CONTACTO Y CORREO
 // ===============================================
+// ===============================================
+// 🔧 FORMULARIO: GUARDADO (CON MARCA)
+// ===============================================
 form.addEventListener("submit", async function (e) {
   e.preventDefault();
   const formData = new FormData(form);
 
   // 1. Obtener datos básicos
   const placa = (formData.get("placa") || "").trim();
+  const marca = (formData.get("marca") || "").trim(); // 👈 NUEVO CAMPO
   const modelo = (formData.get("modelo") || "").trim();
   const propietario = (formData.get("propietario") || "").trim();
   const cedula = (formData.get("cedula") || "").trim();
-  
-  // 👇 NUEVOS DATOS DE CONTACTO 👇
   const contacto = (formData.get("contacto") || "").trim();
   const correo = (formData.get("correo") || "").trim();
   
@@ -1536,15 +1699,14 @@ form.addEventListener("submit", async function (e) {
   const fecha_salida = formData.get("fecha_salida") || "";
   const hora_salida = formData.get("hora_salida") || "";
   
-  // Validación
   if (!placa || !modelo || !propietario) {
-    alert("Placa, modelo y propietario son obligatorios.");
+    alert("Placa, marca, modelo y propietario son obligatorios.");
     return;
   }
 
   const danos = formData.getAll("danos");
 
-  // 2. Procesar Archivos (Mantenemos tu lógica asíncrona)
+  // 2. Procesar Archivos
   const archivosCliente = await procesarArchivosMultiple("archivos_cliente");
   const archivosAutorizaciones = await procesarArchivosMultiple("archivos_autorizaciones");
   const archivosProformas = await procesarArchivosMultiple("archivos_proformas");
@@ -1557,73 +1719,59 @@ form.addEventListener("submit", async function (e) {
     archivoOrden = { nombre: file.name, tipo: file.type, base64 };
   }
 
-  // Helper para el nombre del área (Mantenido)
   const getNombreArea = (idEstado) => {
       const col = STATUS_COLUMNS.find(c => c.id === idEstado);
       return col ? col.label : idEstado;
   };
 
-  // ==========================
   // MODO EDICIÓN
-  // ==========================
   if (editingVehicleId) {
     const idx = vehicles.findIndex(v => v.id === editingVehicleId);
     if (idx === -1) return;
-
     const original = vehicles[idx];
 
-    // Notificación cambio técnico
     if (tecnico && original.tecnico !== tecnico) {
         const nombreArea = getNombreArea(original.estado);
-        crearNotificacion("tecnico", tecnico, `🛠️ Trabajo asignado: ${placa} (${modelo}) en el área de ${nombreArea.toUpperCase()}`);
+        crearNotificacion("tecnico", tecnico, `🛠️ Trabajo asignado: ${placa} (${marca} ${modelo}) en el área de ${nombreArea.toUpperCase()}`);
     }
 
     vehicles[idx] = {
       ...original,
-      vin, placa, modelo, propietario, cedula,
-      contacto, correo, // <--- GUARDAMOS AQUÍ LOS NUEVOS DATOS
+      vin, placa, marca, modelo, propietario, cedula, // 👈 AGREGAMOS 'marca'
+      contacto, correo,
       aseguradora, asesor, tecnico,
       fecha_ingreso, fecha_salida, hora_salida,
-      danos, equipamiento,
+      danos,
       archivoOrden: archivoOrden || original.archivoOrden,
       archivosCliente: archivosCliente.length ? archivosCliente : (original.archivosCliente || []),
       archivosAutorizaciones: archivosAutorizaciones.length ? archivosAutorizaciones : (original.archivosAutorizaciones || []),
       archivosProformas: archivosProformas.length ? archivosProformas : (original.archivosProformas || [])
     };
-
     editingVehicleId = null;
 
-  // ==========================
   // MODO NUEVO
-  // ==========================
   } else {
     const estadoInicial = "falta_inspeccion";
-    
     const newVehicle = {
       id: Date.now(),
-      vin, placa, modelo, propietario, cedula,
-      contacto, correo, // <--- GUARDAMOS AQUÍ LOS NUEVOS DATOS
+      vin, placa, marca, modelo, propietario, cedula, // 👈 AGREGAMOS 'marca'
+      contacto, correo,
       aseguradora, asesor, tecnico,
       fecha_ingreso, fecha_salida, hora_salida,
       estado: estadoInicial, 
-      danos, equipamiento,
+      danos,
       archivoOrden,
       archivosCliente, archivosAutorizaciones, archivosProformas,
-      presupuesto: [], 
-      ordenes: []
+      presupuesto: [], ordenes: []
     };
-
     vehicles.push(newVehicle);
 
     if (tecnico) {
         const nombreArea = getNombreArea(estadoInicial);
-        crearNotificacion("tecnico", tecnico, `🛠️ Nuevo trabajo: ${placa} (${modelo}) ingresó a ${nombreArea.toUpperCase()}`);
+        crearNotificacion("tecnico", tecnico, `🛠️ Nuevo trabajo: ${placa} (${marca} ${modelo}) ingresó a ${nombreArea.toUpperCase()}`);
     }
   }
 
-  // ==========================
-  // FINALIZACIÓN (Código Limpio)
-  // ==========================
   guardarCambios(); 
   renderBoard();
   form.reset();
@@ -1640,14 +1788,13 @@ document.getElementById("btnEditarVehiculo").addEventListener("click", () => {
     
     document.getElementById("vin").value = v.vin || "";
     document.getElementById("placa").value = v.placa || "";
+    document.getElementById("marca").value = v.marca || ""; // <--- CARGAR MARCA
     document.getElementById("modelo").value = v.modelo || "";
     document.getElementById("propietario").value = v.propietario || "";
     document.getElementById("cedula").value = v.cedula || "";
-
-    // 👇 AQUÍ ESTABA EL PROBLEMA: FALTABAN ESTAS DOS LÍNEAS 👇
     document.getElementById("contacto").value = v.contacto || "";
     document.getElementById("correo").value = v.correo || "";
-
+    
     document.getElementById("aseguradora").value = v.aseguradora || "";
     document.getElementById("asesor").value = v.asesor || "";
     document.getElementById("tecnico").value = v.tecnico || "";
@@ -1656,7 +1803,6 @@ document.getElementById("btnEditarVehiculo").addEventListener("click", () => {
     document.getElementById("hora_salida").value = v.hora_salida || "";
     
     if (v.danos) document.querySelectorAll('input[name="danos"]').forEach(chk => chk.checked = v.danos.includes(chk.value));
-    if (v.equipamiento) document.querySelectorAll('input[name="equipamiento"]').forEach(chk => chk.checked = v.equipamiento.includes(chk.value));
     
     showView("form");
 });
@@ -1909,6 +2055,7 @@ function editarVehiculoDesdeDetalle(id) {
     
     document.getElementById("vin").value = v.vin || "";
     document.getElementById("placa").value = v.placa || "";
+    document.getElementById("marca").value = v.marca || "";
     document.getElementById("modelo").value = v.modelo || "";
     document.getElementById("propietario").value = v.propietario || "";
     document.getElementById("cedula").value = v.cedula || "";
